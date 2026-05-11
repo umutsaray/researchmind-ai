@@ -2072,6 +2072,10 @@ def normalize_topic_seed(text: str) -> str:
         "erken tani": "early diagnosis",
         "görüntüleme": "medical imaging",
         "goruntuleme": "medical imaging",
+        "kamu harcamalari": "public expenditure",
+        "vergi uyumu": "tax compliance",
+        "mali surdurulebilirlik": "fiscal sustainability",
+        "butce": "budget",
     }
     lowered = clean.lower()
     for source, target in replacements.items():
@@ -2115,16 +2119,63 @@ def parse_topic_json(text: str) -> list[dict[str, str]]:
 
 def rule_based_topic_refinement(seed: str) -> list[dict[str, str]]:
     normalized = normalize_topic_seed(seed)
+    normalized_key = normalize_topic_key(normalized)
+
+    if any(term in normalized_key for term in ["tax compliance", "public expenditure", "fiscal sustainability", "public finance", "budget"]):
+        return [
+            {
+                "title": "AI-Assisted Tax Compliance and Public Expenditure Sustainability Analysis",
+                "rationale": "Connects tax compliance, public spending, and fiscal sustainability in a publishable analytics topic.",
+            },
+            {
+                "title": "Machine Learning-Based Fiscal Risk Assessment for Public Finance Sustainability",
+                "rationale": "Frames the topic around fiscal risk, predictive modeling, and public finance decision support.",
+            },
+            {
+                "title": "Data-Driven Analysis of Tax Compliance and Government Spending Efficiency",
+                "rationale": "Focuses on measurable public finance efficiency and compliance behavior.",
+            },
+            {
+                "title": "Predictive Analytics for Fiscal Sustainability and Public Budget Management",
+                "rationale": "Turns the keywords into a clear forecasting and budget management research direction.",
+            },
+            {
+                "title": "Explainable AI for Tax Compliance Risk Detection in Public Finance",
+                "rationale": "Adds explainability and risk detection for a stronger SCI-style contribution angle.",
+            },
+        ]
+
     suggestions = domain_adapted_suggestions(normalized)
     suggestions = naturalize_suggestions(suggestions, normalized)
     titles = synthesize_paper_titles({"query": normalized, "ai_topic_suggestions": suggestions}, min_count=5)
-    return [
+    topics = [
         {
             "title": title,
             "rationale": "Domain, method, modality, task and novelty angle were inferred from the provided keywords.",
         }
         for title in titles[:5]
     ]
+    if len(topics) >= 3:
+        return topics
+
+    fallback_base = title_case_topic(normalized or "Applied AI Research")
+    fallback_titles = [
+        f"Explainable AI Framework for {fallback_base}",
+        f"Data-Driven Decision Support for {fallback_base}",
+        f"Predictive Analytics and Validation Strategy for {fallback_base}",
+    ]
+    seen = {normalize_topic_key(item["title"]) for item in topics}
+    for title in fallback_titles:
+        key = normalize_topic_key(title)
+        if key not in seen:
+            seen.add(key)
+            topics.append({
+                "title": title,
+                "rationale": "Deterministic local fallback generated a complete research topic.",
+            })
+        if len(topics) >= 5:
+            break
+    return topics
 
 
 def call_llm_topic_refiner(provider: str, seed: str, api_key: str) -> list[dict[str, str]]:
@@ -2181,7 +2232,25 @@ def call_llm_topic_refiner(provider: str, seed: str, api_key: str) -> list[dict[
     return []
 
 
+TOPIC_PROVIDER_ENV_KEYS = {
+    "OpenAI": "OPENAI_API_KEY",
+    "Groq": "GROQ_API_KEY",
+    "Gemini": "GEMINI_API_KEY",
+}
+
+
+def auto_topic_provider_from_config() -> tuple[str, str]:
+    for provider in ["Groq", "OpenAI", "Gemini"]:
+        api_key = read_env_value(TOPIC_PROVIDER_ENV_KEYS[provider])
+        if api_key:
+            return provider, api_key
+    return "Rule-based", ""
+
+
 def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list[dict[str, str]], str]:
+    if not str(seed or "").strip():
+        return [], "No input"
+
     try:
         llm_topics = call_llm_topic_refiner(provider, seed, api_key)
         if llm_topics:
@@ -2189,7 +2258,13 @@ def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list
     except Exception as exc:
         st.session_state["topic_suggester_warning"] = f"LLM önerisi başarısız oldu; rule-based öneriler gösteriliyor. ({exc})"
 
-    return rule_based_topic_refinement(seed), "Rule-based fallback"
+    if provider != "Rule-based" and api_key:
+        st.session_state["topic_suggester_warning"] = (
+            "Konu önerme servisi şu anda yanıt vermedi. Yerel öneri motoru ile devam ediliyor."
+        )
+
+    fallback_topics = rule_based_topic_refinement(seed)
+    return fallback_topics[:5], "Rule-based fallback"
 
 
 QUERY_WIDGET_KEYS = {
@@ -2208,7 +2283,6 @@ def apply_suggested_research_topic(title: str) -> None:
     st.session_state["pending_research_topic"] = clean_title
     st.session_state["selected_research_topic"] = clean_title
     st.session_state["topic_transfer_notice"] = "Önerilen konu araştırma konusu alanına aktarıldı."
-    st.rerun()
 
 
 def sync_pending_research_topic(data_source: str) -> None:
@@ -2234,8 +2308,12 @@ def render_topic_suggester() -> None:
             key="topic_suggester_seed",
             height=90,
         )
+        if is_admin():
+            with st.expander("Konu önerme config durumu", expanded=False):
+                for name, env_key in TOPIC_PROVIDER_ENV_KEYS.items():
+                    st.caption(f"{name}: {'configured' if read_env_value(env_key) else 'missing'}")
         if demo_mode_enabled() and not is_admin():
-            provider = "Rule-based"
+            provider, api_key = auto_topic_provider_from_config()
         else:
             provider = st.selectbox(
                 "LLM sağlayıcı",
@@ -2244,10 +2322,10 @@ def render_topic_suggester() -> None:
                 help="API key yoksa ücretsiz/rule-based mod kullanılır.",
                 key="topic_suggester_provider",
             )
-        env_key_map = {"OpenAI": "OPENAI_API_KEY", "Groq": "GROQ_API_KEY", "Gemini": "GEMINI_API_KEY"}
-        api_key = ""
-        if provider != "Rule-based":
-            env_key = env_key_map[provider]
+        if not (demo_mode_enabled() and not is_admin()):
+            api_key = ""
+        if provider != "Rule-based" and ((not demo_mode_enabled()) or is_admin()):
+            env_key = TOPIC_PROVIDER_ENV_KEYS[provider]
             api_key = st.text_input(
                 f"{provider} API key",
                 value="",
@@ -2257,7 +2335,9 @@ def render_topic_suggester() -> None:
             ).strip() or read_env_value(env_key)
 
         if st.button("Konu Öner", use_container_width=True, key="suggest_research_topics_button"):
-            topics, mode = refine_research_topics(seed, provider, api_key)
+            with st.spinner("Konu önerileri üretiliyor..."):
+                topics, mode = refine_research_topics(seed, provider, api_key)
+            st.session_state["topic_suggestions"] = topics
             st.session_state["topic_suggester_results"] = topics
             st.session_state["topic_suggester_mode"] = mode
 
@@ -2265,7 +2345,7 @@ def render_topic_suggester() -> None:
         if warning:
             st.warning(warning)
 
-        topics = st.session_state.get("topic_suggester_results", [])
+        topics = st.session_state.get("topic_suggestions", st.session_state.get("topic_suggester_results", []))
         if topics:
             st.caption(f"Öneri modu: {st.session_state.get('topic_suggester_mode', 'Rule-based fallback')}")
             for index, item in enumerate(topics, start=1):
@@ -2275,7 +2355,7 @@ def render_topic_suggester() -> None:
                     st.caption(item["rationale"])
                 st.button(
                     "Bu konuyu analiz et",
-                    key=f"use_suggested_topic_{index}",
+                    key=f"use_suggested_topic_{index}_{hashlib.sha256(title.encode('utf-8')).hexdigest()[:8]}",
                     use_container_width=True,
                     on_click=apply_suggested_research_topic,
                     args=(title,),
