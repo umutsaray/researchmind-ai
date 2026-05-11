@@ -103,6 +103,31 @@ HEALTHCARE_BLACKLIST = {
 ENGINEERING_BIOMED_BLACKLIST = {
     "alzheimer", "dementia", "cancer", "patient cohort", "clinical validation",
     "mri", "pet", "biomarker", "diagnosis", "disease",
+    "clinical", "patient", "treatment", "healthcare", "clinical decision support",
+    "hospital", "population", "medical", "clinically meaningful endpoints",
+}
+
+ENGINEERING_LANGUAGE_REPLACEMENTS = {
+    "clinical decision support": "engineering decision support",
+    "clinically meaningful endpoints": "engineering performance metrics",
+    "clinical endpoints": "engineering performance metrics",
+    "patient population": "target infrastructure or engineering system",
+    "patient cohort": "engineering test cohort",
+    "external clinical evidence": "external engineering validation evidence",
+    "clinical evidence": "engineering validation evidence",
+    "clinical validation": "engineering validation",
+    "clinical records": "engineering system logs",
+    "patient": "engineering system",
+    "patients": "engineering systems",
+    "diagnosis": "fault detection",
+    "diagnostic": "fault-detection",
+    "treatment": "mitigation strategy",
+    "healthcare": "engineering systems",
+    "hospital": "field deployment environment",
+    "disease": "failure mode",
+    "medical": "engineering",
+    "population": "target infrastructure or engineering system",
+    "clinical": "engineering",
 }
 
 ENGINEERING_HEALTH_HYBRID_TERMS = {
@@ -861,6 +886,20 @@ def forbidden_terms_for_domain(selected_domain: str, query: str) -> set[str]:
 def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]:
     key = normalize_topic_key(query)
     if selected_domain == ENGINEERING_DOMAIN:
+        if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building", "infrastructure"]):
+            return {
+                "direction": "Explainable AI for seismic vulnerability and infrastructure resilience assessment",
+                "methodology": "structural health monitoring; finite element analysis; sensor fusion; seismic vulnerability modeling; reliability analysis",
+                "evidence": "structural sensor streams; ground-motion records; finite element simulations; benchmark infrastructure datasets",
+                "differentiation": "Differentiate the work through engineering performance metrics, benchmarked seismic scenarios, and interpretable resilience indicators.",
+            }
+        if any(term in key for term in ["cfd", "thermal", "heat transfer", "thermodynamics"]):
+            return {
+                "direction": "Simulation-driven thermal optimization using CFD and interpretable surrogate modeling",
+                "methodology": "CFD simulation; finite element analysis; optimization algorithms; surrogate modeling; benchmark validation",
+                "evidence": "simulation outputs; thermal boundary conditions; experimental benchmark datasets; engineering performance metrics",
+                "differentiation": "Differentiate the work through reproducible simulation protocols, optimization constraints, and validated thermal performance gains.",
+            }
         if any(term in key for term in ["uav", "drone", "swarm"]):
             return {
                 "direction": "Real-time UAV swarm threat detection using edge AI and computer vision",
@@ -871,7 +910,7 @@ def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]
         if any(term in key for term in ["wind turbine", "digital twin", "predictive maintenance"]):
             return {
                 "direction": "Digital twin-enabled predictive maintenance for wind turbine reliability",
-                "methodology": "digital twin modeling; fault diagnosis; time-series forecasting; sensor fusion; reliability analysis",
+                "methodology": "digital twin modeling; fault detection; time-series forecasting; sensor fusion; reliability analysis",
                 "evidence": "SCADA signals; vibration/temperature sensors; turbine fault logs; simulation-based validation",
                 "differentiation": "Differentiate the work through physics-informed digital twins, multi-sensor evidence, and season-level reliability validation.",
             }
@@ -900,17 +939,29 @@ def domain_specific_insight(query: str, selected_domain: str) -> str:
 
 def domain_specific_paperability_reason(query: str, selected_domain: str) -> str:
     if selected_domain == ENGINEERING_DOMAIN:
-        return "Engineering evidence such as sensor streams, simulation results, benchmark datasets and reliability metrics improves publication feasibility."
+        return "Engineering evidence such as sensor streams, simulation results, benchmark datasets, reliability analysis and engineering performance metrics improves publication feasibility."
     return domain_evidence_reason(query)
+
+
+def sanitize_engineering_language(text: str) -> str:
+    clean = str(text or "")
+    for source, target in sorted(ENGINEERING_LANGUAGE_REPLACEMENTS.items(), key=lambda item: len(item[0]), reverse=True):
+        pattern = rf"(?<![A-Za-z0-9]){re.escape(source)}(?![A-Za-z0-9])"
+        clean = re.sub(pattern, target, clean, flags=re.I)
+    return clean
 
 
 def domain_narrowing_for_selected(query: str, selected_domain: str) -> str:
     if selected_domain == ENGINEERING_DOMAIN:
         key = normalize_topic_key(query)
+        if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building"]):
+            return "Narrow the topic around structural health monitoring, seismic vulnerability indicators, finite element or sensor-fusion validation, and engineering performance metrics for a defined infrastructure class."
+        if any(term in key for term in ["cfd", "thermal", "heat transfer"]):
+            return "Narrow the topic around CFD/FEM simulation, thermal optimization objectives, benchmark validation and measurable engineering performance metrics."
         if "uav" in key or "drone" in key:
             return "Narrow the topic around UAV swarm computer vision, edge AI deployment, real-time threat detection metrics and benchmarked robustness validation."
         if "wind turbine" in key:
-            return "Narrow the topic around digital twin modeling, multi-sensor fusion, fault diagnosis and season-level reliability validation for wind turbines."
+            return "Narrow the topic around digital twin modeling, multi-sensor fusion, fault detection and season-level reliability validation for wind turbines."
         return "Narrow the topic around a specific engineering system, measurable performance metric, benchmark dataset and deployment-oriented validation protocol."
     return domain_narrowing_direction(query)
 
@@ -924,7 +975,7 @@ def apply_domain_guard_to_results(results: dict) -> dict:
 
     def has_forbidden(text: str) -> bool:
         key = normalize_topic_key(text)
-        found = {term for term in forbidden if term in key}
+        found = {term for term in forbidden if normalize_topic_key(term) and re.search(rf"(?<![a-z0-9]){re.escape(normalize_topic_key(term))}(?![a-z0-9])", key)}
         leakage_terms.update(found)
         return bool(found)
 
@@ -947,6 +998,10 @@ def apply_domain_guard_to_results(results: dict) -> dict:
                 filtered = pd.concat([filtered, fallback], ignore_index=True).drop_duplicates(subset=[title_col], keep="first")
             results["ai_topic_suggestions"] = filtered.head(8)
 
+    if selected_domain == ENGINEERING_DOMAIN:
+        results["ai_research_insight"] = sanitize_engineering_language(
+            results.get("ai_research_insight") or domain_specific_insight(query, selected_domain)
+        )
     if forbidden and has_forbidden(results.get("ai_research_insight", "")):
         results["ai_research_insight"] = domain_specific_insight(query, selected_domain)
         corrected += 1
@@ -970,7 +1025,23 @@ def apply_domain_guard_to_results(results: dict) -> dict:
         if selected_domain == ENGINEERING_DOMAIN or has_forbidden(paperability.get("recommended_next_action", "")):
             paperability["recommended_next_action"] = domain_narrowing_for_selected(query, selected_domain)
             corrected += 1
+        if selected_domain == ENGINEERING_DOMAIN:
+            paperability["reasons"] = [sanitize_engineering_language(reason) for reason in paperability["reasons"]]
+            paperability["recommended_next_action"] = sanitize_engineering_language(paperability.get("recommended_next_action", ""))
+            metrics = []
+            for metric in paperability.get("metrics", []):
+                item = dict(metric)
+                item["metric"] = sanitize_engineering_language(item.get("metric", ""))
+                if item["metric"].lower().startswith("engineering / practical"):
+                    item["metric"] = "Engineering / Practical Relevance"
+                item["comment"] = sanitize_engineering_language(item.get("comment", ""))
+                metrics.append(item)
+            paperability["metrics"] = metrics
         results["paperability_score"] = paperability
+
+    if selected_domain == ENGINEERING_DOMAIN:
+        strategy = {key: sanitize_engineering_language(value) for key, value in dict(results.get("research_strategy") or {}).items()}
+        results["research_strategy"] = strategy
 
     inferred = infer_research_domain(query)
     leakage_score = round(min(1.0, len(leakage_terms) / 5), 2)
@@ -2391,7 +2462,23 @@ def parse_topic_json(text: str) -> list[dict[str, str]]:
 
 def engineering_topic_refinement(seed: str) -> list[dict[str, str]]:
     key = normalize_topic_key(normalize_topic_seed(seed))
-    if any(term in key for term in ["uav", "drone", "swarm", "robotics"]):
+    if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building", "shm"]):
+        titles = [
+            "Explainable AI for Seismic Risk Stratification of Critical Infrastructure",
+            "Physics-Informed Machine Learning for Structural Health Monitoring under Earthquake Loads",
+            "Sensor Fusion-Based Seismic Vulnerability Assessment for Bridge and Building Systems",
+            "Finite Element-Guided Deep Learning for Infrastructure Resilience Evaluation",
+            "Interpretable Reliability Analysis for Earthquake-Resilient Structural Systems",
+        ]
+    elif any(term in key for term in ["cfd", "thermal", "heat transfer", "thermodynamics"]):
+        titles = [
+            "CFD-Guided Surrogate Modeling for Thermal System Optimization",
+            "Physics-Informed Deep Learning for Heat Transfer Prediction in Engineering Systems",
+            "Simulation-Based Thermal Optimization Using Finite Element and CFD Benchmarks",
+            "Explainable Machine Learning for Real-Time Thermal Performance Monitoring",
+            "Multi-Objective Optimization of Heat Transfer Systems with CFD-Validated Models",
+        ]
+    elif any(term in key for term in ["uav", "drone", "swarm", "robotics"]):
         titles = [
             "Edge AI-Based Computer Vision for Real-Time UAV Swarm Threat Detection",
             "Vision Transformer Models for Autonomous UAV Swarm Surveillance and Threat Assessment",
@@ -2401,7 +2488,7 @@ def engineering_topic_refinement(seed: str) -> list[dict[str, str]]:
         ]
     elif any(term in key for term in ["wind turbine", "digital twin", "predictive maintenance", "fault"]):
         titles = [
-            "Digital Twin-Driven Predictive Maintenance for Wind Turbine Fault Diagnosis",
+            "Digital Twin-Driven Predictive Maintenance for Wind Turbine Fault Detection",
             "Sensor Fusion and Time-Series Forecasting for Wind Turbine Health Monitoring",
             "Physics-Informed Digital Twins for Reliability Analysis in Wind Energy Systems",
             "Anomaly Detection Models for Real-Time Wind Turbine Predictive Maintenance",
@@ -3538,6 +3625,7 @@ def build_executive_summary(results: dict) -> str:
     gap = results.get("gap_score") or {}
     domain = results.get("domain_reasoning") or {}
     paperability = results.get("paperability_score") or {}
+    selected_domain = results.get("selected_domain", current_selected_domain())
     strategic = parse_numeric(results.get("strategic_opportunity_score"))
     paper_score = parse_numeric(paperability.get("total_score"))
     matched = parse_numeric(gap.get("total_records"))
@@ -3565,6 +3653,16 @@ def build_executive_summary(results: dict) -> str:
         pubmed_note = " PubMed returned no results for this specific query; OpenAlex was used for the analysis."
     elif diagnostics.get("pubmed_final_status") == "service_unavailable":
         pubmed_note = " PubMed temporarily unavailable; OpenAlex results were used for analysis."
+
+    if selected_domain == ENGINEERING_DOMAIN:
+        return sanitize_engineering_language(
+            f"This topic represents {competition} and {opportunity_phrase} engineering research area. "
+            f"The current evidence landscape should be evaluated through benchmark datasets, simulation evidence, "
+            f"real-time monitoring constraints, and engineering performance metrics, {growth_phrase}. "
+            f"Based on the combined opportunity, domain consistency, and paperability signals, the topic shows "
+            f"{publication_phrase}, provided the study is framed around a specific engineering system, validation protocol, "
+            f"and measurable reliability or optimization contribution."
+        )
 
     return (
         f"This topic represents {competition} and {opportunity_phrase} research area within {clinical_domain}. "
@@ -3700,7 +3798,13 @@ def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
         if len(clean_titles) >= min_count:
             break
     if len(clean_titles) < min_count:
-        fallback_titles = domain_adapted_suggestions(query)
+        if selected_domain == ENGINEERING_DOMAIN:
+            fallback_titles = pd.DataFrame(
+                [(item["title"],) for item in engineering_topic_refinement(query)],
+                columns=["suggested_research_topic"],
+            )
+        else:
+            fallback_titles = domain_adapted_suggestions(query)
         if "suggested_research_topic" in fallback_titles.columns:
             for title in fallback_titles["suggested_research_topic"].dropna().astype(str).tolist():
                 key = normalize_topic_key(title)
@@ -3719,12 +3823,30 @@ def build_opportunity_analysis(results: dict) -> dict[str, str]:
     strategic = parse_numeric(results.get("strategic_opportunity_score"))
     paper_score = parse_numeric(paperability.get("total_score"))
     domain = results.get("domain_reasoning") or {}
+    selected_domain = results.get("selected_domain", current_selected_domain())
 
     competition = (
         "The field appears crowded and requires a narrow claim." if matched > 250
         else "The field is competitive but still differentiable with a focused method." if matched > 50
         else "The field has manageable competition and room for positioning."
     )
+    if selected_domain == ENGINEERING_DOMAIN:
+        novelty = (
+            "Novelty is strongest when the topic is framed around a specific engineering system, validation benchmark, and measurable performance contribution."
+            if strategic >= 60 else
+            "Novelty should be strengthened by narrowing the target infrastructure or engineering system, data source, and validation benchmark."
+        )
+        relevance = "Engineering relevance is supported by reliability, resilience, optimization, real-time monitoring, or deployment-oriented performance metrics."
+        method = "Methodological strength is supported by sensor fusion, simulation, anomaly detection, digital twin modeling, or benchmarked optimization." if paper_score >= 60 else "Methodological strength should be increased through stronger baselines, simulations and reliability analysis."
+        dataset = "Dataset feasibility depends on access to sensor streams, simulation outputs, benchmark datasets, system logs, or field measurements."
+        return {
+            "Competition Level": competition,
+            "Novelty Potential": novelty,
+            "Engineering Relevance": relevance,
+            "Methodological Strength": method,
+            "Dataset Feasibility": dataset,
+        }
+
     novelty = (
         "Novelty is strongest when the topic is framed around a specific clinical validation and method combination."
         if strategic >= 60 else
@@ -3746,8 +3868,27 @@ def build_opportunity_analysis(results: dict) -> dict[str, str]:
 def final_strategic_recommendation(results: dict) -> str:
     paperability = results.get("paperability_score") or {}
     domain = results.get("domain_reasoning") or {}
+    selected_domain = results.get("selected_domain", current_selected_domain())
     score = parse_numeric(paperability.get("total_score"))
     consistency = domain.get("domain_consistency", "Medium")
+
+    if selected_domain == ENGINEERING_DOMAIN:
+        if score >= 70 and consistency == "High":
+            return (
+                "This engineering topic should be pursued with a narrow system boundary, explicit engineering performance metrics, "
+                "and benchmarked validation. A focus on sensor fusion, simulation-backed evidence, reliability analysis, or real-time "
+                "deployment constraints would improve differentiation compared with generic AI-for-engineering studies."
+            )
+        if score >= 50:
+            return (
+                "This engineering topic is worth pursuing after refinement. The strongest path is to define the target infrastructure "
+                "or engineering system, select benchmark datasets or simulation scenarios, and position the contribution around measurable "
+                "reliability, optimization, resilience, or monitoring gains."
+            )
+        return (
+            "This engineering topic should be reframed before execution. Publication potential depends on clearer system boundaries, "
+            "stronger validation evidence, and defensible engineering performance metrics."
+        )
 
     if score >= 70 and consistency == "High":
         return (
@@ -3889,9 +4030,14 @@ def generate_executive_pdf_report(results: dict, output_path: str | Path, summar
         ])))
 
         story.append(p("Research Strategy Recommendations", h1))
+        validation_strategy = (
+            "Prioritize benchmark datasets, simulation-based validation, engineering performance metrics, and transparent error analysis."
+            if results.get("selected_domain") == ENGINEERING_DOMAIN
+            else "Prioritize external validation, clinically meaningful endpoints, and transparent error analysis."
+        )
         strategy_rows = [
             [p("Recommended Methodology", h2), p(strategy.get("methodology", "-"), body)],
-            [p("Suggested Validation Strategy", h2), p("Prioritize external validation, clinically meaningful endpoints, and transparent error analysis.", body)],
+            [p("Suggested Validation Strategy", h2), p(validation_strategy, body)],
             [p("Dataset / Evidence Focus", h2), p(strategy.get("evidence", "-"), body)],
             [p("Differentiation Strategy", h2), p(strategy.get("differentiation", "-"), body)],
         ]
