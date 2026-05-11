@@ -9,6 +9,7 @@ import re
 import shutil
 import time
 import traceback
+import unicodedata
 
 import pandas as pd
 import plotly.express as px
@@ -58,40 +59,40 @@ HEALTHCARE_DOMAIN = "Healthcare & Biomedical Sciences"
 ENGINEERING_DOMAIN = "Engineering & Applied Technologies"
 ACTIVE_RESEARCH_DOMAINS = [HEALTHCARE_DOMAIN, ENGINEERING_DOMAIN]
 DOMAIN_SUPPORT_WARNING = (
-    "Bu demo surumunde yalnizca saglik/biyomedikal ve muhendislik alanlari desteklenmektedir. "
-    "Lutfen konunuzu bu alanlardan biriyle iliskilendirerek tekrar deneyin."
+    "Bu demo sürümünde yalnızca sağlık/biyomedikal ve mühendislik alanları desteklenmektedir. "
+    "Lütfen konunuzu bu alanlardan biriyle ilişkilendirerek tekrar deneyin."
 )
 
-UNSUPPORTED_DOMAIN_TERMS = {
-    "tax compliance", "fiscal sustainability", "public expenditure", "macroeconomic",
+ENGINEERING_KEYWORDS = [
+    "engineering", "seismic", "earthquake", "structural", "civil engineering",
+    "bridge", "building", "construction", "geotechnical", "infrastructure",
+    "structural health monitoring", "shm", "cfd", "finite element",
+    "thermodynamics", "heat transfer", "robotics", "uav", "drone",
+    "wireless communication", "signal processing", "iot", "embedded systems",
+    "microcontroller", "power systems", "renewable energy", "machine learning",
+    "deep learning", "computer vision", "cybersecurity", "blockchain",
+    "materials", "nanomaterials", "composite materials", "3d printing",
+    "manufacturing", "optimization", "simulation", "digital twin", "control systems",
+]
+
+HEALTHCARE_KEYWORDS = [
+    "healthcare", "medical", "clinical", "disease", "patient", "mri", "ct",
+    "eeg", "ecg", "alzheimer", "cancer", "diagnosis", "treatment", "hospital",
+    "biosensor", "radiology", "genomics", "neurology", "cardiology",
+    "public health", "medical imaging", "wearable health", "digital health",
+]
+
+BLOCKED_KEYWORDS = [
+    "tax", "taxation", "fiscal", "economics", "public expenditure", "inflation",
+    "banking", "monetary policy", "stock market", "cryptocurrency trading",
+    "accounting", "audit", "tax compliance", "fiscal sustainability",
     "government spending", "budget deficit", "public finance", "fiscal risk",
-    "public spending", "fiscal", "tax", "vergi uyumu", "kamu harcamalar", "mali surdur",
-    "education policy", "curriculum", "student achievement", "social sciences",
-    "agriculture", "law", "legal", "business management", "marketing",
-}
+    "public spending", "vergi uyumu", "kamu harcamalar", "mali surdur",
+]
 
-HEALTHCARE_TERMS = {
-    "medicine", "biomedical", "medical imaging", "radiology", "mri", "pet", "ct",
-    "ultrasound", "eeg", "ecg", "emg", "clinical decision support", "diagnosis",
-    "alzheimer", "parkinson", "dementia", "autism", "cancer", "oncology",
-    "pathology", "histopathology", "genomics", "bioinformatics", "biomarker",
-    "digital health", "telemedicine", "hospital", "medical device", "wearable health",
-    "rehabilitation", "public health", "epidemiology", "federated healthcare",
-    "explainable medical",
-}
-
-ENGINEERING_TERMS = {
-    "engineering", "electrical", "electronics", "computer engineering", "software",
-    "artificial intelligence engineering", "mechanical", "civil engineering",
-    "environmental engineering", "industrial engineering", "energy systems",
-    "renewable energy", "wind turbine", "solar", "smart grid", "power electronics",
-    "wireless communication", "iot", "edge ai", "uav", "drone", "robotics",
-    "autonomous", "digital twin", "predictive maintenance", "structural health",
-    "fault detection", "signal processing", "image processing", "control systems",
-    "optimization", "cfd", "fem", "materials", "manufacturing", "smart cities",
-    "transportation", "traffic", "cybersecurity", "embedded systems",
-    "computer vision", "threat detection", "swarm", "uav swarm",
-}
+UNSUPPORTED_DOMAIN_TERMS = set(BLOCKED_KEYWORDS)
+HEALTHCARE_TERMS = set(HEALTHCARE_KEYWORDS)
+ENGINEERING_TERMS = set(ENGINEERING_KEYWORDS)
 
 HEALTHCARE_BLACKLIST = {
     "tax compliance", "fiscal sustainability", "public expenditure", "macroeconomic",
@@ -767,7 +768,8 @@ def list_focus_terms(top_topics: pd.DataFrame, top_keywords: pd.DataFrame, query
 
 
 def normalize_topic_key(value: str) -> str:
-    text = str(value or "").lower()
+    text = unicodedata.normalize("NFKD", str(value or "").lower())
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
     text = text.replace("’", "'").replace("`", "'").replace("´", "'")
     text = re.sub(r"\balzheimer\?s\b", "alzheimer", text)
     text = re.sub(r"\balzheimer'?s\b", "alzheimer", text)
@@ -790,7 +792,18 @@ def current_selected_domain() -> str:
 
 def contains_domain_term(text: str, terms: set[str]) -> bool:
     key = normalize_topic_key(text)
-    return any(term in key for term in terms)
+    normalized_terms = [normalize_topic_key(term) for term in terms]
+    return any(term and re.search(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])", key) for term in normalized_terms)
+
+
+def matched_domain_terms(text: str, terms: set[str] | list[str]) -> list[str]:
+    key = normalize_topic_key(text)
+    matches = []
+    for term in terms:
+        normalized = normalize_topic_key(term)
+        if normalized and re.search(rf"(?<![a-z0-9]){re.escape(normalized)}(?![a-z0-9])", key):
+            matches.append(term)
+    return sorted(matches)
 
 
 def is_engineering_health_hybrid(text: str) -> bool:
@@ -801,8 +814,8 @@ def infer_research_domain(text: str) -> str:
     key = normalize_topic_key(text)
     if contains_domain_term(key, UNSUPPORTED_DOMAIN_TERMS):
         return "Unsupported"
-    healthcare_hits = sum(1 for term in HEALTHCARE_TERMS if term in key)
-    engineering_hits = sum(1 for term in ENGINEERING_TERMS if term in key)
+    healthcare_hits = len(matched_domain_terms(key, HEALTHCARE_KEYWORDS))
+    engineering_hits = len(matched_domain_terms(key, ENGINEERING_KEYWORDS))
     if healthcare_hits and engineering_hits:
         return "Healthcare-Engineering Hybrid" if is_engineering_health_hybrid(key) else (
             HEALTHCARE_DOMAIN if healthcare_hits >= engineering_hits else ENGINEERING_DOMAIN
@@ -816,24 +829,25 @@ def infer_research_domain(text: str) -> str:
 
 def validate_domain_query(query: str, selected_domain: str) -> tuple[bool, str, dict]:
     inferred = infer_research_domain(query)
-    key = normalize_topic_key(query)
-    leakage_terms = sorted(term for term in UNSUPPORTED_DOMAIN_TERMS if term in key)
+    blocked_terms = matched_domain_terms(query, BLOCKED_KEYWORDS)
+    healthcare_terms = matched_domain_terms(query, HEALTHCARE_KEYWORDS)
+    engineering_terms = matched_domain_terms(query, ENGINEERING_KEYWORDS)
+    selected_terms = engineering_terms if selected_domain == ENGINEERING_DOMAIN else healthcare_terms
     debug = {
         "selected_domain": selected_domain,
         "inferred_domain": inferred,
-        "domain_match": inferred in {selected_domain, "Healthcare-Engineering Hybrid", "Not detected"},
-        "leakage_terms": leakage_terms,
+        "domain_match": bool(selected_terms),
+        "leakage_terms": blocked_terms,
+        "engineering_terms": engineering_terms,
+        "healthcare_terms": healthcare_terms,
+        "classification_confidence": "high" if selected_terms else "low",
     }
-    if inferred == "Unsupported" or leakage_terms:
+    if blocked_terms:
         debug["domain_match"] = False
         return False, DOMAIN_SUPPORT_WARNING, debug
-    if selected_domain == HEALTHCARE_DOMAIN and inferred == ENGINEERING_DOMAIN:
-        debug["domain_match"] = False
-        return False, "Secilen arastirma alani saglik/biyomedikal. Lutfen konuyu bu alanla iliskilendirin veya muhendislik alanini secin.", debug
-    if selected_domain == ENGINEERING_DOMAIN and inferred == HEALTHCARE_DOMAIN and not is_engineering_health_hybrid(query):
-        debug["domain_match"] = False
-        return False, "Secilen arastirma alani muhendislik. Lutfen konuyu muhendislik/uygulamali teknoloji baglamiyla iliskilendirin.", debug
-    return True, "", debug
+    if selected_terms:
+        return True, "", debug
+    return True, "Topic classification confidence is low, but analysis can still continue.", debug
 
 
 def forbidden_terms_for_domain(selected_domain: str, query: str) -> set[str]:
@@ -2752,6 +2766,8 @@ def render_topic_suggester() -> None:
                 st.session_state["topic_suggester_results"] = []
                 st.session_state["topic_suggester_mode"] = "Domain blocked"
             else:
+                if domain_message:
+                    st.warning(domain_message)
                 with st.spinner("Konu önerileri üretiliyor..."):
                     topics, mode = refine_research_topics(seed, provider, api_key, selected_domain)
                 st.session_state["topic_suggestions"] = topics
@@ -4135,14 +4151,14 @@ def build_sidebar_config() -> dict:
     with st.sidebar:
         st.header("Veri Kaynağı ve Analiz Ayarları")
         selected_domain = st.selectbox(
-            "AraÅŸtÄ±rma AlanÄ±",
+            "Araştırma Alanı",
             ACTIVE_RESEARCH_DOMAINS,
             index=0,
             key="selected_research_domain",
         )
         st.caption(
-            "ResearchMind AI ÅŸu anda saÄŸlÄ±k/biyomedikal ve mÃ¼hendislik/uygulamalÄ± teknolojiler "
-            "alanlarÄ±nda optimize edilmiÅŸtir. DiÄŸer alanlar yakÄ±nda aktif olacaktÄ±r."
+            "ResearchMind AI şu anda sağlık/biyomedikal ve mühendislik/uygulamalı teknolojiler "
+            "alanlarında optimize edilmiştir. Diğer alanlar yakında aktif olacaktır."
         )
         source_label = st.selectbox(
             "Veri kaynağı",
@@ -4866,10 +4882,16 @@ if sidebar_config["run_clicked"]:
     if not domain_ok:
         st.warning(domain_message)
     elif is_demo and not st.session_state.get("demo_user_registered"):
+        if domain_message:
+            st.warning(domain_message)
         st.error("Demo analizi başlatmak için önce kayıt formunu doldurmanız gerekir.")
     elif is_demo and not is_admin() and demo_user_used_today(demo_email):
+        if domain_message:
+            st.warning(domain_message)
         st.warning("Bugünkü demo analiz hakkınız kullanılmıştır. İlginiz için teşekkür ederiz.")
     else:
+        if domain_message:
+            st.warning(domain_message)
         cached_results = load_demo_cache(sidebar_config) if is_demo else None
 
         if cached_results:
