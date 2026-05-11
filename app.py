@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import shutil
 import time
+import traceback
 
 import pandas as pd
 import plotly.express as px
@@ -2085,8 +2086,12 @@ def normalize_topic_seed(text: str) -> str:
 
 def topic_refinement_prompt(seed: str) -> str:
     return (
-        "Convert the user's Turkish, English, or messy keywords into 5 concise SCI-style English research topics. "
-        "Avoid generic titles. Each title should include, when possible: domain, method, data/modality, task, and novelty angle. "
+        "Convert the user's Turkish, English, or messy keywords into 5 concise Q1/SCI-style English research topics. "
+        "Avoid generic titles and avoid broad 'AI-based ...' phrasing. "
+        "Each title must include a clear domain, method, data/modality, task, and novelty angle when possible. "
+        "Prefer specific publishable angles such as explainability, external validation, privacy-preserving learning, "
+        "multimodal fusion, risk stratification, or decision-support validation when relevant. "
+        "Write titles that sound like real high-quality journal article titles. "
         "Return only valid JSON in this exact shape: "
         '[{"title":"...","rationale":"..."},{"title":"...","rationale":"..."}]. '
         f"User input: {seed}"
@@ -2178,15 +2183,68 @@ def rule_based_topic_refinement(seed: str) -> list[dict[str, str]]:
     return topics
 
 
-def call_llm_topic_refiner(provider: str, seed: str, api_key: str) -> list[dict[str, str]]:
+def mask_secret(value: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return "missing"
+    if len(text) <= 8:
+        return "*" * len(text)
+    return f"{text[:4]}...{text[-4:]}"
+
+
+def call_llm_topic_refiner(
+    provider: str,
+    seed: str,
+    api_key: str,
+    debug: dict | None = None,
+) -> list[dict[str, str]]:
+    debug = debug if debug is not None else {}
+    debug.update({
+        "active_provider": provider,
+        "secret_detected": bool(str(api_key or "").strip()),
+        "secret_masked": mask_secret(api_key),
+        "llm_status": "not_started",
+        "fallback_reason": "",
+    })
+
     if not api_key.strip() or provider == "Rule-based":
+        debug["llm_status"] = "skipped"
+        debug["fallback_reason"] = "No LLM provider selected or API key was not detected."
         return []
 
     prompt = topic_refinement_prompt(seed)
     headers = {"Content-Type": "application/json"}
+    started_at = time.perf_counter()
+
+    def finish_from_response(response: requests.Response, content: str) -> list[dict[str, str]]:
+        debug["http_status"] = response.status_code
+        debug["response_chars"] = len(content or "")
+        debug["raw_response_preview"] = str(content or "")[:700]
+        topics = parse_topic_json(content)
+        debug["parsed_topic_count"] = len(topics)
+        debug["elapsed_ms"] = int((time.perf_counter() - started_at) * 1000)
+        if topics:
+            debug["llm_status"] = "success"
+            debug["fallback_reason"] = ""
+        else:
+            debug["llm_status"] = "empty_or_unparseable_response"
+            debug["fallback_reason"] = "LLM returned content, but no valid topic JSON could be parsed."
+        return topics
+
+    def ensure_success(response: requests.Response) -> None:
+        if response.status_code >= 400:
+            debug["http_status"] = response.status_code
+            debug["response_chars"] = len(response.text or "")
+            debug["raw_response_preview"] = str(response.text or "")[:700]
+            debug["elapsed_ms"] = int((time.perf_counter() - started_at) * 1000)
+            debug["llm_status"] = "http_error"
+            debug["fallback_reason"] = f"LLM provider returned HTTP {response.status_code}."
+        response.raise_for_status()
 
     if provider == "OpenAI":
         headers["Authorization"] = f"Bearer {api_key}"
+        debug["client_status"] = "OpenAI-compatible HTTP client ready"
+        debug["model"] = "gpt-4o-mini"
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
             headers=headers,
@@ -2198,11 +2256,13 @@ def call_llm_topic_refiner(provider: str, seed: str, api_key: str) -> list[dict[
             },
             timeout=30,
         )
-        response.raise_for_status()
-        return parse_topic_json(response.json()["choices"][0]["message"]["content"])
+        ensure_success(response)
+        return finish_from_response(response, response.json()["choices"][0]["message"]["content"])
 
     if provider == "Groq":
         headers["Authorization"] = f"Bearer {api_key}"
+        debug["client_status"] = "Groq OpenAI-compatible HTTP client ready"
+        debug["model"] = "llama-3.1-8b-instant"
         response = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers=headers,
@@ -2214,21 +2274,25 @@ def call_llm_topic_refiner(provider: str, seed: str, api_key: str) -> list[dict[
             },
             timeout=30,
         )
-        response.raise_for_status()
-        return parse_topic_json(response.json()["choices"][0]["message"]["content"])
+        ensure_success(response)
+        return finish_from_response(response, response.json()["choices"][0]["message"]["content"])
 
     if provider == "Gemini":
+        debug["client_status"] = "Gemini HTTP client ready"
+        debug["model"] = "gemini-1.5-flash"
         response = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}",
             headers=headers,
             json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"temperature": 0.35}},
             timeout=30,
         )
-        response.raise_for_status()
+        ensure_success(response)
         candidates = response.json().get("candidates", [])
         parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
-        return parse_topic_json(" ".join(part.get("text", "") for part in parts))
+        return finish_from_response(response, " ".join(part.get("text", "") for part in parts))
 
+    debug["llm_status"] = "skipped"
+    debug["fallback_reason"] = f"Unsupported provider: {provider}"
     return []
 
 
@@ -2247,7 +2311,7 @@ def auto_topic_provider_from_config() -> tuple[str, str]:
     return "Rule-based", ""
 
 
-def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list[dict[str, str]], str]:
+def refine_research_topics_legacy(seed: str, provider: str, api_key: str) -> tuple[list[dict[str, str]], str]:
     if not str(seed or "").strip():
         return [], "No input"
 
@@ -2264,6 +2328,56 @@ def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list
         )
 
     fallback_topics = rule_based_topic_refinement(seed)
+    return fallback_topics[:5], "Rule-based fallback"
+
+
+def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list[dict[str, str]], str]:
+    debug = {
+        "active_provider": provider,
+        "secret_detected": bool(str(api_key or "").strip()),
+        "secret_masked": mask_secret(api_key),
+        "llm_status": "not_started",
+        "fallback_reason": "",
+        "traceback": "",
+    }
+    st.session_state["topic_llm_debug"] = debug
+
+    if not str(seed or "").strip():
+        debug["llm_status"] = "skipped"
+        debug["fallback_reason"] = "No topic seed was entered."
+        return [], "No input"
+
+    try:
+        llm_topics = call_llm_topic_refiner(provider, seed, api_key, debug)
+        if llm_topics:
+            fallback_topics = rule_based_topic_refinement(seed)[:5]
+            debug["fallback_comparison_count"] = len(fallback_topics)
+            debug["fallback_comparison_titles"] = [item.get("title", "") for item in fallback_topics]
+            debug["llm_quality_note"] = (
+                "LLM output is preferred for more creative Q1/SCI-style synthesis; "
+                "fallback remains deterministic and domain-safe."
+            )
+            return llm_topics[:5], f"{provider} LLM"
+    except Exception as exc:
+        debug["llm_status"] = "exception"
+        debug["fallback_reason"] = debug.get("fallback_reason") or str(exc)
+        debug["traceback"] = traceback.format_exc()
+        st.session_state["topic_suggester_warning"] = (
+            "Konu önerme servisi şu anda yanıt vermedi. Yerel öneri motoru ile devam ediliyor."
+        )
+
+    if provider != "Rule-based" and api_key:
+        st.session_state["topic_suggester_warning"] = (
+            "Konu önerme servisi şu anda yanıt vermedi. Yerel öneri motoru ile devam ediliyor."
+        )
+        if not debug.get("fallback_reason"):
+            debug["fallback_reason"] = "LLM returned no valid topic suggestions."
+
+    fallback_topics = rule_based_topic_refinement(seed)
+    debug["fallback_topic_count"] = len(fallback_topics)
+    debug["fallback_titles"] = [item.get("title", "") for item in fallback_topics[:5]]
+    if provider == "Rule-based":
+        debug["fallback_reason"] = debug.get("fallback_reason") or "No provider secret was detected, so local fallback was used."
     return fallback_topics[:5], "Rule-based fallback"
 
 
@@ -2311,14 +2425,17 @@ def render_topic_suggester() -> None:
         if is_admin():
             with st.expander("Konu önerme config durumu", expanded=False):
                 for name, env_key in TOPIC_PROVIDER_ENV_KEYS.items():
-                    st.caption(f"{name}: {'configured' if read_env_value(env_key) else 'missing'}")
+                    secret_value = read_env_value(env_key)
+                    st.caption(f"{name}: {mask_secret(secret_value)}")
         if demo_mode_enabled() and not is_admin():
             provider, api_key = auto_topic_provider_from_config()
         else:
+            provider_options = ["Rule-based", "OpenAI", "Groq", "Gemini"]
+            default_provider, _ = auto_topic_provider_from_config()
             provider = st.selectbox(
                 "LLM sağlayıcı",
-                ["Rule-based", "OpenAI", "Groq", "Gemini"],
-                index=0,
+                provider_options,
+                index=provider_options.index(default_provider) if default_provider in provider_options else 0,
                 help="API key yoksa ücretsiz/rule-based mod kullanılır.",
                 key="topic_suggester_provider",
             )
@@ -2344,6 +2461,35 @@ def render_topic_suggester() -> None:
         warning = st.session_state.pop("topic_suggester_warning", "")
         if warning:
             st.warning(warning)
+
+        llm_debug = st.session_state.get("topic_llm_debug", {})
+        if llm_debug and is_admin():
+            with st.expander("LLM konu önerme debug", expanded=False):
+                st.write({
+                    "active_provider": llm_debug.get("active_provider"),
+                    "secret_detected": llm_debug.get("secret_detected"),
+                    "secret_masked": llm_debug.get("secret_masked"),
+                    "client_status": llm_debug.get("client_status"),
+                    "model": llm_debug.get("model"),
+                    "llm_status": llm_debug.get("llm_status"),
+                    "http_status": llm_debug.get("http_status"),
+                    "response_chars": llm_debug.get("response_chars"),
+                    "parsed_topic_count": llm_debug.get("parsed_topic_count"),
+                    "elapsed_ms": llm_debug.get("elapsed_ms"),
+                    "fallback_reason": llm_debug.get("fallback_reason"),
+                })
+                if llm_debug.get("fallback_comparison_titles"):
+                    st.caption("Fallback comparison titles")
+                    st.write(llm_debug.get("fallback_comparison_titles"))
+                if llm_debug.get("fallback_titles"):
+                    st.caption("Fallback titles used")
+                    st.write(llm_debug.get("fallback_titles"))
+                if llm_debug.get("raw_response_preview"):
+                    st.caption("LLM raw response preview")
+                    st.code(llm_debug.get("raw_response_preview"))
+                if llm_debug.get("traceback"):
+                    st.caption("Traceback")
+                    st.code(llm_debug.get("traceback"))
 
         topics = st.session_state.get("topic_suggestions", st.session_state.get("topic_suggester_results", []))
         if topics:
