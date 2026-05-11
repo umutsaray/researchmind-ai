@@ -54,6 +54,61 @@ DATA_SOURCE_LABELS = {
     "Hybrid: OpenAlex + PubMed": "Hibrit Analiz",
 }
 
+HEALTHCARE_DOMAIN = "Healthcare & Biomedical Sciences"
+ENGINEERING_DOMAIN = "Engineering & Applied Technologies"
+ACTIVE_RESEARCH_DOMAINS = [HEALTHCARE_DOMAIN, ENGINEERING_DOMAIN]
+DOMAIN_SUPPORT_WARNING = (
+    "Bu demo surumunde yalnizca saglik/biyomedikal ve muhendislik alanlari desteklenmektedir. "
+    "Lutfen konunuzu bu alanlardan biriyle iliskilendirerek tekrar deneyin."
+)
+
+UNSUPPORTED_DOMAIN_TERMS = {
+    "tax compliance", "fiscal sustainability", "public expenditure", "macroeconomic",
+    "government spending", "budget deficit", "public finance", "fiscal risk",
+    "public spending", "fiscal", "tax", "vergi uyumu", "kamu harcamalar", "mali surdur",
+    "education policy", "curriculum", "student achievement", "social sciences",
+    "agriculture", "law", "legal", "business management", "marketing",
+}
+
+HEALTHCARE_TERMS = {
+    "medicine", "biomedical", "medical imaging", "radiology", "mri", "pet", "ct",
+    "ultrasound", "eeg", "ecg", "emg", "clinical decision support", "diagnosis",
+    "alzheimer", "parkinson", "dementia", "autism", "cancer", "oncology",
+    "pathology", "histopathology", "genomics", "bioinformatics", "biomarker",
+    "digital health", "telemedicine", "hospital", "medical device", "wearable health",
+    "rehabilitation", "public health", "epidemiology", "federated healthcare",
+    "explainable medical",
+}
+
+ENGINEERING_TERMS = {
+    "engineering", "electrical", "electronics", "computer engineering", "software",
+    "artificial intelligence engineering", "mechanical", "civil engineering",
+    "environmental engineering", "industrial engineering", "energy systems",
+    "renewable energy", "wind turbine", "solar", "smart grid", "power electronics",
+    "wireless communication", "iot", "edge ai", "uav", "drone", "robotics",
+    "autonomous", "digital twin", "predictive maintenance", "structural health",
+    "fault detection", "signal processing", "image processing", "control systems",
+    "optimization", "cfd", "fem", "materials", "manufacturing", "smart cities",
+    "transportation", "traffic", "cybersecurity", "embedded systems",
+    "computer vision", "threat detection", "swarm", "uav swarm",
+}
+
+HEALTHCARE_BLACKLIST = {
+    "tax compliance", "fiscal sustainability", "public expenditure", "macroeconomic",
+    "government spending", "budget deficit", "public finance", "fiscal risk",
+    "public spending", "fiscal", "tax", "vergi uyumu", "kamu harcamalar", "mali surdur",
+}
+
+ENGINEERING_BIOMED_BLACKLIST = {
+    "alzheimer", "dementia", "cancer", "patient cohort", "clinical validation",
+    "mri", "pet", "biomarker", "diagnosis", "disease",
+}
+
+ENGINEERING_HEALTH_HYBRID_TERMS = {
+    "biomedical engineering", "medical device", "biomedical signal processing",
+    "medical imaging device", "health technology", "wearable health",
+}
+
 STOP_TOPICS = {
     "unknown", "humans", "human", "male", "female", "aged", "middle aged",
     "young adult", "adult", "animals", "animal", "retrospective studies",
@@ -727,6 +782,199 @@ def clean_topic_label(value: str) -> str:
     text = re.sub(r"\bAlzheimer\?s disease\b", "Alzheimer's disease", text, flags=re.I)
     text = re.sub(r"\bAlzheimer's disease\b", "Alzheimer's disease", text, flags=re.I)
     return text
+
+
+def current_selected_domain() -> str:
+    return st.session_state.get("selected_research_domain", HEALTHCARE_DOMAIN)
+
+
+def contains_domain_term(text: str, terms: set[str]) -> bool:
+    key = normalize_topic_key(text)
+    return any(term in key for term in terms)
+
+
+def is_engineering_health_hybrid(text: str) -> bool:
+    return contains_domain_term(text, ENGINEERING_HEALTH_HYBRID_TERMS)
+
+
+def infer_research_domain(text: str) -> str:
+    key = normalize_topic_key(text)
+    if contains_domain_term(key, UNSUPPORTED_DOMAIN_TERMS):
+        return "Unsupported"
+    healthcare_hits = sum(1 for term in HEALTHCARE_TERMS if term in key)
+    engineering_hits = sum(1 for term in ENGINEERING_TERMS if term in key)
+    if healthcare_hits and engineering_hits:
+        return "Healthcare-Engineering Hybrid" if is_engineering_health_hybrid(key) else (
+            HEALTHCARE_DOMAIN if healthcare_hits >= engineering_hits else ENGINEERING_DOMAIN
+        )
+    if healthcare_hits:
+        return HEALTHCARE_DOMAIN
+    if engineering_hits:
+        return ENGINEERING_DOMAIN
+    return "Not detected"
+
+
+def validate_domain_query(query: str, selected_domain: str) -> tuple[bool, str, dict]:
+    inferred = infer_research_domain(query)
+    key = normalize_topic_key(query)
+    leakage_terms = sorted(term for term in UNSUPPORTED_DOMAIN_TERMS if term in key)
+    debug = {
+        "selected_domain": selected_domain,
+        "inferred_domain": inferred,
+        "domain_match": inferred in {selected_domain, "Healthcare-Engineering Hybrid", "Not detected"},
+        "leakage_terms": leakage_terms,
+    }
+    if inferred == "Unsupported" or leakage_terms:
+        debug["domain_match"] = False
+        return False, DOMAIN_SUPPORT_WARNING, debug
+    if selected_domain == HEALTHCARE_DOMAIN and inferred == ENGINEERING_DOMAIN:
+        debug["domain_match"] = False
+        return False, "Secilen arastirma alani saglik/biyomedikal. Lutfen konuyu bu alanla iliskilendirin veya muhendislik alanini secin.", debug
+    if selected_domain == ENGINEERING_DOMAIN and inferred == HEALTHCARE_DOMAIN and not is_engineering_health_hybrid(query):
+        debug["domain_match"] = False
+        return False, "Secilen arastirma alani muhendislik. Lutfen konuyu muhendislik/uygulamali teknoloji baglamiyla iliskilendirin.", debug
+    return True, "", debug
+
+
+def forbidden_terms_for_domain(selected_domain: str, query: str) -> set[str]:
+    if selected_domain == HEALTHCARE_DOMAIN:
+        return HEALTHCARE_BLACKLIST
+    if selected_domain == ENGINEERING_DOMAIN and not is_engineering_health_hybrid(query):
+        return ENGINEERING_BIOMED_BLACKLIST
+    return set()
+
+
+def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]:
+    key = normalize_topic_key(query)
+    if selected_domain == ENGINEERING_DOMAIN:
+        if any(term in key for term in ["uav", "drone", "swarm"]):
+            return {
+                "direction": "Real-time UAV swarm threat detection using edge AI and computer vision",
+                "methodology": "computer vision; edge AI architecture; sensor fusion; anomaly detection; benchmark dataset evaluation",
+                "evidence": "UAV video streams; simulated swarm scenarios; edge-device latency benchmarks; detection robustness tests",
+                "differentiation": "Differentiate the work through real-time deployment constraints, adversarial scenarios, and benchmarked swarm-level validation.",
+            }
+        if any(term in key for term in ["wind turbine", "digital twin", "predictive maintenance"]):
+            return {
+                "direction": "Digital twin-enabled predictive maintenance for wind turbine reliability",
+                "methodology": "digital twin modeling; fault diagnosis; time-series forecasting; sensor fusion; reliability analysis",
+                "evidence": "SCADA signals; vibration/temperature sensors; turbine fault logs; simulation-based validation",
+                "differentiation": "Differentiate the work through physics-informed digital twins, multi-sensor evidence, and season-level reliability validation.",
+            }
+        return {
+            "direction": naturalize_topic_title(query, "engineering validation"),
+            "methodology": "predictive maintenance; digital twin modeling; anomaly detection; optimization algorithms; real-time monitoring",
+            "evidence": "sensor data; benchmark datasets; simulation-based validation; reliability metrics",
+            "differentiation": "Differentiate the work through deployment constraints, robust validation, and measurable engineering performance gains.",
+        }
+    return build_research_strategy(query, pd.DataFrame())
+
+
+def domain_specific_insight(query: str, selected_domain: str) -> str:
+    if selected_domain == ENGINEERING_DOMAIN:
+        return (
+            "This engineering topic should be framed around system-level validation, real-time constraints, "
+            "sensor or simulation evidence, and reliability-oriented performance metrics. Strong differentiation "
+            "comes from benchmark evaluation, deployment feasibility, and robust fault or threat detection."
+        )
+    return (
+        "This healthcare and biomedical topic should be framed around disease-specific evidence, modality-aware modeling, "
+        "explainability, and external validation. Strong differentiation comes from clinically meaningful endpoints and "
+        "privacy-preserving or multimodal validation when relevant."
+    )
+
+
+def domain_specific_paperability_reason(query: str, selected_domain: str) -> str:
+    if selected_domain == ENGINEERING_DOMAIN:
+        return "Engineering evidence such as sensor streams, simulation results, benchmark datasets and reliability metrics improves publication feasibility."
+    return domain_evidence_reason(query)
+
+
+def domain_narrowing_for_selected(query: str, selected_domain: str) -> str:
+    if selected_domain == ENGINEERING_DOMAIN:
+        key = normalize_topic_key(query)
+        if "uav" in key or "drone" in key:
+            return "Narrow the topic around UAV swarm computer vision, edge AI deployment, real-time threat detection metrics and benchmarked robustness validation."
+        if "wind turbine" in key:
+            return "Narrow the topic around digital twin modeling, multi-sensor fusion, fault diagnosis and season-level reliability validation for wind turbines."
+        return "Narrow the topic around a specific engineering system, measurable performance metric, benchmark dataset and deployment-oriented validation protocol."
+    return domain_narrowing_direction(query)
+
+
+def apply_domain_guard_to_results(results: dict) -> dict:
+    selected_domain = results.get("selected_domain") or current_selected_domain()
+    query = results.get("query", "")
+    forbidden = forbidden_terms_for_domain(selected_domain, query)
+    corrected = 0
+    leakage_terms: set[str] = set()
+
+    def has_forbidden(text: str) -> bool:
+        key = normalize_topic_key(text)
+        found = {term for term in forbidden if term in key}
+        leakage_terms.update(found)
+        return bool(found)
+
+    suggestions = _as_dataframe(results.get("ai_topic_suggestions"))
+    if selected_domain == ENGINEERING_DOMAIN:
+        results["research_strategy"] = domain_specific_strategy(query, selected_domain)
+        corrected += 1
+
+    if not suggestions.empty and forbidden:
+        title_col = "suggested_research_topic" if "suggested_research_topic" in suggestions.columns else "suggested_topic" if "suggested_topic" in suggestions.columns else None
+        if title_col:
+            mask = suggestions.astype(str).agg(" ".join, axis=1).map(lambda text: not has_forbidden(text))
+            filtered = suggestions.loc[mask].copy()
+            corrected += len(suggestions) - len(filtered)
+            if len(filtered) < 3:
+                fallback = domain_adapted_suggestions(query) if selected_domain == HEALTHCARE_DOMAIN else pd.DataFrame(
+                    [(item["title"], 68, "positive", item["rationale"]) for item in engineering_topic_refinement(query)],
+                    columns=["suggested_research_topic", "gap_score", "growth_rate", "recommendation"],
+                )
+                filtered = pd.concat([filtered, fallback], ignore_index=True).drop_duplicates(subset=[title_col], keep="first")
+            results["ai_topic_suggestions"] = filtered.head(8)
+
+    if forbidden and has_forbidden(results.get("ai_research_insight", "")):
+        results["ai_research_insight"] = domain_specific_insight(query, selected_domain)
+        corrected += 1
+
+    strategy = dict(results.get("research_strategy") or {})
+    if forbidden and any(has_forbidden(value) for value in strategy.values()):
+        results["research_strategy"] = domain_specific_strategy(query, selected_domain)
+        corrected += 1
+
+    paperability = dict(results.get("paperability_score") or {})
+    if paperability:
+        reasons = [reason for reason in paperability.get("reasons", []) if not has_forbidden(reason)]
+        if len(reasons) != len(paperability.get("reasons", [])):
+            corrected += len(paperability.get("reasons", [])) - len(reasons)
+        domain_reason = domain_specific_paperability_reason(query, selected_domain)
+        if selected_domain == ENGINEERING_DOMAIN and domain_reason not in reasons:
+            reasons.insert(0, domain_reason)
+        if not reasons:
+            reasons = [domain_reason]
+        paperability["reasons"] = reasons[:5]
+        if selected_domain == ENGINEERING_DOMAIN or has_forbidden(paperability.get("recommended_next_action", "")):
+            paperability["recommended_next_action"] = domain_narrowing_for_selected(query, selected_domain)
+            corrected += 1
+        results["paperability_score"] = paperability
+
+    inferred = infer_research_domain(query)
+    leakage_score = round(min(1.0, len(leakage_terms) / 5), 2)
+    guard = {
+        "selected_domain": selected_domain,
+        "inferred_domain": inferred,
+        "domain_match": inferred in {selected_domain, "Healthcare-Engineering Hybrid", "Not detected"},
+        "leakage_terms": sorted(leakage_terms),
+        "corrected_items_count": corrected,
+        "domain_leakage_risk_score": leakage_score,
+    }
+    results["domain_guard"] = guard
+    domain_reasoning = dict(results.get("domain_reasoning") or {})
+    domain_reasoning["selected_domain"] = selected_domain
+    domain_reasoning["domain_guard_leakage_score"] = leakage_score
+    domain_reasoning["domain_guard_corrected_items"] = corrected
+    results["domain_reasoning"] = domain_reasoning
+    return results
 
 
 def _contains_term(text_key: str, term: str) -> bool:
@@ -1864,6 +2112,7 @@ def demo_cache_key(config: dict) -> str:
             "query": query,
             "source": config.get("data_source", ""),
             "years_back": int(config.get("years_back", 5)),
+            "selected_domain": config.get("selected_domain", current_selected_domain()),
         },
         sort_keys=True,
         ensure_ascii=False,
@@ -1910,6 +2159,7 @@ def load_demo_cache(config: dict) -> dict | None:
     return {
         "data_source": config.get("data_source", "-"),
         "data_source_label": config.get("data_source_label", config.get("data_source", "-")),
+        "selected_domain": config.get("selected_domain", current_selected_domain()),
         "query": preprocess_research_query(config.get("query", "")),
         "raw_query": config.get("query", ""),
         "analysis_time": metadata.get("analysis_time", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
@@ -1953,6 +2203,7 @@ def save_demo_cache(config: dict, results: dict) -> None:
                 "query": preprocess_research_query(config.get("query", ""))[:160],
                 "source": config.get("data_source", ""),
                 "years_back": int(config.get("years_back", 5)),
+                "selected_domain": config.get("selected_domain", current_selected_domain()),
                 "analysis_time": results.get("analysis_time", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                 "export_path": str(Path(export_path).resolve()),
             },
@@ -2084,13 +2335,15 @@ def normalize_topic_seed(text: str) -> str:
     return title_case_topic(lowered)
 
 
-def topic_refinement_prompt(seed: str) -> str:
+def topic_refinement_prompt(seed: str, selected_domain: str = "") -> str:
+    domain_text = selected_domain or current_selected_domain()
     return (
         "Convert the user's Turkish, English, or messy keywords into 5 concise Q1/SCI-style English research topics. "
         "Avoid generic titles and avoid broad 'AI-based ...' phrasing. "
         "Each title must include a clear domain, method, data/modality, task, and novelty angle when possible. "
         "Prefer specific publishable angles such as explainability, external validation, privacy-preserving learning, "
         "multimodal fusion, risk stratification, or decision-support validation when relevant. "
+        f"Selected research domain: {domain_text}. Stay strictly within this domain. "
         "Write titles that sound like real high-quality journal article titles. "
         "Return only valid JSON in this exact shape: "
         '[{"title":"...","rationale":"..."},{"title":"...","rationale":"..."}]. '
@@ -2122,9 +2375,43 @@ def parse_topic_json(text: str) -> list[dict[str, str]]:
     return topics
 
 
-def rule_based_topic_refinement(seed: str) -> list[dict[str, str]]:
+def engineering_topic_refinement(seed: str) -> list[dict[str, str]]:
+    key = normalize_topic_key(normalize_topic_seed(seed))
+    if any(term in key for term in ["uav", "drone", "swarm", "robotics"]):
+        titles = [
+            "Edge AI-Based Computer Vision for Real-Time UAV Swarm Threat Detection",
+            "Vision Transformer Models for Autonomous UAV Swarm Surveillance and Threat Assessment",
+            "Multi-Sensor Fusion for Robust Drone Swarm Detection in Edge Computing Systems",
+            "Real-Time Anomaly Detection for UAV Swarm Security Using Deep Learning",
+            "Benchmark Evaluation of Computer Vision Models for UAV Threat Detection",
+        ]
+    elif any(term in key for term in ["wind turbine", "digital twin", "predictive maintenance", "fault"]):
+        titles = [
+            "Digital Twin-Driven Predictive Maintenance for Wind Turbine Fault Diagnosis",
+            "Sensor Fusion and Time-Series Forecasting for Wind Turbine Health Monitoring",
+            "Physics-Informed Digital Twins for Reliability Analysis in Wind Energy Systems",
+            "Anomaly Detection Models for Real-Time Wind Turbine Predictive Maintenance",
+            "Benchmark Evaluation of Deep Learning Models for Wind Turbine Fault Prediction",
+        ]
+    else:
+        base = title_case_topic(normalize_topic_seed(seed) or "Engineering Systems")
+        titles = [
+            f"Digital Twin and Predictive Analytics Framework for {base}",
+            f"Edge AI-Based Real-Time Monitoring for {base}",
+            f"Sensor Fusion and Anomaly Detection for {base}",
+            f"Optimization-Driven Control Strategy for {base}",
+            f"Benchmark Dataset Evaluation for Reliable {base}",
+        ]
+    return [{"title": title, "rationale": "Engineering-focused Q1/SCI-style topic generated within the selected domain."} for title in titles]
+
+
+def rule_based_topic_refinement(seed: str, selected_domain: str | None = None) -> list[dict[str, str]]:
+    selected_domain = selected_domain or current_selected_domain()
     normalized = normalize_topic_seed(seed)
     normalized_key = normalize_topic_key(normalized)
+
+    if selected_domain == ENGINEERING_DOMAIN:
+        return engineering_topic_refinement(seed)
 
     if any(term in normalized_key for term in ["tax compliance", "public expenditure", "fiscal sustainability", "public finance", "budget"]):
         return [
@@ -2196,6 +2483,7 @@ def call_llm_topic_refiner(
     provider: str,
     seed: str,
     api_key: str,
+    selected_domain: str = "",
     debug: dict | None = None,
 ) -> list[dict[str, str]]:
     debug = debug if debug is not None else {}
@@ -2212,7 +2500,7 @@ def call_llm_topic_refiner(
         debug["fallback_reason"] = "No LLM provider selected or API key was not detected."
         return []
 
-    prompt = topic_refinement_prompt(seed)
+    prompt = topic_refinement_prompt(seed, selected_domain)
     headers = {"Content-Type": "application/json"}
     started_at = time.perf_counter()
 
@@ -2331,9 +2619,12 @@ def refine_research_topics_legacy(seed: str, provider: str, api_key: str) -> tup
     return fallback_topics[:5], "Rule-based fallback"
 
 
-def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list[dict[str, str]], str]:
+def refine_research_topics(seed: str, provider: str, api_key: str, selected_domain: str | None = None) -> tuple[list[dict[str, str]], str]:
+    selected_domain = selected_domain or current_selected_domain()
     debug = {
         "active_provider": provider,
+        "selected_domain": selected_domain,
+        "inferred_domain": infer_research_domain(seed),
         "secret_detected": bool(str(api_key or "").strip()),
         "secret_masked": mask_secret(api_key),
         "llm_status": "not_started",
@@ -2348,9 +2639,9 @@ def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list
         return [], "No input"
 
     try:
-        llm_topics = call_llm_topic_refiner(provider, seed, api_key, debug)
+        llm_topics = call_llm_topic_refiner(provider, seed, api_key, selected_domain, debug)
         if llm_topics:
-            fallback_topics = rule_based_topic_refinement(seed)[:5]
+            fallback_topics = rule_based_topic_refinement(seed, selected_domain)[:5]
             debug["fallback_comparison_count"] = len(fallback_topics)
             debug["fallback_comparison_titles"] = [item.get("title", "") for item in fallback_topics]
             debug["llm_quality_note"] = (
@@ -2373,7 +2664,7 @@ def refine_research_topics(seed: str, provider: str, api_key: str) -> tuple[list
         if not debug.get("fallback_reason"):
             debug["fallback_reason"] = "LLM returned no valid topic suggestions."
 
-    fallback_topics = rule_based_topic_refinement(seed)
+    fallback_topics = rule_based_topic_refinement(seed, selected_domain)
     debug["fallback_topic_count"] = len(fallback_topics)
     debug["fallback_titles"] = [item.get("title", "") for item in fallback_topics[:5]]
     if provider == "Rule-based":
@@ -2422,6 +2713,7 @@ def render_topic_suggester() -> None:
             key="topic_suggester_seed",
             height=90,
         )
+        selected_domain = current_selected_domain()
         if is_admin():
             with st.expander("Konu önerme config durumu", expanded=False):
                 for name, env_key in TOPIC_PROVIDER_ENV_KEYS.items():
@@ -2452,11 +2744,19 @@ def render_topic_suggester() -> None:
             ).strip() or read_env_value(env_key)
 
         if st.button("Konu Öner", use_container_width=True, key="suggest_research_topics_button"):
-            with st.spinner("Konu önerileri üretiliyor..."):
-                topics, mode = refine_research_topics(seed, provider, api_key)
-            st.session_state["topic_suggestions"] = topics
-            st.session_state["topic_suggester_results"] = topics
-            st.session_state["topic_suggester_mode"] = mode
+            domain_ok, domain_message, domain_debug = validate_domain_query(seed, selected_domain)
+            st.session_state["domain_guard_debug"] = domain_debug
+            if not domain_ok:
+                st.warning(domain_message)
+                st.session_state["topic_suggestions"] = []
+                st.session_state["topic_suggester_results"] = []
+                st.session_state["topic_suggester_mode"] = "Domain blocked"
+            else:
+                with st.spinner("Konu önerileri üretiliyor..."):
+                    topics, mode = refine_research_topics(seed, provider, api_key, selected_domain)
+                st.session_state["topic_suggestions"] = topics
+                st.session_state["topic_suggester_results"] = topics
+                st.session_state["topic_suggester_mode"] = mode
 
         warning = st.session_state.pop("topic_suggester_warning", "")
         if warning:
@@ -2490,6 +2790,19 @@ def render_topic_suggester() -> None:
                 if llm_debug.get("traceback"):
                     st.caption("Traceback")
                     st.code(llm_debug.get("traceback"))
+
+        domain_debug = st.session_state.get("domain_guard_debug", {})
+        if domain_debug and is_admin():
+            with st.expander("DomainGuard debug", expanded=False):
+                st.write({
+                    "selected_domain": domain_debug.get("selected_domain"),
+                    "inferred_domain": domain_debug.get("inferred_domain"),
+                    "domain_match": domain_debug.get("domain_match"),
+                    "leakage_terms": domain_debug.get("leakage_terms"),
+                    "corrected_items_count": domain_debug.get("corrected_items_count", 0),
+                    "topic_suggestion_provider": st.session_state.get("topic_suggester_mode", "-"),
+                    "fallback_reason": (st.session_state.get("topic_llm_debug", {}) or {}).get("fallback_reason", "-"),
+                })
 
         topics = st.session_state.get("topic_suggestions", st.session_state.get("topic_suggester_results", []))
         if topics:
@@ -2719,9 +3032,11 @@ def compute_top_keywords(df: pd.DataFrame, n: int = 20) -> pd.DataFrame:
 def run_full_analysis(config: dict) -> dict:
     source = config["data_source"]
     raw_query = config["query"]
+    selected_domain = config.get("selected_domain", current_selected_domain())
     query = preprocess_research_query(raw_query)
     config = config.copy()
     config["query"] = query
+    config["selected_domain"] = selected_domain
     warnings: list[str] = []
     errors: list[str] = []
     diagnostics: dict = {
@@ -2809,6 +3124,7 @@ def run_full_analysis(config: dict) -> dict:
     results = {
         "data_source": source,
         "data_source_label": config.get("data_source_label", DATA_SOURCE_LABELS.get(source, source)),
+        "selected_domain": selected_domain,
         "query": query,
         "raw_query": raw_query,
         "analysis_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -2838,6 +3154,7 @@ def run_full_analysis(config: dict) -> dict:
         "source_distribution_before": source_distribution_before,
         "source_distribution": source_distribution_after,
     }
+    results = apply_domain_guard_to_results(results)
     results["export_path"] = export_analysis_results(results)
     return results
 
@@ -3281,6 +3598,7 @@ def is_generic_paper_title(title: str, query: str) -> bool:
 
 def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
     query = results.get("query", "")
+    selected_domain = results.get("selected_domain", current_selected_domain())
     concepts = extract_query_concepts(query)
     disease = concepts.get("disease", [])
     modality = concepts.get("modality", [])
@@ -3293,7 +3611,9 @@ def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
     if topic_col in suggestions.columns:
         suggestion_titles.extend(suggestions[topic_col].dropna().astype(str).head(3).tolist())
 
-    if "autism" in disease:
+    if selected_domain == ENGINEERING_DOMAIN and not is_engineering_health_hybrid(query):
+        titles.extend([item["title"] for item in engineering_topic_refinement(query)])
+    elif "autism" in disease:
         titles.extend([
             "Federated Explainable EEG-Eye Tracking Fusion for Early Autism Detection",
             "Privacy-Aware Multimodal Neurodevelopmental AI for ASD Screening",
@@ -3358,7 +3678,7 @@ def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
     for title in titles:
         clean = re.sub(r"\s+", " ", str(title or "")).strip(" .")
         key = normalize_topic_key(clean)
-        if clean and key not in seen and not is_generic_paper_title(clean, query):
+        if clean and key not in seen and (selected_domain == ENGINEERING_DOMAIN or not is_generic_paper_title(clean, query)):
             seen.add(key)
             clean_titles.append(clean)
         if len(clean_titles) >= min_count:
@@ -3368,7 +3688,7 @@ def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
         if "suggested_research_topic" in fallback_titles.columns:
             for title in fallback_titles["suggested_research_topic"].dropna().astype(str).tolist():
                 key = normalize_topic_key(title)
-                if key not in seen and not is_generic_paper_title(title, query):
+                if key not in seen and (selected_domain == ENGINEERING_DOMAIN or not is_generic_paper_title(title, query)):
                     seen.add(key)
                     clean_titles.append(title)
                 if len(clean_titles) >= min_count:
@@ -3502,6 +3822,7 @@ def generate_executive_pdf_report(results: dict, output_path: str | Path, summar
                 p(
                     "Research Intelligence Report<br/><br/>"
                     f"Research Topic: {results.get('query', '-')}<br/>"
+                    f"Selected Research Domain: {results.get('selected_domain', '-')}<br/>"
                     f"Analysis Date: {results.get('analysis_time', '-')}<br/>"
                     f"Data Sources: {source_text}<br/>"
                     f"Strategic Opportunity Score: {strategic}<br/>"
@@ -3569,6 +3890,7 @@ def generate_executive_pdf_report(results: dict, output_path: str | Path, summar
 
         story.append(p("Domain Reasoning", h1))
         domain_rows = [
+            [p("Selected Research Domain", h2), p(results.get("selected_domain", "-"), body)],
             [p("Primary Domain", h2), p(domain.get("clinical_domain", "-"), body)],
             [p("Primary Modality", h2), p(domain.get("primary_modality", "-"), body)],
             [p("Dominant Methodology", h2), p(domain.get("primary_method", "-"), body)],
@@ -3658,6 +3980,7 @@ def export_analysis_results(results: dict) -> str:
         "ai_topic_suggestions.csv": results.get("ai_topic_suggestions"),
         "paperability_score.csv": paperability_to_dataframe(results.get("paperability_score")),
         "domain_reasoning.csv": domain_reasoning_to_dataframe(results.get("domain_reasoning")),
+        "domain_guard.csv": domain_reasoning_to_dataframe(results.get("domain_guard")),
     }
 
     for filename, value in dataframe_exports.items():
@@ -3712,6 +4035,7 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
     distribution_before = results.get("source_distribution_before", {})
     paperability = results.get("paperability_score") or {}
     domain_reasoning = results.get("domain_reasoning") or {}
+    domain_guard = results.get("domain_guard") or {}
     paperability_reasons = [
         f"- {item}"
         for item in paperability.get("reasons", [])
@@ -3725,6 +4049,7 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         "ResearchMind AI Özet Raporu",
         "",
         f"Veri kaynağı: {results.get('data_source_label', results.get('data_source', '-'))}",
+        f"Selected research domain: {results.get('selected_domain', '-')}",
         f"Ham araştırma konusu: {results.get('raw_query', results.get('query', '-'))}",
         f"Araştırma konusu: {results.get('query', '-')}",
         f"Kayıt sayısı: {len(df):,}",
@@ -3773,6 +4098,7 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         f"- Differentiation Strategy: {results.get('research_strategy', {}).get('differentiation', '-')}",
         "",
         "Domain Reasoning:",
+        f"- Selected research domain: {results.get('selected_domain', '-')}",
         f"- Primary disease: {domain_reasoning.get('primary_disease', '-')}",
         f"- Modality: {domain_reasoning.get('primary_modality', '-')}",
         f"- Clinical domain: {domain_reasoning.get('clinical_domain', '-')}",
@@ -3780,6 +4106,9 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         f"- Domain consistency: {domain_reasoning.get('domain_consistency', '-')} ({domain_reasoning.get('domain_consistency_score', '-')})",
         f"- Leakage risk: {domain_reasoning.get('semantic_leakage_risk', '-')}",
         f"- Filtered leakage suggestions: {domain_reasoning.get('leakage_filtered_count', 0)}",
+        f"- DomainGuard inferred domain: {domain_guard.get('inferred_domain', '-')}",
+        f"- DomainGuard corrected items: {domain_guard.get('corrected_items_count', 0)}",
+        f"- DomainGuard leakage risk score: {domain_guard.get('domain_leakage_risk_score', 0)}",
         "",
         "Paperability Score:",
         f"- Total score: {paperability.get('total_score', '-')}",
@@ -3805,6 +4134,16 @@ def build_sidebar_config() -> dict:
     query_max_chars = 160 if is_demo else None
     with st.sidebar:
         st.header("Veri Kaynağı ve Analiz Ayarları")
+        selected_domain = st.selectbox(
+            "AraÅŸtÄ±rma AlanÄ±",
+            ACTIVE_RESEARCH_DOMAINS,
+            index=0,
+            key="selected_research_domain",
+        )
+        st.caption(
+            "ResearchMind AI ÅŸu anda saÄŸlÄ±k/biyomedikal ve mÃ¼hendislik/uygulamalÄ± teknolojiler "
+            "alanlarÄ±nda optimize edilmiÅŸtir. DiÄŸer alanlar yakÄ±nda aktif olacaktÄ±r."
+        )
         source_label = st.selectbox(
             "Veri kaynağı",
             list(DATA_SOURCE_LABELS.values()),
@@ -3831,6 +4170,7 @@ def build_sidebar_config() -> dict:
             "pubmed_email": "",
             "pubmed_api_key": "",
             "years_back": 5,
+            "selected_domain": selected_domain,
         }
 
         if data_source == "Local CSV":
@@ -4517,8 +4857,15 @@ sidebar_config = build_sidebar_config()
 if sidebar_config["run_clicked"]:
     is_demo = demo_mode_enabled()
     demo_email = st.session_state.get("demo_user_email", "")
+    domain_ok, domain_message, domain_debug = validate_domain_query(
+        sidebar_config.get("query", ""),
+        sidebar_config.get("selected_domain", current_selected_domain()),
+    )
+    st.session_state["domain_guard_debug"] = domain_debug
 
-    if is_demo and not st.session_state.get("demo_user_registered"):
+    if not domain_ok:
+        st.warning(domain_message)
+    elif is_demo and not st.session_state.get("demo_user_registered"):
         st.error("Demo analizi başlatmak için önce kayıt formunu doldurmanız gerekir.")
     elif is_demo and not is_admin() and demo_user_used_today(demo_email):
         st.warning("Bugünkü demo analiz hakkınız kullanılmıştır. İlginiz için teşekkür ederiz.")
@@ -4529,6 +4876,7 @@ if sidebar_config["run_clicked"]:
             log_demo_usage(demo_email, sidebar_config, "cached", cached_results.get("export_path", ""))
             st.session_state["analysis_results"] = cached_results
             st.session_state["latest_export_path"] = cached_results.get("export_path", "")
+            st.session_state["domain_guard_debug"] = cached_results.get("domain_guard", st.session_state.get("domain_guard_debug", {}))
         else:
             with st.spinner("Tüm analiz çalıştırılıyor ve sonuçlar kaydediliyor..."):
                 try:
@@ -4547,6 +4895,7 @@ if sidebar_config["run_clicked"]:
 
                 st.session_state["analysis_results"] = analysis_results
                 st.session_state["latest_export_path"] = analysis_results.get("export_path", "")
+                st.session_state["domain_guard_debug"] = analysis_results.get("domain_guard", st.session_state.get("domain_guard_debug", {}))
 
                 if is_demo:
                     df = _as_dataframe(analysis_results.get("normalized_dataset"))
