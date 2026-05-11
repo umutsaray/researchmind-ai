@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-import os
 from pathlib import Path
 import re
 import time
@@ -11,6 +10,8 @@ import xml.etree.ElementTree as ET
 
 import pandas as pd
 import requests
+
+from config_utils import get_config_value
 
 
 EUTILS_BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
@@ -114,11 +115,9 @@ def _read_env_file(path: str | Path = ".env") -> dict[str, str]:
 
 
 def get_pubmed_config(env_path: str | Path = ".env") -> PubMedConfig:
-    env_file = _read_env_file(env_path)
-
     return PubMedConfig(
-        api_key=os.getenv("PUBMED_API_KEY", env_file.get("PUBMED_API_KEY", "")).strip(),
-        email=os.getenv("NCBI_EMAIL", env_file.get("NCBI_EMAIL", "")).strip(),
+        api_key=get_config_value("PUBMED_API_KEY", "", env_path).strip(),
+        email=get_config_value("NCBI_EMAIL", "", env_path).strip(),
     )
 
 

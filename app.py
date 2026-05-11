@@ -4,7 +4,6 @@ from datetime import datetime
 import hashlib
 import html
 import json
-import os
 from pathlib import Path
 import re
 import shutil
@@ -17,6 +16,7 @@ import streamlit as st
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from config_utils import get_config_bool, get_config_value
 from pubmed_client import (
     PubMedClient,
     PubMedClientError,
@@ -1693,33 +1693,11 @@ def render_query_help() -> None:
 
 
 def read_env_value(key: str, env_path: str | Path = ".env") -> str:
-    value = os.getenv(key, "").strip()
-    if value:
-        return value
-
-    path = Path(env_path)
-    if not path.exists():
-        return ""
-
-    try:
-        for line in path.read_text(encoding="utf-8").splitlines():
-            clean = line.strip()
-            if not clean or clean.startswith("#") or "=" not in clean:
-                continue
-            env_key, env_value = clean.split("=", 1)
-            if env_key.strip() == key:
-                return env_value.strip().strip('"').strip("'")
-    except OSError:
-        return ""
-
-    return ""
+    return get_config_value(key, "", env_path)
 
 
 def config_bool(key: str, default: bool = False) -> bool:
-    value = read_env_value(key)
-    if not value:
-        return default
-    return value.strip().lower() in {"1", "true", "yes", "on"}
+    return get_config_bool(key, default)
 
 
 def demo_mode_enabled() -> bool:
@@ -1740,7 +1718,7 @@ def admin_password_hash() -> str:
 
 
 def admin_bypass_enabled() -> bool:
-    return read_env_value("ADMIN_BYPASS", ".env").strip().lower() == "true"
+    return get_config_bool("ADMIN_BYPASS", False)
 
 
 def is_admin_email(email: str) -> bool:
@@ -2304,6 +2282,25 @@ def render_topic_suggester() -> None:
                 )
 
 
+def render_config_warnings() -> None:
+    missing = []
+    if not get_config_value("OPENALEX_EMAIL"):
+        missing.append("OPENALEX_EMAIL")
+    if not get_config_value("NCBI_EMAIL"):
+        missing.append("NCBI_EMAIL")
+
+    if demo_mode_enabled() and is_admin_email(st.session_state.get("demo_user_email", "")) and not admin_bypass_enabled():
+        if not get_config_value("ADMIN_PASSWORD_HASH"):
+            missing.append("ADMIN_PASSWORD_HASH")
+
+    if missing and ((not demo_mode_enabled()) or is_admin()):
+        st.warning(
+            "Eksik yapılandırma bulundu: "
+            + ", ".join(dict.fromkeys(missing))
+            + ". Local geliştirmede .env, Streamlit Cloud'da Secrets alanını kullanın."
+        )
+
+
 def render_admin_demo_management() -> None:
     if not (demo_mode_enabled() and is_admin()):
         return
@@ -2764,13 +2761,15 @@ def _run_openalex_gap(config: dict, warnings: list[str], errors: list[str]) -> d
     if "_openalex_gap" in config:
         return config["_openalex_gap"]
 
-    if not config.get("openalex_api_key", ""):
+    openalex_contact = str(config.get("openalex_api_key", "")).strip() or get_config_value("OPENALEX_EMAIL")
+
+    if not openalex_contact:
         warnings.append("OpenAlex e-posta veya API bilgisi eklenmemiş. Yoğun kullanımda erişim sınırlanabilir.")
 
     try:
         return openalex_gap_analysis(
             query=config["query"],
-            api_key=config.get("openalex_api_key", ""),
+            api_key=openalex_contact,
             per_page=int(config.get("openalex_max_results", DEFAULT_LIVE_RESULT_LIMIT)),
             years_back=int(config.get("years_back", 5)),
         )
@@ -2805,9 +2804,10 @@ def _generate_ai_suggestions(
 ) -> pd.DataFrame:
     try:
         if source in {"OpenAlex Live", "Hybrid: OpenAlex + PubMed"}:
+            openalex_contact = str(config.get("openalex_api_key", "")).strip() or get_config_value("OPENALEX_EMAIL")
             suggestions = generate_ai_research_topic_suggestions(
                 query=query,
-                api_key=config.get("openalex_api_key", ""),
+                api_key=openalex_contact,
                 years_back=int(config.get("years_back", 5)),
             )
             suggestions = apply_domain_reasoning_filter(suggestions, query)
@@ -3759,6 +3759,7 @@ def build_sidebar_config() -> dict:
                 st.code(latest_export_path)
             _render_download_buttons(latest_export_path)
 
+        render_config_warnings()
         render_admin_demo_management()
 
     return config | {"run_clicked": run_clicked}
