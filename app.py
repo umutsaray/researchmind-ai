@@ -252,6 +252,229 @@ LEAKAGE_TERMS = {
     "emotion recognition", "activity recognition",
 }
 
+ENGINEERING_SUBDOMAIN_ONTOLOGY = {
+    "civil_structural_engineering": {
+        "subdomain_label": "Civil / Structural Engineering",
+        "keywords": [
+            "civil engineering", "structural engineering", "seismic", "earthquake", "bridge", "building",
+            "concrete", "steel", "geotechnical", "soil", "foundation", "tunnel", "dam", "flood",
+            "infrastructure", "construction", "structural health monitoring", "fragility curve",
+            "earthquake damage", "seismic vulnerability",
+        ],
+        "preferred_objects": ["bridges", "buildings", "infrastructure systems", "concrete structures", "steel structures", "soil-structure systems", "dams", "tunnels"],
+        "preferred_metrics": ["seismic vulnerability", "structural damage", "load capacity", "displacement", "fragility", "resilience", "reliability", "safety"],
+    },
+    "materials_engineering": {
+        "subdomain_label": "Materials Engineering",
+        "keywords": [
+            "materials engineering", "composite materials", "coating", "corrosion", "fatigue",
+            "microstructure", "alloy", "polymer", "ceramics", "nanomaterials", "additive manufacturing",
+            "heat treatment", "mechanical strength", "surface modification",
+        ],
+        "preferred_objects": ["composite materials", "coatings", "alloys", "polymer composites", "nanomaterials", "additively manufactured parts"],
+        "preferred_metrics": ["corrosion resistance", "fatigue life", "mechanical strength", "hardness", "wear resistance", "microstructure-property relationship", "coating durability"],
+    },
+    "mechanical_engineering": {
+        "subdomain_label": "Mechanical Engineering",
+        "keywords": [
+            "mechanical engineering", "cfd", "heat transfer", "thermodynamics", "fluid mechanics",
+            "vibration", "tribology", "finite element analysis", "fatigue", "hvac", "turbine",
+            "compressor", "engine", "thermal optimization",
+        ],
+        "preferred_objects": ["mechanical systems", "turbines", "heat exchangers", "engines", "HVAC systems", "rotating machinery"],
+        "preferred_metrics": ["thermal efficiency", "vibration response", "stress distribution", "fatigue life", "pressure drop", "energy efficiency"],
+    },
+    "electrical_electronics_engineering": {
+        "subdomain_label": "Electrical / Electronics Engineering",
+        "keywords": [
+            "electrical engineering", "electronics", "power systems", "smart grid", "renewable energy",
+            "power electronics", "signal processing", "control systems", "embedded systems",
+            "microcontroller", "sensor networks", "iot", "antenna", "wireless communication",
+        ],
+        "preferred_objects": ["power grids", "embedded systems", "sensor networks", "antennas", "control systems", "electronic circuits"],
+        "preferred_metrics": ["energy efficiency", "signal quality", "voltage stability", "reliability", "latency", "power loss"],
+    },
+    "computer_software_engineering": {
+        "subdomain_label": "Computer / Software Engineering",
+        "keywords": [
+            "software engineering", "computer engineering", "cybersecurity", "blockchain", "cloud computing",
+            "edge computing", "machine learning", "deep learning", "computer vision", "data mining",
+            "database", "distributed systems", "federated learning",
+        ],
+        "preferred_objects": ["software systems", "cyber-physical systems", "distributed networks", "blockchain systems", "AI models", "databases"],
+        "preferred_metrics": ["accuracy", "latency", "robustness", "security", "scalability", "privacy", "computational efficiency"],
+    },
+    "aerospace_uav_engineering": {
+        "subdomain_label": "Aerospace / UAV Engineering",
+        "keywords": [
+            "aerospace", "aviation", "uav", "drone", "flight control", "aerodynamics",
+            "propulsion", "avionics", "satellite", "trajectory optimization", "swarm", "autonomous flight",
+            "suru haberlesmesi", "ucus kontrol",
+        ],
+        "preferred_objects": ["UAV systems", "aircraft structures", "satellite systems", "flight controllers", "drone swarms"],
+        "preferred_metrics": ["flight stability", "trajectory accuracy", "aerodynamic efficiency", "mission reliability", "communication latency"],
+    },
+    "chemical_process_engineering": {
+        "subdomain_label": "Chemical / Process Engineering",
+        "keywords": [
+            "chemical engineering", "catalyst", "reaction kinetics", "process optimization", "membrane",
+            "bioreactor", "mass transfer", "separation process", "chemical process", "reactor design",
+        ],
+        "preferred_objects": ["chemical reactors", "catalysts", "membranes", "separation systems", "bioreactors", "process plants"],
+        "preferred_metrics": ["conversion efficiency", "selectivity", "yield", "mass transfer rate", "process stability", "energy consumption"],
+    },
+    "industrial_systems_engineering": {
+        "subdomain_label": "Industrial / Systems Engineering",
+        "keywords": [
+            "industrial engineering", "optimization", "supply chain", "production planning", "scheduling",
+            "quality control", "lean manufacturing", "decision support", "simulation", "logistics", "operations research",
+        ],
+        "preferred_objects": ["production systems", "supply chains", "logistics networks", "manufacturing lines", "decision support systems"],
+        "preferred_metrics": ["cost reduction", "throughput", "resource utilization", "waiting time", "productivity", "quality improvement"],
+    },
+    "energy_environmental_engineering": {
+        "subdomain_label": "Energy / Environmental Engineering",
+        "keywords": [
+            "energy systems", "renewable energy", "solar", "wind turbine", "photovoltaic", "battery",
+            "hydrogen", "environmental engineering", "wastewater", "air pollution", "carbon emissions",
+            "sustainability", "life cycle assessment", "kestirimci bakim",
+        ],
+        "preferred_objects": ["solar panels", "wind turbines", "batteries", "hydrogen systems", "wastewater systems", "environmental monitoring systems"],
+        "preferred_metrics": ["energy yield", "efficiency", "emissions reduction", "degradation", "sustainability", "environmental impact", "reliability"],
+    },
+    "biomedical_engineering": {
+        "subdomain_label": "Biomedical Engineering",
+        "keywords": [
+            "biomedical engineering", "biosensor", "prosthesis", "rehabilitation robotics", "medical device",
+            "wearable sensor", "ecg", "eeg", "mri", "ct", "biomedical signal", "medical imaging",
+        ],
+        "preferred_objects": ["biosensors", "medical devices", "wearable systems", "prosthetic systems", "biomedical signals"],
+        "preferred_metrics": ["diagnostic accuracy", "signal quality", "device reliability", "usability", "safety"],
+    },
+    "general_engineering": {
+        "subdomain_label": "General Engineering",
+        "keywords": ["engineering", "optimization", "simulation", "monitoring", "reliability"],
+        "preferred_objects": ["engineering systems", "sensor-enabled systems", "simulation models", "benchmark systems"],
+        "preferred_metrics": ["reliability", "efficiency", "robustness", "performance", "scalability"],
+    },
+}
+
+HEALTHCARE_SUBDOMAIN_ONTOLOGY = {
+    "medicine_clinical": {
+        "subdomain_label": "Clinical Medicine",
+        "keywords": ["medicine", "clinical medicine", "internal medicine", "diagnosis", "treatment", "prognosis", "disease", "patient", "clinical decision support", "clinical risk prediction", "therapy", "clinical outcome", "cancer", "oncology"],
+        "preferred_objects": ["patients", "clinical cohorts", "disease groups", "diagnostic workflows", "treatment pathways"],
+        "preferred_metrics": ["diagnostic accuracy", "prognosis", "treatment response", "clinical outcome", "mortality risk", "readmission risk"],
+    },
+    "nursing": {
+        "subdomain_label": "Nursing",
+        "keywords": ["nursing", "nurse", "nursing care", "patient care", "care quality", "nursing workload", "burnout", "triage", "patient safety", "clinical nursing", "nursing education"],
+        "preferred_objects": ["nursing care processes", "nurses", "hospital wards", "patient safety systems", "nursing education programs"],
+        "preferred_metrics": ["care quality", "workload", "burnout risk", "patient safety", "triage accuracy", "nursing performance"],
+    },
+    "midwifery": {
+        "subdomain_label": "Midwifery",
+        "keywords": ["midwifery", "midwife", "maternal health", "pregnancy", "prenatal care", "antenatal care", "postpartum", "childbirth", "birth outcomes", "neonatal", "obstetric care"],
+        "preferred_objects": ["pregnant women", "maternal health services", "prenatal care pathways", "childbirth processes", "neonatal outcomes"],
+        "preferred_metrics": ["maternal risk", "birth outcomes", "prenatal care quality", "postpartum complications", "neonatal safety"],
+    },
+    "biomedical_engineering_health": {
+        "subdomain_label": "Biomedical Engineering / Health Technologies",
+        "keywords": ["biomedical engineering", "medical device", "biosensor", "wearable sensor", "prosthesis", "rehabilitation robotics", "biomedical signal", "ecg", "eeg", "mri", "ct", "medical imaging", "bioinstrumentation"],
+        "preferred_objects": ["medical devices", "biosensors", "wearable health systems", "biomedical signals", "imaging systems", "prosthetic systems"],
+        "preferred_metrics": ["device reliability", "signal quality", "diagnostic accuracy", "usability", "safety", "measurement precision"],
+    },
+    "public_health": {
+        "subdomain_label": "Public Health",
+        "keywords": ["public health", "epidemiology", "health policy", "population health", "vaccination", "disease surveillance", "health inequality", "environmental health", "community health", "outbreak"],
+        "preferred_objects": ["populations", "communities", "surveillance systems", "public health programs", "epidemiological datasets"],
+        "preferred_metrics": ["incidence", "prevalence", "risk factors", "intervention effectiveness", "health equity", "outbreak prediction"],
+    },
+    "dentistry": {
+        "subdomain_label": "Dentistry",
+        "keywords": ["dentistry", "dental", "oral health", "caries", "periodontal", "orthodontics", "implant", "maxillofacial", "dental imaging"],
+        "preferred_objects": ["dental patients", "oral health datasets", "dental images", "periodontal assessments", "implant systems"],
+        "preferred_metrics": ["caries detection", "periodontal risk", "treatment success", "implant stability", "oral health outcome"],
+    },
+    "pharmacy_pharmacology": {
+        "subdomain_label": "Pharmacy / Pharmacology",
+        "keywords": ["pharmacy", "pharmacology", "drug", "medication", "adverse drug reaction", "pharmacovigilance", "dosage", "drug interaction", "medication adherence"],
+        "preferred_objects": ["medications", "prescriptions", "drug safety records", "pharmacovigilance databases", "treatment regimens"],
+        "preferred_metrics": ["drug safety", "adverse reaction risk", "medication adherence", "dosage optimization", "therapeutic response"],
+    },
+    "nutrition_dietetics": {
+        "subdomain_label": "Nutrition and Dietetics",
+        "keywords": ["nutrition", "dietetics", "diet", "dietary intake", "obesity", "malnutrition", "food consumption", "nutritional assessment", "metabolic health"],
+        "preferred_objects": ["dietary records", "nutrition programs", "metabolic health profiles", "patient diets"],
+        "preferred_metrics": ["nutritional status", "obesity risk", "malnutrition risk", "dietary adherence", "metabolic outcome"],
+    },
+    "physiotherapy_rehabilitation": {
+        "subdomain_label": "Physiotherapy and Rehabilitation",
+        "keywords": ["physiotherapy", "physical therapy", "rehabilitation", "exercise therapy", "gait analysis", "motor recovery", "musculoskeletal", "stroke rehabilitation"],
+        "preferred_objects": ["rehabilitation programs", "patients undergoing therapy", "gait signals", "exercise interventions", "musculoskeletal assessments"],
+        "preferred_metrics": ["functional recovery", "mobility improvement", "pain reduction", "gait performance", "rehabilitation outcome"],
+    },
+    "mental_health_psychology": {
+        "subdomain_label": "Mental Health / Psychology",
+        "keywords": ["mental health", "psychology", "psychiatry", "depression", "anxiety", "stress", "burnout", "cognitive assessment", "behavioral health"],
+        "preferred_objects": ["mental health assessments", "psychological scales", "behavioral datasets", "therapy programs"],
+        "preferred_metrics": ["symptom severity", "stress level", "burnout risk", "treatment response", "cognitive performance"],
+    },
+    "general_healthcare": {
+        "subdomain_label": "General Healthcare",
+        "keywords": ["healthcare", "medical", "clinical", "digital health"],
+        "preferred_objects": ["healthcare workflows", "health datasets", "care delivery systems", "decision support workflows"],
+        "preferred_metrics": ["care quality", "risk prediction", "workflow efficiency", "safety", "outcome improvement"],
+    },
+}
+
+TURKISH_ENGINEERING_MAP = {
+    "malzeme mühendisliği": "materials engineering", "malzeme muhendisligi": "materials engineering",
+    "kompozit malzemeler": "composite materials", "kaplama teknolojileri": "coating technologies",
+    "korozyon direnci": "corrosion resistance", "yorulma analizi": "fatigue analysis",
+    "ısıl işlem": "heat treatment", "isil islem": "heat treatment", "mikro yapı": "microstructure",
+    "mikroyapı": "microstructure", "mekanik dayanım": "mechanical strength", "mekanik dayanim": "mechanical strength",
+    "katkılı imalat": "additive manufacturing", "katkili imalat": "additive manufacturing",
+    "polimer kompozit": "polymer composites", "inşaat mühendisliği": "civil engineering",
+    "insaat muhendisligi": "civil engineering", "deprem": "earthquake", "köprü": "bridge",
+    "kopru": "bridge", "beton": "concrete", "zemin": "soil", "makine mühendisliği": "mechanical engineering",
+    "makine muhendisligi": "mechanical engineering", "akışkanlar": "fluid mechanics",
+    "akiskanlar": "fluid mechanics", "ısı transferi": "heat transfer", "isi transferi": "heat transfer",
+    "elektrik elektronik": "electrical electronics engineering", "güç sistemleri": "power systems",
+    "guc sistemleri": "power systems", "gömülü sistemler": "embedded systems",
+    "gomulu sistemler": "embedded systems", "havacılık": "aerospace", "havacilik": "aerospace",
+    "iha": "uav", "İHA": "uav", "kimya mühendisliği": "chemical engineering",
+    "kimya muhendisligi": "chemical engineering", "endüstri mühendisliği": "industrial engineering",
+    "endustri muhendisligi": "industrial engineering", "enerji sistemleri": "energy systems",
+    "çevre mühendisliği": "environmental engineering", "cevre muhendisligi": "environmental engineering",
+    "biyomedikal mühendisliği": "biomedical engineering", "biyomedikal muhendisligi": "biomedical engineering",
+    "rüzgar türbini": "wind turbine", "ruzgar turbini": "wind turbine", "kestirimci bakım": "predictive maintenance",
+    "kestirimci bakim": "predictive maintenance", "sürü haberleşmesi": "swarm communication",
+    "suru haberlesmesi": "swarm communication", "uçuş kontrol": "flight control", "ucus kontrol": "flight control",
+}
+
+TURKISH_HEALTHCARE_MAP = {
+    "tıp": "medicine", "tip": "medicine", "klinik": "clinical", "tanı": "diagnosis",
+    "tani": "diagnosis", "tedavi": "treatment", "prognoz": "prognosis", "hasta": "patient",
+    "kanser": "cancer", "onkoloji": "oncology", "hemşirelik": "nursing", "hemsirelik": "nursing",
+    "hemşire": "nurse", "hemsire": "nurse", "hasta bakımı": "patient care", "hasta bakimi": "patient care",
+    "bakım kalitesi": "care quality", "bakim kalitesi": "care quality", "hasta güvenliği": "patient safety",
+    "hasta guvenligi": "patient safety", "ebelik": "midwifery", "ebe": "midwife", "gebelik": "pregnancy",
+    "doğum": "childbirth", "dogum": "childbirth", "anne sağlığı": "maternal health",
+    "anne sagligi": "maternal health", "yenidoğan": "neonatal", "yenidogan": "neonatal",
+    "biyomedikal": "biomedical engineering", "tıbbi cihaz": "medical device", "tibbi cihaz": "medical device",
+    "biyosensör": "biosensor", "biyosensor": "biosensor", "giyilebilir sensör": "wearable sensor",
+    "giyilebilir sensor": "wearable sensor", "tıbbi görüntüleme": "medical imaging",
+    "tibbi goruntuleme": "medical imaging", "halk sağlığı": "public health", "halk sagligi": "public health",
+    "epidemiyoloji": "epidemiology", "aşılama": "vaccination", "asilama": "vaccination",
+    "ağız ve diş sağlığı": "oral health", "agiz ve dis sagligi": "oral health",
+    "diş hekimliği": "dentistry", "dis hekimligi": "dentistry", "eczacılık": "pharmacy",
+    "eczacilik": "pharmacy", "farmakoloji": "pharmacology", "ilaç etkileşimi": "drug interaction",
+    "ilac etkilesimi": "drug interaction", "beslenme": "nutrition", "diyetetik": "dietetics",
+    "fizyoterapi": "physiotherapy", "rehabilitasyon": "rehabilitation", "ruh sağlığı": "mental health",
+    "ruh sagligi": "mental health", "psikoloji": "psychology", "depresyon": "depression", "anksiyete": "anxiety",
+}
+
 
 st.set_page_config(page_title="ResearchMind AI", layout="wide")
 
@@ -804,6 +1027,147 @@ def normalize_topic_key(value: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def apply_phrase_replacements(text: str, replacements: dict[str, str]) -> str:
+    clean = unicodedata.normalize("NFKC", str(text or ""))
+    for source, target in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
+        clean = re.sub(re.escape(source), target, clean, flags=re.I)
+    return re.sub(r"\s+", " ", clean).strip()
+
+
+def normalize_keywords_for_domain(text: str) -> dict[str, str]:
+    original = re.sub(r"\s+", " ", str(text or "").replace("\n", " ")).strip()
+    expanded = apply_phrase_replacements(original, {**TURKISH_ENGINEERING_MAP, **TURKISH_HEALTHCARE_MAP})
+    return {
+        "original": original,
+        "expanded": expanded,
+        "normalized": normalize_topic_key(expanded),
+        "display": original or expanded,
+    }
+
+
+def _score_subdomain(normalized_text: str, ontology_item: dict) -> tuple[float, list[str]]:
+    tokens = set(normalized_text.split())
+    score = 0.0
+    matches = []
+    for keyword in ontology_item.get("keywords", []):
+        key = normalize_topic_key(keyword)
+        if not key:
+            continue
+        if re.search(rf"(?<![a-z0-9]){re.escape(key)}(?![a-z0-9])", normalized_text):
+            score += 3
+            matches.append(keyword)
+            continue
+        if tokens & set(key.split()):
+            score += 1
+            matches.append(keyword)
+    return score, list(dict.fromkeys(matches))
+
+
+def detect_subdomain(normalized_keywords: str, ontology: dict, fallback_key: str) -> dict:
+    best_key = fallback_key
+    best_score = -1.0
+    best_matches: list[str] = []
+    for subdomain_key, item in ontology.items():
+        if subdomain_key == fallback_key:
+            continue
+        score, matches = _score_subdomain(normalized_keywords, item)
+        if score > best_score:
+            best_key = subdomain_key
+            best_score = score
+            best_matches = matches
+    if best_score <= 0:
+        best_key = fallback_key
+        best_score = 0.0
+        best_matches = []
+    item = ontology[best_key]
+    return {
+        "subdomain_key": best_key,
+        "subdomain_label": item["subdomain_label"],
+        "confidence": round(min(1.0, best_score / 9.0), 3),
+        "matched_keywords": best_matches,
+        "preferred_objects": list(item.get("preferred_objects", [])),
+        "preferred_metrics": list(item.get("preferred_metrics", [])),
+    }
+
+
+def detect_engineering_subdomain(normalized_keywords: str) -> dict:
+    return detect_subdomain(normalized_keywords, ENGINEERING_SUBDOMAIN_ONTOLOGY, "general_engineering")
+
+
+def detect_healthcare_subdomain(normalized_keywords: str) -> dict:
+    return detect_subdomain(normalized_keywords, HEALTHCARE_SUBDOMAIN_ONTOLOGY, "general_healthcare")
+
+
+def domain_intent(query: str, selected_domain: str | None = None) -> dict:
+    selected_domain = selected_domain or current_selected_domain()
+    processed = normalize_keywords_for_domain(query)
+    detected = (
+        detect_engineering_subdomain(processed["normalized"])
+        if selected_domain == ENGINEERING_DOMAIN
+        else detect_healthcare_subdomain(processed["normalized"])
+    )
+    return {
+        **detected,
+        "selected_domain": selected_domain,
+        "original_keywords": processed["original"],
+        "expanded_keywords": processed["expanded"],
+        "normalized_keywords": processed["normalized"],
+    }
+
+
+def _cycle_pick(items: list[str], index: int, fallback: str) -> str:
+    return items[index % len(items)] if items else fallback
+
+
+def generate_intent_titles(query: str, selected_domain: str | None = None, min_count: int = 5) -> list[dict[str, str]]:
+    intent = domain_intent(query, selected_domain)
+    label = intent["subdomain_label"]
+    objects = intent.get("preferred_objects") or [title_case_topic(intent.get("expanded_keywords") or query)]
+    metrics = intent.get("preferred_metrics") or ["performance"]
+    selected_domain = intent["selected_domain"]
+    subdomain_key = intent["subdomain_key"]
+
+    if selected_domain == ENGINEERING_DOMAIN:
+        templates = [
+            "Explainable AI for {metric} Prediction in {object}",
+            "Machine Learning-Based {metric} Assessment in {object}",
+            "Digital Twin-Based {object} Monitoring for {metric}",
+            "Optimization-Driven {object} Design for {metric}",
+            "Benchmark Dataset Evaluation for {metric} in {subdomain_label}",
+            "Decision Support Model for {metric} in {subdomain_label}",
+        ]
+    else:
+        templates = [
+            "Explainable AI for {metric} Prediction in {object}",
+            "Machine Learning-Based {metric} Assessment in {object}",
+            "Digital Health Framework for {object} Monitoring",
+            "Benchmark Dataset Evaluation for {metric} in {subdomain_label}",
+            "Decision Support Model for {metric} in {subdomain_label}",
+        ]
+        if subdomain_key == "medicine_clinical":
+            templates.insert(2, "Clinical Decision Support Model for {metric} in {subdomain_label}")
+
+    rows = []
+    seen = set()
+    for index, template in enumerate(templates * 2):
+        title = template.format(
+            metric=_cycle_pick(metrics, index, "performance"),
+            object=_cycle_pick(objects, index, label),
+            subdomain_label=label,
+        )
+        title = re.sub(r"\s+", " ", title).strip()
+        key = normalize_topic_key(title)
+        if key and key not in seen:
+            seen.add(key)
+            rows.append({
+                "title": title,
+                "rationale": f"{label} intent preserved using objects and metrics detected from the user's keywords.",
+            })
+        if len(rows) >= min_count:
+            break
+    return rows
+
+
 def clean_topic_label(value: str) -> str:
     text = re.sub(r"\s+", " ", str(value or "").replace("’", "'")).strip(" ,;")
     text = re.sub(r"\bAlzheimer\?s disease\b", "Alzheimer's disease", text, flags=re.I)
@@ -884,6 +1248,26 @@ def forbidden_terms_for_domain(selected_domain: str, query: str) -> set[str]:
 
 
 def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]:
+    intent = domain_intent(query, selected_domain)
+    label = intent["subdomain_label"]
+    objects = intent.get("preferred_objects", [])
+    metrics = intent.get("preferred_metrics", [])
+    object_text = ", ".join(objects[:3]) or title_case_topic(intent.get("expanded_keywords") or query)
+    metric_text = ", ".join(metrics[:3]) or "performance"
+    if selected_domain == ENGINEERING_DOMAIN:
+        return {
+            "direction": f"{label} research focused on {metric_text} in {object_text}",
+            "methodology": engineering_methodology_for_intent(intent),
+            "evidence": evidence_focus_for_intent(intent),
+            "differentiation": f"Differentiate the work through subdomain-specific {metric_text}, benchmark validation, transparent error analysis, and a clearly defined engineering object: {object_text}.",
+        }
+    if selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
+        return {
+            "direction": f"{label} research focused on {metric_text} in {object_text}",
+            "methodology": healthcare_methodology_for_intent(intent),
+            "evidence": evidence_focus_for_intent(intent),
+            "differentiation": f"Differentiate the work through {label.lower()}-specific outcomes, validated measurement instruments, transparent error analysis, and a clearly defined evidence base.",
+        }
     key = normalize_topic_key(query)
     if selected_domain == ENGINEERING_DOMAIN:
         if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building", "infrastructure"]):
@@ -924,23 +1308,31 @@ def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]
 
 
 def domain_specific_insight(query: str, selected_domain: str) -> str:
+    intent = domain_intent(query, selected_domain)
+    label = intent["subdomain_label"]
+    objects = ", ".join(intent.get("preferred_objects", [])[:3]) or "the target research object"
+    metrics = ", ".join(intent.get("preferred_metrics", [])[:3]) or "domain-specific performance"
     if selected_domain == ENGINEERING_DOMAIN:
         return (
-            "This engineering topic should be framed around system-level validation, real-time constraints, "
-            "sensor or simulation evidence, and reliability-oriented performance metrics. Strong differentiation "
-            "comes from benchmark evaluation, deployment feasibility, and robust fault or threat detection."
+            f"This {label} topic should be framed around {objects}, measurable {metrics}, "
+            "benchmark or simulation evidence, and engineering performance metrics. Strong differentiation "
+            "comes from preserving the engineering object, deployment feasibility, and robust validation."
         )
     return (
-        "This healthcare and biomedical topic should be framed around disease-specific evidence, modality-aware modeling, "
-        "explainability, and external validation. Strong differentiation comes from clinically meaningful endpoints and "
-        "privacy-preserving or multimodal validation when relevant."
+        f"This {label} topic should be framed around {objects}, measurable {metrics}, "
+        "subdomain-specific evidence, and transparent validation. Strong differentiation comes from preserving "
+        "the healthcare research object rather than drifting into unrelated technical suffixes."
     )
 
 
 def domain_specific_paperability_reason(query: str, selected_domain: str) -> str:
+    intent = domain_intent(query, selected_domain)
+    label = intent["subdomain_label"]
+    objects = ", ".join(intent.get("preferred_objects", [])[:2]) or "domain-specific evidence"
+    metrics = ", ".join(intent.get("preferred_metrics", [])[:2]) or "validated outcomes"
     if selected_domain == ENGINEERING_DOMAIN:
-        return "Engineering evidence such as sensor streams, simulation results, benchmark datasets, reliability analysis and engineering performance metrics improves publication feasibility."
-    return domain_evidence_reason(query)
+        return f"{label} evidence such as {objects}, benchmark datasets, and {metrics} improves publication feasibility."
+    return f"{label} evidence such as {objects} and {metrics} improves publication feasibility."
 
 
 def sanitize_engineering_language(text: str) -> str:
@@ -951,7 +1343,178 @@ def sanitize_engineering_language(text: str) -> str:
     return clean
 
 
+def forbidden_terms_for_intent(intent: dict) -> set[str]:
+    selected_domain = intent.get("selected_domain", current_selected_domain())
+    subdomain = intent.get("subdomain_key", "")
+    explicit = set(intent.get("normalized_keywords", "").split())
+    explicit_text = intent.get("normalized_keywords", "")
+
+    if selected_domain == ENGINEERING_DOMAIN:
+        forbidden = {
+            "clinical", "patient", "disease", "diagnosis", "treatment", "hospital", "healthcare",
+            "medical", "eeg", "ecg", "mri", "ct", "covid 19", "covid", "oncology", "alzheimer",
+            "nursing", "midwifery", "clinical decision support", "clinically meaningful endpoints",
+        }
+        if subdomain == "biomedical_engineering" or any(term in explicit_text for term in ["biomedical", "medical device", "medical imaging", "biosensor"]):
+            forbidden -= {"medical", "eeg", "ecg", "mri", "ct", "diagnosis"}
+        cross = {
+            "materials_engineering": {"bridge", "seismic", "earthquake", "concrete", "structural", "uav", "drone", "flight", "turbine"},
+            "civil_structural_engineering": {"coating", "corrosion", "polymer", "composite materials", "uav", "drone", "eeg"},
+            "mechanical_engineering": {"bridge", "seismic", "concrete", "coating", "corrosion", "uav", "drone", "eeg"},
+            "aerospace_uav_engineering": {"concrete", "coating", "corrosion", "patient", "clinical"},
+            "energy_environmental_engineering": {"patient", "clinical", "eeg", "oncology"},
+        }
+        forbidden |= cross.get(subdomain, set())
+    else:
+        forbidden = {
+            "seismic", "bridge", "concrete", "corrosion", "coating", "uav", "drone", "turbine",
+            "cfd", "additive manufacturing", "power grid", "geotechnical", "structural health monitoring",
+        }
+
+    allowed = {term for term in forbidden if term and (term in explicit_text or any(token in explicit for token in normalize_topic_key(term).split()))}
+    return forbidden - allowed
+
+
+def find_forbidden_terms(text: str, forbidden: set[str]) -> list[str]:
+    key = normalize_topic_key(text)
+    return sorted(term for term in forbidden if normalize_topic_key(term) and re.search(rf"(?<![a-z0-9]){re.escape(normalize_topic_key(term))}(?![a-z0-9])", key))
+
+
+def sanitize_text_for_intent(text: str, intent: dict) -> str:
+    clean = str(text or "")
+    if intent.get("selected_domain") == ENGINEERING_DOMAIN:
+        replacements = {
+            **ENGINEERING_LANGUAGE_REPLACEMENTS,
+            "EEG": "sensor", "ECG": "sensor", "MRI": "sensor", "CT": "sensor",
+            "COVID-19": "benchmark", "COVID": "benchmark", "oncology": "engineering application",
+            "Alzheimer": "target system", "nursing": "operations", "midwifery": "operations",
+        }
+        clean = apply_phrase_replacements(clean, replacements)
+    forbidden = forbidden_terms_for_intent(intent)
+    for term in find_forbidden_terms(clean, forbidden):
+        clean = re.sub(rf"(?<![A-Za-z0-9]){re.escape(term)}(?![A-Za-z0-9])", "", clean, flags=re.I)
+    return re.sub(r"\s+", " ", clean).strip(" ;,.")
+
+
+def sanitize_suggestions_for_intent(suggestions: pd.DataFrame, query: str, selected_domain: str | None = None) -> pd.DataFrame:
+    suggestions = _as_dataframe(suggestions)
+    intent = domain_intent(query, selected_domain)
+    forbidden = forbidden_terms_for_intent(intent)
+    title_col = "suggested_research_topic" if "suggested_research_topic" in suggestions.columns else "suggested_topic" if "suggested_topic" in suggestions.columns else None
+
+    if suggestions.empty or not title_col:
+        return intent_topics_to_dataframe(query, intent["selected_domain"])
+
+    out = suggestions.copy()
+    before = len(out)
+    mask = out.astype(str).agg(" ".join, axis=1).map(lambda text: not find_forbidden_terms(text, forbidden))
+    out = out.loc[mask].copy()
+    if len(out) < 3:
+        out = pd.concat([out, intent_topics_to_dataframe(query, intent["selected_domain"])], ignore_index=True, sort=False)
+    out[title_col] = out[title_col].map(lambda value: sanitize_text_for_intent(value, intent))
+    out = out[out[title_col].fillna("").astype(str).str.strip().ne("")]
+    out = out.drop_duplicates(subset=[title_col], keep="first").head(8).reset_index(drop=True)
+    out.attrs["domain_filtered_count"] = max(0, before - len(out))
+    return out
+
+
+def sanitize_topic_items_for_intent(topics: list[dict[str, str]], query: str, selected_domain: str | None = None) -> list[dict[str, str]]:
+    intent = domain_intent(query, selected_domain)
+    forbidden = forbidden_terms_for_intent(intent)
+    clean_topics = []
+    seen = set()
+    for item in topics:
+        title = sanitize_text_for_intent(item.get("title", ""), intent)
+        rationale = sanitize_text_for_intent(item.get("rationale", ""), intent)
+        key = normalize_topic_key(title)
+        if title and key not in seen and not find_forbidden_terms(title, forbidden):
+            seen.add(key)
+            clean_topics.append({"title": title, "rationale": rationale or f"{intent['subdomain_label']} intent preserved."})
+    if len(clean_topics) < 3:
+        for item in generate_intent_titles(query, intent["selected_domain"], min_count=5):
+            key = normalize_topic_key(item["title"])
+            if key not in seen:
+                seen.add(key)
+                clean_topics.append(item)
+            if len(clean_topics) >= 5:
+                break
+    return clean_topics[:5]
+
+
+def engineering_methodology_for_intent(intent: dict) -> str:
+    subdomain = intent.get("subdomain_key")
+    pools = {
+        "civil_structural_engineering": ["structural health monitoring", "finite element analysis", "fragility analysis", "sensor fusion", "reliability analysis"],
+        "materials_engineering": ["microstructure-property modeling", "durability testing", "materials informatics", "mechanical performance prediction", "experimental benchmark validation"],
+        "mechanical_engineering": ["CFD/FEM simulation", "thermal optimization", "vibration analysis", "surrogate modeling", "benchmark validation"],
+        "electrical_electronics_engineering": ["signal processing", "embedded systems validation", "control systems", "IoT/edge AI architecture", "reliability analysis"],
+        "computer_software_engineering": ["benchmark dataset evaluation", "robustness testing", "scalability analysis", "privacy-aware architecture", "computational efficiency analysis"],
+        "aerospace_uav_engineering": ["flight control modeling", "sensor fusion", "edge AI", "trajectory optimization", "real-time monitoring"],
+        "chemical_process_engineering": ["process optimization", "reaction kinetics modeling", "mass transfer analysis", "simulation-based validation", "stability analysis"],
+        "industrial_systems_engineering": ["operations research", "simulation modeling", "scheduling optimization", "decision support modeling", "quality control analytics"],
+        "energy_environmental_engineering": ["digital twin modeling", "predictive maintenance", "sensor fusion", "time-series forecasting", "reliability analysis"],
+        "biomedical_engineering": ["biomedical signal processing", "device reliability testing", "usability validation", "safety analysis", "benchmark biomedical datasets"],
+    }
+    return "; ".join(pools.get(subdomain, ["simulation-based validation", "optimization algorithms", "benchmark dataset evaluation", "real-time monitoring", "reliability analysis"]))
+
+
+def healthcare_methodology_for_intent(intent: dict) -> str:
+    subdomain = intent.get("subdomain_key")
+    pools = {
+        "nursing": ["validated nursing scales", "care quality modeling", "workload analysis", "patient safety outcome modeling", "transparent error analysis"],
+        "midwifery": ["maternal risk stratification", "prenatal care indicators", "birth outcome modeling", "neonatal safety assessment", "transparent error analysis"],
+        "biomedical_engineering_health": ["biomedical signal processing", "device reliability testing", "usability validation", "safety assessment", "benchmark biomedical datasets"],
+        "public_health": ["epidemiological modeling", "population-level validation", "intervention effectiveness analysis", "bias assessment", "uncertainty analysis"],
+        "dentistry": ["dental imaging analytics", "oral health outcome modeling", "periodontal risk assessment", "implant stability analysis", "transparent error analysis"],
+        "pharmacy_pharmacology": ["pharmacovigilance modeling", "drug safety analysis", "dosage optimization", "adverse reaction risk prediction", "transparent error analysis"],
+        "nutrition_dietetics": ["dietary record analysis", "nutritional status modeling", "metabolic outcome assessment", "adherence modeling", "transparent error analysis"],
+        "physiotherapy_rehabilitation": ["gait analysis", "functional recovery modeling", "exercise intervention assessment", "rehabilitation outcome validation", "transparent error analysis"],
+        "mental_health_psychology": ["validated psychological scales", "symptom severity modeling", "behavioral data analysis", "treatment response prediction", "transparent error analysis"],
+    }
+    return "; ".join(pools.get(subdomain, ["external validation", "clinically interpretable modeling", "transparent error analysis", "outcome-focused evaluation"]))
+
+
+def evidence_focus_for_intent(intent: dict) -> str:
+    subdomain = intent.get("subdomain_key")
+    engineering = {
+        "civil_structural_engineering": "benchmark structural datasets; simulation-based validation; fragility analysis; structural safety metrics",
+        "materials_engineering": "experimental datasets; microstructure-property validation; mechanical performance metrics; durability testing",
+        "mechanical_engineering": "CFD/FEM outputs; thermal or vibration benchmarks; experimental measurements; engineering performance metrics",
+        "electrical_electronics_engineering": "sensor/network measurements; embedded system logs; signal quality benchmarks; latency and reliability metrics",
+        "computer_software_engineering": "benchmark datasets; system logs; scalability tests; security and robustness metrics",
+        "aerospace_uav_engineering": "UAV telemetry; flight-control logs; swarm communication benchmarks; real-time performance metrics",
+        "chemical_process_engineering": "reactor/process data; catalyst measurements; mass transfer benchmarks; process stability metrics",
+        "industrial_systems_engineering": "production logs; logistics datasets; simulation models; productivity and throughput metrics",
+        "energy_environmental_engineering": "SCADA signals; turbine or battery sensor streams; environmental monitoring data; reliability metrics",
+        "biomedical_engineering": "device measurements; biomedical signals; usability tests; safety and reliability evidence",
+    }
+    healthcare = {
+        "medicine_clinical": "external validation; clinically meaningful endpoints; transparent error analysis; clinically interpretable model outputs",
+        "nursing": "validated nursing scales; care quality indicators; patient safety outcomes; workload measures",
+        "midwifery": "maternal and neonatal outcomes; prenatal care indicators; birth outcome measures; transparent risk stratification",
+        "biomedical_engineering_health": "device reliability; signal quality; benchmark biomedical datasets; usability and safety evidence",
+        "public_health": "population-level datasets; epidemiological validity; intervention outcomes; bias assessment",
+        "dentistry": "dental images; oral health datasets; periodontal assessments; implant outcome evidence",
+        "pharmacy_pharmacology": "pharmacovigilance databases; prescription records; drug safety outcomes; dosage response evidence",
+        "nutrition_dietetics": "dietary records; nutrition programs; metabolic health profiles; adherence measures",
+        "physiotherapy_rehabilitation": "gait signals; exercise intervention records; functional recovery measures; rehabilitation outcomes",
+        "mental_health_psychology": "validated psychological scales; behavioral datasets; symptom severity measures; therapy response evidence",
+    }
+    return engineering.get(subdomain) or healthcare.get(subdomain) or "; ".join((intent.get("preferred_objects", []) + intent.get("preferred_metrics", []))[:5])
+
+
+def validation_strategy_for_intent(intent: dict) -> str:
+    return evidence_focus_for_intent(intent) + "; transparent error analysis."
+
+
 def domain_narrowing_for_selected(query: str, selected_domain: str) -> str:
+    intent = domain_intent(query, selected_domain)
+    object_text = ", ".join(intent.get("preferred_objects", [])[:2]) or title_case_topic(intent.get("expanded_keywords") or query)
+    metric_text = ", ".join(intent.get("preferred_metrics", [])[:2]) or "performance"
+    if selected_domain == ENGINEERING_DOMAIN:
+        return f"Narrow the topic around {object_text}, measurable {metric_text}, benchmark or simulation-based validation, and a clearly defined engineering performance contribution."
+    if selected_domain == HEALTHCARE_DOMAIN:
+        return f"Narrow the topic around {object_text}, measurable {metric_text}, subdomain-specific validation evidence, and transparent error analysis."
     if selected_domain == ENGINEERING_DOMAIN:
         key = normalize_topic_key(query)
         if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building"]):
@@ -969,7 +1532,8 @@ def domain_narrowing_for_selected(query: str, selected_domain: str) -> str:
 def apply_domain_guard_to_results(results: dict) -> dict:
     selected_domain = results.get("selected_domain") or current_selected_domain()
     query = results.get("query", "")
-    forbidden = forbidden_terms_for_domain(selected_domain, query)
+    intent = domain_intent(query, selected_domain)
+    forbidden = forbidden_terms_for_intent(intent) | forbidden_terms_for_domain(selected_domain, query)
     corrected = 0
     leakage_terms: set[str] = set()
 
@@ -980,7 +1544,7 @@ def apply_domain_guard_to_results(results: dict) -> dict:
         return bool(found)
 
     suggestions = _as_dataframe(results.get("ai_topic_suggestions"))
-    if selected_domain == ENGINEERING_DOMAIN:
+    if selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN}:
         results["research_strategy"] = domain_specific_strategy(query, selected_domain)
         corrected += 1
 
@@ -991,17 +1555,11 @@ def apply_domain_guard_to_results(results: dict) -> dict:
             filtered = suggestions.loc[mask].copy()
             corrected += len(suggestions) - len(filtered)
             if len(filtered) < 3:
-                fallback = domain_adapted_suggestions(query) if selected_domain == HEALTHCARE_DOMAIN else pd.DataFrame(
-                    [(item["title"], 68, "positive", item["rationale"]) for item in engineering_topic_refinement(query)],
-                    columns=["suggested_research_topic", "gap_score", "growth_rate", "recommendation"],
-                )
+                fallback = intent_topics_to_dataframe(query, selected_domain)
                 filtered = pd.concat([filtered, fallback], ignore_index=True).drop_duplicates(subset=[title_col], keep="first")
-            results["ai_topic_suggestions"] = filtered.head(8)
+            results["ai_topic_suggestions"] = sanitize_suggestions_for_intent(filtered.head(8), query, selected_domain)
 
-    if selected_domain == ENGINEERING_DOMAIN:
-        results["ai_research_insight"] = sanitize_engineering_language(
-            results.get("ai_research_insight") or domain_specific_insight(query, selected_domain)
-        )
+    results["ai_research_insight"] = sanitize_text_for_intent(domain_specific_insight(query, selected_domain), intent)
     if forbidden and has_forbidden(results.get("ai_research_insight", "")):
         results["ai_research_insight"] = domain_specific_insight(query, selected_domain)
         corrected += 1
@@ -1017,31 +1575,29 @@ def apply_domain_guard_to_results(results: dict) -> dict:
         if len(reasons) != len(paperability.get("reasons", [])):
             corrected += len(paperability.get("reasons", [])) - len(reasons)
         domain_reason = domain_specific_paperability_reason(query, selected_domain)
-        if selected_domain == ENGINEERING_DOMAIN and domain_reason not in reasons:
+        if domain_reason not in reasons:
             reasons.insert(0, domain_reason)
         if not reasons:
             reasons = [domain_reason]
         paperability["reasons"] = reasons[:5]
-        if selected_domain == ENGINEERING_DOMAIN or has_forbidden(paperability.get("recommended_next_action", "")):
+        if selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN} or has_forbidden(paperability.get("recommended_next_action", "")):
             paperability["recommended_next_action"] = domain_narrowing_for_selected(query, selected_domain)
             corrected += 1
-        if selected_domain == ENGINEERING_DOMAIN:
-            paperability["reasons"] = [sanitize_engineering_language(reason) for reason in paperability["reasons"]]
-            paperability["recommended_next_action"] = sanitize_engineering_language(paperability.get("recommended_next_action", ""))
-            metrics = []
-            for metric in paperability.get("metrics", []):
-                item = dict(metric)
-                item["metric"] = sanitize_engineering_language(item.get("metric", ""))
-                if item["metric"].lower().startswith("engineering / practical"):
-                    item["metric"] = "Engineering / Practical Relevance"
-                item["comment"] = sanitize_engineering_language(item.get("comment", ""))
-                metrics.append(item)
-            paperability["metrics"] = metrics
+        paperability["reasons"] = [sanitize_text_for_intent(reason, intent) for reason in paperability["reasons"]]
+        paperability["recommended_next_action"] = sanitize_text_for_intent(paperability.get("recommended_next_action", ""), intent)
+        metrics = []
+        for metric in paperability.get("metrics", []):
+            item = dict(metric)
+            item["metric"] = sanitize_text_for_intent(item.get("metric", ""), intent)
+            if selected_domain == ENGINEERING_DOMAIN and item["metric"].lower().startswith("engineering / practical"):
+                item["metric"] = "Engineering / Practical Relevance"
+            item["comment"] = sanitize_text_for_intent(item.get("comment", ""), intent)
+            metrics.append(item)
+        paperability["metrics"] = metrics
         results["paperability_score"] = paperability
 
-    if selected_domain == ENGINEERING_DOMAIN:
-        strategy = {key: sanitize_engineering_language(value) for key, value in dict(results.get("research_strategy") or {}).items()}
-        results["research_strategy"] = strategy
+    strategy = {key: sanitize_text_for_intent(value, intent) for key, value in dict(results.get("research_strategy") or {}).items()}
+    results["research_strategy"] = strategy
 
     inferred = infer_research_domain(query)
     leakage_score = round(min(1.0, len(leakage_terms) / 5), 2)
@@ -1212,6 +1768,8 @@ def domain_label(values: list[str], fallback: str = "Not detected") -> str:
 
 
 def build_domain_reasoning(query: str, suggestions: pd.DataFrame | None = None) -> dict:
+    selected_domain = current_selected_domain()
+    intent = domain_intent(query, selected_domain)
     concepts = extract_query_concepts(query)
     suggestions = _as_dataframe(suggestions)
     scores = pd.to_numeric(suggestions.get("domain_consistency_score", pd.Series(dtype=float)), errors="coerce").dropna()
@@ -1242,7 +1800,15 @@ def build_domain_reasoning(query: str, suggestions: pd.DataFrame | None = None) 
         "primary_disease": domain_label(concepts.get("disease", [])),
         "primary_modality": domain_label(modality),
         "primary_method": dominant_method,
-        "clinical_domain": domain_label(concepts.get("clinical_domain", [])),
+        "clinical_domain": intent["subdomain_label"],
+        "primary_domain": intent["subdomain_label"],
+        "selected_domain": selected_domain,
+        "subdomain_key": intent["subdomain_key"],
+        "subdomain_label": intent["subdomain_label"],
+        "subdomain_confidence": intent["confidence"],
+        "matched_keywords": ", ".join(intent.get("matched_keywords", [])[:8]),
+        "preferred_objects": ", ".join(intent.get("preferred_objects", [])[:6]),
+        "preferred_metrics": ", ".join(intent.get("preferred_metrics", [])[:6]),
         "domain_consistency_score": round(consistency, 3),
         "domain_consistency": consistency_label,
         "semantic_leakage_risk": risk,
@@ -1254,6 +1820,11 @@ def build_domain_reasoning(query: str, suggestions: pd.DataFrame | None = None) 
 def domain_reasoning_to_dataframe(reasoning: dict | None) -> pd.DataFrame:
     reasoning = reasoning or {}
     rows = [
+        ("selected subdomain", reasoning.get("subdomain_label", reasoning.get("primary_domain", "-"))),
+        ("subdomain confidence", reasoning.get("subdomain_confidence", "-")),
+        ("matched keywords", reasoning.get("matched_keywords", "-")),
+        ("preferred objects", reasoning.get("preferred_objects", "-")),
+        ("preferred metrics", reasoning.get("preferred_metrics", "-")),
         ("primary disease", reasoning.get("primary_disease", "-")),
         ("modality", reasoning.get("primary_modality", "-")),
         ("clinical domain", reasoning.get("clinical_domain", "-")),
@@ -1387,7 +1958,11 @@ def generate_ai_insight(
     return f"{opening} {detail} {recommendation}"
 
 
-def build_research_strategy(query: str, suggestions: pd.DataFrame | None = None) -> dict[str, str]:
+def build_research_strategy(query: str, suggestions: pd.DataFrame | None = None, selected_domain: str | None = None) -> dict[str, str]:
+    selected_domain = selected_domain or current_selected_domain()
+    intent = domain_intent(query, selected_domain)
+    if selected_domain == ENGINEERING_DOMAIN or (selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}):
+        return domain_specific_strategy(query, selected_domain)
     text = f"{query} "
     suggestions = _as_dataframe(suggestions)
     if not suggestions.empty:
@@ -1595,6 +2170,8 @@ def build_paperability_score(
     openalex_volume = parse_numeric((openalex_gap or {}).get("total_records"))
     distribution = distribution or {}
     domain_reasoning = domain_reasoning or build_domain_reasoning(query, suggestions)
+    selected_domain = domain_reasoning.get("selected_domain", current_selected_domain())
+    intent = domain_intent(query, selected_domain)
     openalex_volume = max(openalex_volume, parse_numeric(distribution.get("OpenAlex", 0)))
 
     generic_terms = {"artificial intelligence", "machine learning", "deep learning", "healthcare", "diagnosis"}
@@ -1611,10 +2188,21 @@ def build_paperability_score(
     saturation_risk = min(70, matched * 0.45) + min(30, openalex_volume / 180)
     competition = max(15, 100 - saturation_risk)
 
-    method_terms = ["explainable", "xai", "federated", "multimodal", "transformer", "vision transformer", "clinical validation", "mri", "pet"]
-    clinical_terms = ["alzheimer", "cancer", "diagnosis", "clinical decision support", "medical imaging", "neuroimaging", "patient", "disease"]
-    evidence_terms = ["mri", "pet", "eeg", "public dataset", "clinical records", "small dataset", "multi center", "multi-center", "validation"]
+    if selected_domain == ENGINEERING_DOMAIN:
+        method_terms = ["explainable", "xai", "digital twin", "sensor fusion", "predictive maintenance", "simulation", "finite element", "cfd", "optimization", "anomaly detection", "edge ai", "embedded", "control systems", "reliability analysis"]
+        clinical_terms = intent.get("preferred_objects", []) + intent.get("matched_keywords", [])
+        evidence_terms = intent.get("preferred_objects", []) + intent.get("preferred_metrics", []) + ["benchmark", "simulation", "sensor", "dataset", "validation"]
+        differentiation_terms = intent.get("preferred_metrics", []) + ["benchmark", "real time", "reliability", "optimization", "transparent error analysis"]
+    else:
+        method_terms = ["explainable", "xai", "federated", "multimodal", "transformer", "vision transformer", "clinical validation", "mri", "pet"]
+        clinical_terms = ["alzheimer", "cancer", "diagnosis", "clinical decision support", "medical imaging", "neuroimaging", "patient", "disease", *intent.get("matched_keywords", [])]
+        evidence_terms = ["mri", "pet", "eeg", "public dataset", "clinical records", "small dataset", "multi center", "multi-center", "validation", *intent.get("preferred_objects", [])]
     differentiation_terms = ["explainability", "açıklanabilirlik", "privacy", "gizlilik", "clinical decision support", "multimodal fusion", "federated learning", "federated"]
+
+    if selected_domain == ENGINEERING_DOMAIN:
+        differentiation_terms = intent.get("preferred_metrics", []) + ["benchmark", "real time", "reliability", "optimization", "transparent error analysis"]
+    else:
+        differentiation_terms = ["explainability", "privacy", "clinical decision support", "multimodal fusion", "federated learning", "federated", *intent.get("preferred_metrics", [])]
 
     method_hits = [term for term in method_terms if term in text]
     clinical_hits = [term for term in clinical_terms if term in text]
@@ -1883,7 +2471,25 @@ def naturalize_topic_title(base_query: str, topic: str = "") -> str:
     return title_case_topic(query)
 
 
+def intent_topics_to_dataframe(query: str, selected_domain: str | None = None, score: int = 68) -> pd.DataFrame:
+    rows = [
+        (item["title"], score, "positive", item["rationale"])
+        for item in generate_intent_titles(query, selected_domain, min_count=5)
+    ]
+    out = pd.DataFrame(rows, columns=["suggested_research_topic", "gap_score", "growth_rate", "recommendation"])
+    out["domain_consistency_score"] = 0.9
+    out["leakage_risk"] = "Low"
+    return out
+
+
 def domain_adapted_suggestions(query: str) -> pd.DataFrame:
+    selected_domain = current_selected_domain()
+    intent = domain_intent(query, selected_domain)
+    if selected_domain == ENGINEERING_DOMAIN:
+        return intent_topics_to_dataframe(query, selected_domain)
+    if selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
+        return intent_topics_to_dataframe(query, selected_domain)
+
     concepts = extract_query_concepts(query)
     disease = concepts.get("disease", [])
     modality = concepts.get("modality", [])
@@ -1942,10 +2548,11 @@ def domain_adapted_suggestions(query: str) -> pd.DataFrame:
 def apply_domain_reasoning_filter(suggestions: pd.DataFrame, query: str) -> pd.DataFrame:
     suggestions = _as_dataframe(suggestions)
     fallback = domain_adapted_suggestions(query)
+    selected_domain = current_selected_domain()
 
     if suggestions.empty:
         fallback.attrs["domain_filtered_count"] = 0
-        return fallback
+        return sanitize_suggestions_for_intent(fallback, query, selected_domain)
 
     out = suggestions.copy()
     title_col = "suggested_research_topic" if "suggested_research_topic" in out.columns else "suggested_topic" if "suggested_topic" in out.columns else None
@@ -1979,7 +2586,7 @@ def apply_domain_reasoning_filter(suggestions: pd.DataFrame, query: str) -> pd.D
 
     filtered = filtered.head(8).reset_index(drop=True)
     filtered.attrs["domain_filtered_count"] = max(0, before - len(out[out["domain_consistency_score"] >= 0.45]))
-    return filtered
+    return sanitize_suggestions_for_intent(filtered, query, selected_domain)
 
 
 def naturalize_suggestions(suggestions: pd.DataFrame, base_query: str) -> pd.DataFrame:
@@ -1987,6 +2594,7 @@ def naturalize_suggestions(suggestions: pd.DataFrame, base_query: str) -> pd.Dat
         return suggestions
 
     out = suggestions.copy()
+    selected_domain = current_selected_domain()
     title_col = None
 
     if "suggested_research_topic" in out.columns:
@@ -1995,6 +2603,9 @@ def naturalize_suggestions(suggestions: pd.DataFrame, base_query: str) -> pd.Dat
         title_col = "suggested_topic"
 
     if title_col:
+        if selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN}:
+            return sanitize_suggestions_for_intent(out, base_query, selected_domain)
+
         def _format(row):
             raw_title = str(row.get(title_col, ""))
             base_topic = row.get("base_topic", "")
@@ -2394,6 +3005,8 @@ def render_demo_registration_gate() -> bool:
 def normalize_topic_seed(text: str) -> str:
     clean = preprocess_research_query(text)
     replacements = {
+        **TURKISH_ENGINEERING_MAP,
+        **TURKISH_HEALTHCARE_MAP,
         "otizm": "autism",
         "asd": "autism",
         "göz takibi": "eye tracking",
@@ -2422,13 +3035,17 @@ def normalize_topic_seed(text: str) -> str:
 
 def topic_refinement_prompt(seed: str, selected_domain: str = "") -> str:
     domain_text = selected_domain or current_selected_domain()
+    intent = domain_intent(seed, domain_text)
+    objects = ", ".join(intent.get("preferred_objects", [])[:4])
+    metrics = ", ".join(intent.get("preferred_metrics", [])[:4])
     return (
         "Convert the user's Turkish, English, or messy keywords into 5 concise Q1/SCI-style English research topics. "
         "Avoid generic titles and avoid broad 'AI-based ...' phrasing. "
-        "Each title must include a clear domain, method, data/modality, task, and novelty angle when possible. "
-        "Prefer specific publishable angles such as explainability, external validation, privacy-preserving learning, "
-        "multimodal fusion, risk stratification, or decision-support validation when relevant. "
+        "Preserve the user's actual research object/subdomain; AI terms are only methodological modifiers. "
+        "Do not append unrelated suffixes such as EEG, COVID-19, Healthcare Security, VANETs, or patient risk prediction unless they are explicit in the user input and aligned with the selected domain. "
+        "Each title must include a clear domain object, method, metric/task, and novelty angle when possible. "
         f"Selected research domain: {domain_text}. Stay strictly within this domain. "
+        f"Detected subdomain: {intent['subdomain_label']}. Preferred objects: {objects}. Preferred metrics: {metrics}. "
         "Write titles that sound like real high-quality journal article titles. "
         "Return only valid JSON in this exact shape: "
         '[{"title":"...","rationale":"..."},{"title":"...","rationale":"..."}]. '
@@ -2461,49 +3078,11 @@ def parse_topic_json(text: str) -> list[dict[str, str]]:
 
 
 def engineering_topic_refinement(seed: str) -> list[dict[str, str]]:
-    key = normalize_topic_key(normalize_topic_seed(seed))
-    if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building", "shm"]):
-        titles = [
-            "Explainable AI for Seismic Risk Stratification of Critical Infrastructure",
-            "Physics-Informed Machine Learning for Structural Health Monitoring under Earthquake Loads",
-            "Sensor Fusion-Based Seismic Vulnerability Assessment for Bridge and Building Systems",
-            "Finite Element-Guided Deep Learning for Infrastructure Resilience Evaluation",
-            "Interpretable Reliability Analysis for Earthquake-Resilient Structural Systems",
-        ]
-    elif any(term in key for term in ["cfd", "thermal", "heat transfer", "thermodynamics"]):
-        titles = [
-            "CFD-Guided Surrogate Modeling for Thermal System Optimization",
-            "Physics-Informed Deep Learning for Heat Transfer Prediction in Engineering Systems",
-            "Simulation-Based Thermal Optimization Using Finite Element and CFD Benchmarks",
-            "Explainable Machine Learning for Real-Time Thermal Performance Monitoring",
-            "Multi-Objective Optimization of Heat Transfer Systems with CFD-Validated Models",
-        ]
-    elif any(term in key for term in ["uav", "drone", "swarm", "robotics"]):
-        titles = [
-            "Edge AI-Based Computer Vision for Real-Time UAV Swarm Threat Detection",
-            "Vision Transformer Models for Autonomous UAV Swarm Surveillance and Threat Assessment",
-            "Multi-Sensor Fusion for Robust Drone Swarm Detection in Edge Computing Systems",
-            "Real-Time Anomaly Detection for UAV Swarm Security Using Deep Learning",
-            "Benchmark Evaluation of Computer Vision Models for UAV Threat Detection",
-        ]
-    elif any(term in key for term in ["wind turbine", "digital twin", "predictive maintenance", "fault"]):
-        titles = [
-            "Digital Twin-Driven Predictive Maintenance for Wind Turbine Fault Detection",
-            "Sensor Fusion and Time-Series Forecasting for Wind Turbine Health Monitoring",
-            "Physics-Informed Digital Twins for Reliability Analysis in Wind Energy Systems",
-            "Anomaly Detection Models for Real-Time Wind Turbine Predictive Maintenance",
-            "Benchmark Evaluation of Deep Learning Models for Wind Turbine Fault Prediction",
-        ]
-    else:
-        base = title_case_topic(normalize_topic_seed(seed) or "Engineering Systems")
-        titles = [
-            f"Digital Twin and Predictive Analytics Framework for {base}",
-            f"Edge AI-Based Real-Time Monitoring for {base}",
-            f"Sensor Fusion and Anomaly Detection for {base}",
-            f"Optimization-Driven Control Strategy for {base}",
-            f"Benchmark Dataset Evaluation for Reliable {base}",
-        ]
-    return [{"title": title, "rationale": "Engineering-focused Q1/SCI-style topic generated within the selected domain."} for title in titles]
+    return generate_intent_titles(seed, ENGINEERING_DOMAIN, min_count=5)
+
+
+def healthcare_topic_refinement(seed: str) -> list[dict[str, str]]:
+    return generate_intent_titles(seed, HEALTHCARE_DOMAIN, min_count=5)
 
 
 def rule_based_topic_refinement(seed: str, selected_domain: str | None = None) -> list[dict[str, str]]:
@@ -2513,6 +3092,10 @@ def rule_based_topic_refinement(seed: str, selected_domain: str | None = None) -
 
     if selected_domain == ENGINEERING_DOMAIN:
         return engineering_topic_refinement(seed)
+
+    intent_topics = healthcare_topic_refinement(seed)
+    if intent_topics and domain_intent(seed, HEALTHCARE_DOMAIN)["subdomain_key"] != "general_healthcare":
+        return intent_topics
 
     if any(term in normalized_key for term in ["tax compliance", "public expenditure", "fiscal sustainability", "public finance", "budget"]):
         return [
@@ -2742,6 +3325,7 @@ def refine_research_topics(seed: str, provider: str, api_key: str, selected_doma
     try:
         llm_topics = call_llm_topic_refiner(provider, seed, api_key, selected_domain, debug)
         if llm_topics:
+            llm_topics = sanitize_topic_items_for_intent(llm_topics, seed, selected_domain)
             fallback_topics = rule_based_topic_refinement(seed, selected_domain)[:5]
             debug["fallback_comparison_count"] = len(fallback_topics)
             debug["fallback_comparison_titles"] = [item.get("title", "") for item in fallback_topics]
@@ -3212,7 +3796,7 @@ def run_full_analysis(config: dict) -> dict:
         source_distribution_after,
         query,
     )
-    research_strategy = build_research_strategy(query, ai_suggestions)
+    research_strategy = build_research_strategy(query, ai_suggestions, selected_domain)
     paperability_score = build_paperability_score(
         query,
         gap_score,
@@ -3655,22 +4239,27 @@ def build_executive_summary(results: dict) -> str:
         pubmed_note = " PubMed temporarily unavailable; OpenAlex results were used for analysis."
 
     if selected_domain == ENGINEERING_DOMAIN:
-        return sanitize_engineering_language(
+        intent = domain_intent(results.get("query", ""), selected_domain)
+        objects = ", ".join(intent.get("preferred_objects", [])[:2]) or "the target engineering system"
+        metrics = ", ".join(intent.get("preferred_metrics", [])[:2]) or "engineering performance"
+        return sanitize_text_for_intent(
             f"This topic represents {competition} and {opportunity_phrase} engineering research area. "
-            f"The current evidence landscape should be evaluated through benchmark datasets, simulation evidence, "
-            f"real-time monitoring constraints, and engineering performance metrics, {growth_phrase}. "
+            f"The current evidence landscape in {intent['subdomain_label']} should be evaluated through {objects}, "
+            f"{metrics}, benchmark datasets, and validation evidence, {growth_phrase}. "
             f"Based on the combined opportunity, domain consistency, and paperability signals, the topic shows "
-            f"{publication_phrase}, provided the study is framed around a specific engineering system, validation protocol, "
-            f"and measurable reliability or optimization contribution."
+            f"{publication_phrase}, provided the study preserves the real research object and frames AI as a methodological modifier.",
+            intent,
         )
 
-    return (
+    intent = domain_intent(results.get("query", ""), selected_domain)
+    summary = (
         f"This topic represents {competition} and {opportunity_phrase} research area within {clinical_domain}. "
-        f"The current evidence landscape is primarily shaped by {modality}, {growth_phrase}. "
+        f"The current evidence landscape is primarily shaped by {intent.get('preferred_objects', ['the available evidence base'])[0]}, {growth_phrase}. "
         f"Based on the combined opportunity, domain consistency, and paperability signals, the topic shows "
         f"{publication_phrase}, provided the study is framed around a specific method, validation strategy, "
         f"and clinically meaningful differentiation.{pubmed_note}"
     )
+    return sanitize_text_for_intent(summary, intent)
 
 
 def is_generic_paper_title(title: str, query: str) -> bool:
@@ -3720,13 +4309,16 @@ def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
     suggestions = _as_dataframe(results.get("ai_topic_suggestions"))
     titles = []
     suggestion_titles = []
+    intent = domain_intent(query, selected_domain)
 
     topic_col = "suggested_research_topic" if "suggested_research_topic" in suggestions.columns else "suggested_topic"
     if topic_col in suggestions.columns:
         suggestion_titles.extend(suggestions[topic_col].dropna().astype(str).head(3).tolist())
 
     if selected_domain == ENGINEERING_DOMAIN and not is_engineering_health_hybrid(query):
-        titles.extend([item["title"] for item in engineering_topic_refinement(query)])
+        titles.extend([item["title"] for item in generate_intent_titles(query, selected_domain, min_count=5)])
+    elif selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
+        titles.extend([item["title"] for item in generate_intent_titles(query, selected_domain, min_count=5)])
     elif "autism" in disease:
         titles.extend([
             "Federated Explainable EEG-Eye Tracking Fusion for Early Autism Detection",
@@ -3791,8 +4383,9 @@ def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
     seen = set()
     for title in titles:
         clean = re.sub(r"\s+", " ", str(title or "")).strip(" .")
+        clean = sanitize_text_for_intent(clean, intent)
         key = normalize_topic_key(clean)
-        if clean and key not in seen and (selected_domain == ENGINEERING_DOMAIN or not is_generic_paper_title(clean, query)):
+        if clean and key not in seen and not find_forbidden_terms(clean, forbidden_terms_for_intent(intent)) and (selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN} or not is_generic_paper_title(clean, query)):
             seen.add(key)
             clean_titles.append(clean)
         if len(clean_titles) >= min_count:
@@ -3807,8 +4400,9 @@ def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
             fallback_titles = domain_adapted_suggestions(query)
         if "suggested_research_topic" in fallback_titles.columns:
             for title in fallback_titles["suggested_research_topic"].dropna().astype(str).tolist():
+                title = sanitize_text_for_intent(title, intent)
                 key = normalize_topic_key(title)
-                if key not in seen and (selected_domain == ENGINEERING_DOMAIN or not is_generic_paper_title(title, query)):
+                if title and key not in seen and not find_forbidden_terms(title, forbidden_terms_for_intent(intent)) and (selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN} or not is_generic_paper_title(title, query)):
                     seen.add(key)
                     clean_titles.append(title)
                 if len(clean_titles) >= min_count:
@@ -3824,6 +4418,7 @@ def build_opportunity_analysis(results: dict) -> dict[str, str]:
     paper_score = parse_numeric(paperability.get("total_score"))
     domain = results.get("domain_reasoning") or {}
     selected_domain = results.get("selected_domain", current_selected_domain())
+    intent = domain_intent(results.get("query", ""), selected_domain)
 
     competition = (
         "The field appears crowded and requires a narrow claim." if matched > 250
@@ -3845,6 +4440,18 @@ def build_opportunity_analysis(results: dict) -> dict[str, str]:
             "Engineering Relevance": relevance,
             "Methodological Strength": method,
             "Dataset Feasibility": dataset,
+        }
+
+    if selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
+        label = intent["subdomain_label"]
+        objects = ", ".join(intent.get("preferred_objects", [])[:2]) or "the target evidence base"
+        metrics = ", ".join(intent.get("preferred_metrics", [])[:2]) or "validated outcomes"
+        return {
+            "Competition Level": competition,
+            "Novelty Potential": f"Novelty is strongest when the topic remains anchored in {label}, {objects}, and measurable {metrics}.",
+            "Healthcare Relevance": f"The practical relevance comes from {label.lower()} outcomes rather than unrelated engineering or AI suffixes.",
+            "Methodological Strength": healthcare_methodology_for_intent(intent),
+            "Dataset Feasibility": evidence_focus_for_intent(intent),
         }
 
     novelty = (
@@ -3869,6 +4476,7 @@ def final_strategic_recommendation(results: dict) -> str:
     paperability = results.get("paperability_score") or {}
     domain = results.get("domain_reasoning") or {}
     selected_domain = results.get("selected_domain", current_selected_domain())
+    intent = domain_intent(results.get("query", ""), selected_domain)
     score = parse_numeric(paperability.get("total_score"))
     consistency = domain.get("domain_consistency", "Medium")
 
@@ -3888,6 +4496,15 @@ def final_strategic_recommendation(results: dict) -> str:
         return (
             "This engineering topic should be reframed before execution. Publication potential depends on clearer system boundaries, "
             "stronger validation evidence, and defensible engineering performance metrics."
+        )
+
+    if selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
+        objects = ", ".join(intent.get("preferred_objects", [])[:2]) or "the target evidence base"
+        metrics = ", ".join(intent.get("preferred_metrics", [])[:2]) or "validated outcomes"
+        return (
+            f"This {intent['subdomain_label']} topic should be pursued with a focused evidence base around {objects}, "
+            f"measurable {metrics}, and transparent validation. The strongest publication path is to preserve the healthcare "
+            "subdomain intent and avoid unrelated engineering or generic AI framing."
         )
 
     if score >= 70 and consistency == "High":
@@ -3966,6 +4583,7 @@ def generate_executive_pdf_report(results: dict, output_path: str | Path, summar
         strategy = results.get("research_strategy") or {}
         domain = results.get("domain_reasoning") or {}
         paperability = results.get("paperability_score") or {}
+        intent = domain_intent(results.get("query", ""), results.get("selected_domain", current_selected_domain()))
         strategic = results.get("strategic_opportunity_score", gap.get("gap_score", "-"))
         paper_score = paperability.get("total_score", "-")
         strategic_label, strategic_color = _score_band(strategic)
@@ -4030,11 +4648,7 @@ def generate_executive_pdf_report(results: dict, output_path: str | Path, summar
         ])))
 
         story.append(p("Research Strategy Recommendations", h1))
-        validation_strategy = (
-            "Prioritize benchmark datasets, simulation-based validation, engineering performance metrics, and transparent error analysis."
-            if results.get("selected_domain") == ENGINEERING_DOMAIN
-            else "Prioritize external validation, clinically meaningful endpoints, and transparent error analysis."
-        )
+        validation_strategy = validation_strategy_for_intent(intent)
         strategy_rows = [
             [p("Recommended Methodology", h2), p(strategy.get("methodology", "-"), body)],
             [p("Suggested Validation Strategy", h2), p(validation_strategy, body)],
@@ -4261,6 +4875,10 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         "",
         "Domain Reasoning:",
         f"- Selected research domain: {results.get('selected_domain', '-')}",
+        f"- Detected subdomain: {domain_reasoning.get('subdomain_label', domain_reasoning.get('primary_domain', '-'))}",
+        f"- Subdomain confidence: {domain_reasoning.get('subdomain_confidence', '-')}",
+        f"- Preferred objects: {domain_reasoning.get('preferred_objects', '-')}",
+        f"- Preferred metrics: {domain_reasoning.get('preferred_metrics', '-')}",
         f"- Primary disease: {domain_reasoning.get('primary_disease', '-')}",
         f"- Modality: {domain_reasoning.get('primary_modality', '-')}",
         f"- Clinical domain: {domain_reasoning.get('clinical_domain', '-')}",
