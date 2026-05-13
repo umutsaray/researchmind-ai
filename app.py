@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from datetime import datetime
 import hashlib
 import html
@@ -47,6 +48,17 @@ DEMO_LIVE_RESULT_LIMIT = 50
 OUTPUTS_DIR = Path("outputs")
 DEMO_LOGS_DIR = Path("demo_logs")
 DEMO_CACHE_DIR = Path("demo_cache")
+LOGO_PATH = Path(__file__).parent / "Researchmind logo.png"
+
+
+def logo_data_uri() -> str:
+    if not LOGO_PATH.exists():
+        return ""
+    try:
+        encoded = base64.b64encode(LOGO_PATH.read_bytes()).decode("ascii")
+    except Exception:
+        return ""
+    return f"data:image/png;base64,{encoded}"
 
 DATA_SOURCE_LABELS = {
     "Local CSV": "Yerel Veri Seti",
@@ -912,24 +924,33 @@ def render_hero(results: dict | None = None) -> None:
     else:
         status_line = "PubMed Ready &nbsp;&nbsp; OpenAlex Ready &nbsp;&nbsp; Hybrid Intelligence Ready"
 
-    st.markdown(
-        f"""
-        <div class="rm-hero">
-            <h1>ResearchMind AI</h1>
-            <h2>AI-Powered Research Intelligence Platform</h2>
-            <div class="rm-badges">
-                <span class="rm-badge">Trend Analysis</span>
-                <span class="rm-badge">Research Gap Detection</span>
-                <span class="rm-badge">AI Topic Recommendation</span>
-            </div>
-            <div class="rm-card-note" style="margin-top: 0.9rem;">{status_line}</div>
-            <p>Araştırma konusunu gir, analiz dönemini seç ve tek tıkla trend, fırsat ve Research Gap Score sonuçlarını üret.</p>
-            <p><strong>Bu demo sürüm yalnızca Biyomedikal Mühendisliği alanı için optimize edilmiştir.</strong><br/>
-            Analizler; biyosensörler, tıbbi cihazlar, biyomedikal sinyaller, giyilebilir sağlık sistemleri ve tıbbi görüntüleme ekseninde değerlendirilir.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    logo_src = logo_data_uri()
+    hero_logo_html = ""
+    if logo_src:
+        hero_logo_html = f"""
+<div style="text-align:center; margin-bottom: 1rem;">
+    <div style="background: rgba(255,255,255,0.94); padding: 12px 18px; border-radius: 16px; display: inline-block; box-shadow: 0 14px 32px rgba(15,23,42,0.18);">
+        <img src="{logo_src}" style="width:250px; max-width:82vw; height:auto; display:block;" />
+    </div>
+</div>"""
+
+    hero_html = f"""
+<div class="rm-hero">
+    {hero_logo_html}
+    <h1>ResearchMind AI</h1>
+    <h2>AI-Powered Research Intelligence Platform</h2>
+    <div class="rm-badges">
+        <span class="rm-badge">Trend Analysis</span>
+        <span class="rm-badge">Research Gap Detection</span>
+        <span class="rm-badge">AI Topic Recommendation</span>
+    </div>
+    <div class="rm-card-note" style="margin-top: 0.9rem;">{status_line}</div>
+    <p>Araştırma konusunu gir, analiz dönemini seç ve tek tıkla trend, fırsat ve Research Gap Score sonuçlarını üret.</p>
+    <p><strong>Bu demo sürüm yalnızca Biyomedikal Mühendisliği alanı için optimize edilmiştir.</strong><br/>
+    Analizler; biyosensörler, tıbbi cihazlar, biyomedikal sinyaller, giyilebilir sağlık sistemleri ve tıbbi görüntüleme ekseninde değerlendirilir.</p>
+</div>
+"""
+    st.markdown(hero_html, unsafe_allow_html=True)
 
 
 def style_plotly_chart(fig):
@@ -5357,6 +5378,27 @@ def build_sidebar_config() -> dict:
     is_demo = demo_mode_enabled()
     query_max_chars = 160 if is_demo else None
     with st.sidebar:
+        logo_src = logo_data_uri()
+        if logo_src:
+            st.markdown(
+                f"""
+                <div style="text-align:center; margin: 0.2rem 0 0.9rem;">
+                    <div style="background: rgba(255,255,255,0.94); padding: 10px 14px; border-radius: 14px; display: inline-block; box-shadow: 0 10px 26px rgba(15,23,42,0.16);">
+                        <img src="{logo_src}" style="width:210px; max-width:100%; height:auto; display:block;" />
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        st.markdown(
+            """
+            <div style="text-align:center; margin: 0.25rem 0 1.25rem;">
+                <div style="font-weight:700; font-size:1.05rem;">ResearchMind AI</div>
+                <div style="font-size:0.78rem; opacity:0.75;">Biomedical Engineering Research Intelligence</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         st.header("Veri Kaynağı ve Analiz Ayarları")
         st.markdown("**Desteklenen Araştırma Alanı**")
         st.markdown("Biomedical Engineering")
