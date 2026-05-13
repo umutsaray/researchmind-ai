@@ -55,12 +55,31 @@ DATA_SOURCE_LABELS = {
     "Hybrid: OpenAlex + PubMed": "Hibrit Analiz",
 }
 
+QUERY_WIDGET_KEYS = {
+    "Local CSV": "local_analysis_query",
+    "OpenAlex Live": "openalex_query",
+    "PubMed Live": "pubmed_query",
+    "Hybrid: OpenAlex + PubMed": "hybrid_query",
+}
+
 HEALTHCARE_DOMAIN = "Healthcare & Biomedical Sciences"
 ENGINEERING_DOMAIN = "Engineering & Applied Technologies"
-ACTIVE_RESEARCH_DOMAINS = [HEALTHCARE_DOMAIN, ENGINEERING_DOMAIN]
+BIOMEDICAL_FIELD = "Biomedical Engineering"
+SUPPORTED_FIELDS = [BIOMEDICAL_FIELD]
+FIELD_TO_DOMAIN_FAMILY = {BIOMEDICAL_FIELD: "biomedical_engineering"}
+LEGACY_DOMAIN_TO_FIELD = {
+    ENGINEERING_DOMAIN: BIOMEDICAL_FIELD,
+    HEALTHCARE_DOMAIN: BIOMEDICAL_FIELD,
+    "Electrical & Electronics Engineering": BIOMEDICAL_FIELD,
+    "AI-Compatible Medicine": BIOMEDICAL_FIELD,
+    "Nursing": BIOMEDICAL_FIELD,
+    "Midwifery": BIOMEDICAL_FIELD,
+}
+ACTIVE_RESEARCH_DOMAINS = SUPPORTED_FIELDS
 DOMAIN_SUPPORT_WARNING = (
-    "Bu demo sürümünde yalnızca sağlık/biyomedikal ve mühendislik alanları desteklenmektedir. "
-    "Lütfen konunuzu bu alanlardan biriyle ilişkilendirerek tekrar deneyin."
+    "Bu demo sürüm yalnızca Biyomedikal Mühendisliği alanı için optimize edilmiştir. "
+    "Lütfen konuyu biyosensörler, tıbbi cihazlar, biyomedikal sinyaller, "
+    "giyilebilir sağlık sistemleri veya tıbbi görüntüleme bağlamında yeniden yazın."
 )
 
 ENGINEERING_KEYWORDS = [
@@ -476,6 +495,261 @@ TURKISH_HEALTHCARE_MAP = {
 }
 
 
+BIOMEDICAL_ENGINEERING_ONTOLOGY = {
+    "keywords": [
+        "biomedical engineering", "medical device", "medical devices", "biosensor", "biosensors",
+        "wearable sensor", "wearable health system", "wearable health systems",
+        "biomedical signal", "biomedical signal processing", "ecg", "eeg", "emg", "mri", "ct",
+        "medical imaging", "bioinstrumentation", "prosthesis", "rehabilitation robotics",
+        "medical device reliability", "health monitoring", "digital biomarker", "signal quality",
+        "noise reduction", "artifact removal", "sensor fusion", "physiological signals",
+        "physiological signal", "remote patient monitoring",
+    ],
+    "preferred_objects": [
+        "biosensors", "wearable health systems", "biomedical signals", "medical devices",
+        "medical imaging systems", "prosthetic systems", "rehabilitation robotics platforms",
+        "physiological monitoring systems",
+    ],
+    "preferred_metrics": [
+        "signal quality", "device reliability", "measurement precision", "diagnostic accuracy",
+        "artifact reduction", "noise robustness", "usability", "safety",
+        "biomedical signal classification performance",
+    ],
+    "validation_language": "Biyomedikal cihaz güvenilirliği, sinyal kalitesi, ölçüm hassasiyeti, güvenlik, kullanılabilirlik ve karşılaştırılabilir biyomedikal veri kümeleri üzerinden doğrulama önceliklendirilmelidir.",
+}
+
+TURKISH_BIOMEDICAL_MAP = {
+    "biyomedikal mühendisliği": "biomedical engineering",
+    "biyomedikal muhendisligi": "biomedical engineering",
+    "biyomedikal": "biomedical engineering",
+    "tıbbi cihaz": "medical device",
+    "tibbi cihaz": "medical device",
+    "tıbbi cihazlar": "medical devices",
+    "tibbi cihazlar": "medical devices",
+    "biyosensör": "biosensor",
+    "biyosensor": "biosensor",
+    "biyosensörler": "biosensors",
+    "biyosensorler": "biosensors",
+    "giyilebilir sensör": "wearable sensor",
+    "giyilebilir sensor": "wearable sensor",
+    "giyilebilir sağlık sistemi": "wearable health system",
+    "giyilebilir saglik sistemi": "wearable health system",
+    "giyilebilir sağlık sistemleri": "wearable health systems",
+    "giyilebilir saglik sistemleri": "wearable health systems",
+    "biyomedikal sinyal": "biomedical signal",
+    "biyomedikal sinyal işleme": "biomedical signal processing",
+    "biyomedikal sinyal isleme": "biomedical signal processing",
+    "sinyal kalitesi": "signal quality",
+    "gürültü azaltma": "noise reduction",
+    "gurultu azaltma": "noise reduction",
+    "artefakt giderme": "artifact removal",
+    "sensör füzyonu": "sensor fusion",
+    "sensor fuzyonu": "sensor fusion",
+    "tıbbi görüntüleme": "medical imaging",
+    "tibbi goruntuleme": "medical imaging",
+    "protez": "prosthesis",
+    "rehabilitasyon robotiği": "rehabilitation robotics",
+    "rehabilitasyon robotigi": "rehabilitation robotics",
+    "uzaktan hasta izleme": "remote patient monitoring",
+    "fizyolojik sinyal": "physiological signal",
+}
+
+SUPPORTED_FIELD_ONTOLOGY = {BIOMEDICAL_FIELD: BIOMEDICAL_ENGINEERING_ONTOLOGY}
+TURKISH_FIELD_KEYWORD_MAP = TURKISH_BIOMEDICAL_MAP
+
+BIOMEDICAL_OUTSIDE_TERMS = set(BLOCKED_KEYWORDS) | {
+    "civil engineering", "seismic", "earthquake", "bridge", "concrete", "structural engineering",
+    "construction", "geotechnical", "materials engineering", "coating", "corrosion", "alloy",
+    "polymer", "composite materials", "nursing", "nurse", "midwifery", "midwife",
+    "care quality", "patient safety", "childbirth", "pregnancy", "neonatal", "tax", "fiscal",
+    "economics", "public expenditure", "hemsirelik", "hemsire", "ebelik", "ebe", "gebelik",
+    "dogum", "yenidogan", "hasta guvenligi", "bakim kalitesi", "malzeme muhendisligi",
+    "kaplama", "korozyon", "insaat muhendisligi", "deprem", "kopru", "beton",
+}
+BIOMEDICAL_CLINICAL_DRIFT_TERMS = {
+    "clinical cohorts", "patient groups", "treatment response", "prognostic performance",
+    "prognosis", "mortality risk", "readmission risk", "clinical outcome prediction",
+}
+BIOMEDICAL_CONTEXT_TERMS = set(BIOMEDICAL_ENGINEERING_ONTOLOGY["keywords"])
+
+BIOMEDICAL_TERMS = [
+    "biomedical", "biomedical engineering", "biosensor", "biosensors",
+    "medical device", "medical devices", "wearable sensor",
+    "wearable health", "wearable biomedical", "biomedical signal",
+    "biomedical signal processing", "ecg", "eeg", "emg",
+    "medical imaging", "mri", "ct", "ultrasound",
+    "prosthesis", "rehabilitation robotics", "health monitoring",
+    "physiological signal", "signal quality", "artifact reduction", "noise reduction",
+    "sensor fusion", "digital biomarker",
+]
+
+STRONG_BIOMEDICAL_OBJECTS = [
+    "mr", "mri", "ct", "pet", "eeg", "ecg", "emg",
+    "alzheimer", "dementia", "cancer", "tumor",
+    "biosensor", "biosensors", "wearable", "medical imaging",
+    "biomedical signal", "neurological", "radiology",
+]
+
+GENERAL_RELATED_TERMS = [
+    "ai", "artificial intelligence", "machine learning", "deep learning",
+    "healthcare", "health", "monitoring", "diagnosis",
+    "digital health", "remote monitoring", "classification",
+    "prediction", "risk prediction",
+]
+
+UNRELATED_BLOCK_TERMS = [
+    "tax", "taxation", "fiscal", "economics", "inflation",
+    "accounting", "audit", "public expenditure", "stock market",
+    "cryptocurrency trading", "bridge", "concrete", "seismic",
+    "earthquake", "civil engineering", "materials engineering",
+    "coating", "corrosion", "football", "tourism", "hotel",
+    "restaurant", "real estate",
+]
+
+TURKISH_UNRELATED_MAP = {
+    "vergi": "tax",
+    "ekonomi": "economics",
+    "enflasyon": "inflation",
+    "köprü": "bridge",
+    "kopru": "bridge",
+    "beton": "concrete",
+    "deprem": "earthquake",
+    "futbol": "football",
+    "turizm": "tourism",
+    "otel": "hotel",
+}
+
+BIOMEDICAL_SOFT_GUIDANCE_MESSAGE = (
+    "Bu konu biyomedikal mühendisliği ile kısmen ilişkili görünüyor. Daha güçlü sonuçlar için "
+    "biyosensör, tıbbi cihaz, biyomedikal sinyal, giyilebilir sağlık sistemi, ECG/EEG veya "
+    "tıbbi görüntüleme gibi daha spesifik terimler eklemeniz önerilir."
+)
+
+BIOMEDICAL_HARD_BLOCK_MESSAGE = (
+    "Bu demo sürüm yalnızca Biyomedikal Mühendisliği alanı için optimize edilmiştir. Girilen bazı "
+    "terimler bu alanla eşleşmiyor. Lütfen konuyu biyosensörler, tıbbi cihazlar, biyomedikal "
+    "sinyaller, giyilebilir sağlık sistemleri veya tıbbi görüntüleme bağlamında yeniden yazın."
+)
+
+BIOMEDICAL_KEYWORD_SUGGESTION = (
+    "Örnek biyomedikal anahtar kelimeler:\n"
+    "- ECG signal processing\n"
+    "- wearable biosensors\n"
+    "- medical imaging AI\n"
+    "- biomedical signal analysis"
+)
+
+BIOMEDICAL_MIXED_TERM_WARNING = (
+    "Bazı terimler biyomedikal mühendisliği ile güçlü eşleşmedi; analiz biyomedikal odaklı terimler üzerinden yürütülecek."
+)
+
+
+
+BIOMEDICAL_TOPIC_BANK = [
+    {"title": 'Explainable AI for ECG Signal Quality Assessment in Wearable Biosensors', "tags": ['ecg', 'biosensor', 'wearable health systems', 'biomedical signal processing', 'explainable ai'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Noise-Robust ECG Analysis for Wearable Health Monitoring Systems', "tags": ['ecg', 'wearable health systems', 'noise reduction'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Deep Learning-Based Artifact Reduction in Biomedical Signal Processing', "tags": ['ct', 'biomedical signal processing', 'artifact reduction'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'AI-Based Calibration Framework for Smart Biomedical Sensors', "tags": ['biomedical calibration'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'Signal Quality Assessment in Bedside Patient Monitoring Devices', "tags": ['biomedical signal processing', 'bedside monitoring', 'patient monitoring'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'Sensor Fusion-Based Reliability Assessment for Wearable Biosensor Systems', "tags": ['biosensor', 'wearable health systems', 'sensor fusion', 'biomedical reliability'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Transformer-Based EEG Signal Classification for Alzheimer Detection', "tags": ['eeg', 'alzheimer', 'biomedical signal processing'], "rationale": 'Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.'},
+    {"title": 'Explainable Deep Learning for Early Alzheimer Diagnosis Using EEG Signals', "tags": ['eeg', 'alzheimer', 'biomedical signal processing', 'explainable ai'], "rationale": 'Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.'},
+    {"title": 'Multimodal MRI and Clinical Data Fusion for Alzheimer Screening', "tags": ['mri', 'alzheimer', 'multimodal fusion'], "rationale": 'Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.'},
+    {"title": 'Edge AI for Real-Time Physiological Signal Monitoring', "tags": ['biomedical signal processing', 'edge ai', 'physiological monitoring'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'TinyML-Based ECG Monitoring on Wearable Medical Devices', "tags": ['ecg', 'wearable health systems', 'tinyml', 'smart medical devices'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'IoMT-Enabled Remote Patient Monitoring Using Biomedical Sensors', "tags": ['patient monitoring', 'iomt', 'remote healthcare'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'Biomedical Signal Quality Index Estimation for Remote Monitoring Systems', "tags": ['biomedical signal processing', 'remote healthcare'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'AI-Assisted Predictive Maintenance for Smart Medical Devices', "tags": ['predictive maintenance', 'smart medical devices'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Federated Learning for Privacy-Preserving Biomedical Signal Analysis', "tags": ['biomedical signal processing', 'federated learning'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Digital Twin-Based Reliability Assessment of Biomedical Monitoring Systems', "tags": ['digital twins', 'biomedical reliability'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'AI-Based Noise Reduction in EEG Signal Processing', "tags": ['eeg', 'biomedical signal processing', 'noise reduction'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Wearable Biosensor Systems for Continuous Physiological Monitoring', "tags": ['biosensor', 'wearable health systems', 'physiological monitoring'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Machine Learning for Biomedical Sensor Calibration Drift Detection', "tags": ['biomedical calibration'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'Deep Neural Networks for Biomedical Image Quality Enhancement', "tags": ['medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'AI-Based Ultrasound Image Enhancement for Clinical Diagnostics', "tags": ['ultrasound', 'medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'Explainable MRI Classification Models for Neurodegenerative Diseases', "tags": ['mri', 'neuroimaging', 'explainable ai'], "rationale": 'Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.'},
+    {"title": 'Deep Learning-Based ECG Arrhythmia Detection in Wearable Systems', "tags": ['ecg', 'wearable health systems'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Real-Time Biomedical Signal Compression for Edge Healthcare Devices', "tags": ['biomedical signal processing', 'edge ai'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'AI-Powered Respiratory Signal Analysis for Smart Monitoring Systems', "tags": ['biomedical signal processing'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Multimodal Physiological Signal Fusion for Smart Healthcare Systems', "tags": ['biomedical signal processing', 'physiological monitoring', 'multimodal fusion'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Biomedical Device Fault Detection Using Deep Learning', "tags": ['smart medical devices'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Explainable AI for Smart ICU Monitoring Systems', "tags": ['explainable ai'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Real-Time ECG Artifact Detection for Wearable Healthcare Devices', "tags": ['ecg', 'ct', 'wearable health systems', 'artifact reduction'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'AI-Based Biomedical Signal Classification for Clinical Decision Support', "tags": ['biomedical signal processing'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Deep Learning for EEG-Based Cognitive Decline Detection', "tags": ['eeg'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Smart Biosensor Networks for Continuous Patient Monitoring', "tags": ['biosensor', 'patient monitoring'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'AI-Assisted Medical Device Calibration Validation Framework', "tags": ['biomedical calibration', 'smart medical devices'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'Machine Learning-Based Biomedical Signal Denoising Techniques', "tags": ['biomedical signal processing'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Transformer Models for EEG-Based Emotion Recognition', "tags": ['eeg'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Explainable AI for CT Image Classification in Clinical Diagnostics', "tags": ['ct', 'explainable ai', 'medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'Edge Computing for Real-Time Biomedical Monitoring Applications', "tags": ['edge ai'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Wearable EEG Systems for Continuous Neurological Assessment', "tags": ['eeg', 'neuroimaging', 'wearable health systems'], "rationale": 'Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.'},
+    {"title": 'Biomedical Sensor Reliability Modeling Using Artificial Intelligence', "tags": ['biomedical reliability'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Deep Learning-Assisted Biomedical Image Segmentation for MRI Analysis', "tags": ['mri', 'medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'AI-Based Sleep Apnea Detection Using Physiological Signals', "tags": ['biomedical signal processing', 'physiological monitoring'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'ECG Signal Compression for Remote Cardiac Monitoring', "tags": ['ecg', 'biomedical signal processing', 'remote healthcare'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Wearable Sensor Fusion for Athlete Physiological Monitoring', "tags": ['wearable health systems', 'sensor fusion', 'physiological monitoring'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'TinyML Frameworks for Low-Power Biomedical Devices', "tags": ['tinyml', 'smart medical devices'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Explainable AI in Smart Cardiac Monitoring Systems', "tags": ['explainable ai'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'AI-Assisted Blood Pressure Estimation Using Wearable Sensors', "tags": ['wearable health systems'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Federated Learning for Distributed EEG Signal Analysis', "tags": ['eeg', 'biomedical signal processing', 'federated learning'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Biomedical Signal Enhancement Using Generative AI', "tags": ['biomedical signal processing'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Deep Learning-Based Motion Artifact Removal in ECG Signals', "tags": ['ecg', 'ct', 'biomedical signal processing', 'artifact reduction'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'MRI-Based Brain Tissue Classification Using Explainable AI', "tags": ['mri', 'explainable ai'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'AI-Based Fall Detection Systems for Elderly Healthcare', "tags": ['biomedical engineering'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Smart Rehabilitation Monitoring with Wearable Sensors', "tags": ['wearable health systems', 'rehabilitation systems'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'AI-Driven Biomedical Image Super-Resolution Techniques', "tags": ['medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'Deep Learning for Portable Ultrasound Image Analysis', "tags": ['ultrasound', 'medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'Real-Time Oxygen Saturation Monitoring with Smart Biosensors', "tags": ['biosensor'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'AI-Based Arrhythmia Prediction Using ECG Time-Series Data', "tags": ['ecg'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Wearable Health Monitoring with Edge AI Architectures', "tags": ['wearable health systems', 'edge ai'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Biomedical Signal Segmentation Using Transformer Networks', "tags": ['biomedical signal processing'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Explainable Federated Learning for Clinical Signal Processing', "tags": ['biomedical signal processing', 'federated learning', 'explainable ai'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'AI-Based Smart Stethoscope Signal Enhancement', "tags": ['biomedical signal processing'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Deep Learning for Automated EEG Artifact Detection', "tags": ['eeg', 'ct', 'artifact reduction'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Biomedical Device Reliability Prediction Using Digital Twins', "tags": ['digital twins', 'smart medical devices', 'biomedical reliability'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Smart Sensor Calibration in Connected Medical Systems', "tags": ['biomedical calibration'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'AI-Assisted Glucose Monitoring Using Wearable Biosensors', "tags": ['biosensor', 'wearable health systems'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Predictive Modeling for Intensive Care Patient Monitoring', "tags": ['patient monitoring'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'ECG-Based Stress Detection Using Machine Learning', "tags": ['ecg'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Biomedical Noise Filtering with Adaptive Deep Networks', "tags": ['noise reduction'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'MRI Reconstruction Using Deep Learning Architectures', "tags": ['mri'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Explainable AI for Physiological Signal Classification', "tags": ['biomedical signal processing', 'explainable ai', 'physiological monitoring'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Wearable Multimodal Biosensors for Remote Healthcare', "tags": ['biosensor', 'wearable health systems', 'remote healthcare', 'multimodal fusion'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'AI-Based Neuroimaging Analysis for Dementia Detection', "tags": ['dementia', 'neuroimaging', 'medical imaging'], "rationale": 'Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.'},
+    {"title": 'Biomedical Sensor Fault Diagnosis in Smart Hospitals', "tags": ['biomedical engineering'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'TinyML-Assisted Biomedical Signal Monitoring', "tags": ['biomedical signal processing', 'tinyml'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Edge AI for Portable EEG Monitoring Devices', "tags": ['eeg', 'edge ai'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Deep Learning-Based Smart Prosthetic Control Systems', "tags": ['prosthetics'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'AI-Based Human Motion Analysis in Rehabilitation Engineering', "tags": ['rehabilitation systems'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Explainable Biomedical Decision Support Systems', "tags": ['explainable ai'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Biomedical Image Registration Using Neural Networks', "tags": ['medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'Real-Time ECG Quality Monitoring for Telemedicine Systems', "tags": ['ecg'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Federated Learning in Connected Biomedical Devices', "tags": ['federated learning', 'smart medical devices'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'AI-Assisted Patient Monitoring in Intensive Care Units', "tags": ['patient monitoring'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'Smart Biomedical Wearables for Elderly Care', "tags": ['wearable health systems'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Machine Learning for Biomedical Sensor Data Integrity', "tags": ['biomedical engineering'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Deep Learning-Based Respiratory Disease Detection', "tags": ['biomedical engineering'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Explainable AI for Smart Diagnostic Imaging Systems', "tags": ['explainable ai', 'medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'Wearable Biosensors for Cardiovascular Monitoring', "tags": ['biosensor', 'wearable health systems'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Biomedical Signal Reliability Assessment with AI', "tags": ['biomedical signal processing', 'biomedical reliability'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'Real-Time EEG-Based Seizure Detection Systems', "tags": ['eeg'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'AI-Powered Biomedical Image Denoising Frameworks', "tags": ['medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'Smart Medical Device Monitoring Using IoMT', "tags": ['iomt', 'smart medical devices'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Edge AI for Low-Latency Biomedical Monitoring', "tags": ['edge ai'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'Deep Learning for Smart Rehabilitation Robotics', "tags": ['rehabilitation systems'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+    {"title": 'AI-Based Medical Device Failure Prediction', "tags": ['smart medical devices'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Explainable Deep Learning in Neuroimaging Analysis', "tags": ['neuroimaging', 'explainable ai', 'medical imaging'], "rationale": 'Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.'},
+    {"title": 'Biomedical Signal Fusion for Remote Patient Monitoring', "tags": ['biomedical signal processing', 'patient monitoring', 'remote healthcare'], "rationale": 'Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.'},
+    {"title": 'Transformer-Based ECG Pattern Recognition Systems', "tags": ['ecg'], "rationale": 'Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.'},
+    {"title": 'AI-Assisted Smart Sensor Validation for Medical Devices', "tags": ['smart medical devices'], "rationale": 'Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.'},
+    {"title": 'Wearable Biomedical Systems for Continuous Health Assessment', "tags": ['wearable health systems'], "rationale": 'Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.'},
+    {"title": 'Deep Learning for Multimodal Medical Imaging Fusion', "tags": ['multimodal fusion', 'medical imaging'], "rationale": 'Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.'},
+    {"title": 'AI-Based Physiological Monitoring in Smart Healthcare Environments', "tags": ['physiological monitoring'], "rationale": 'Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.'},
+]
+
+CURATED_BIOMEDICAL_TOPIC_BANK = BIOMEDICAL_TOPIC_BANK
+
 st.set_page_config(page_title="ResearchMind AI", layout="wide")
 
 
@@ -628,15 +902,15 @@ def render_hero(results: dict | None = None) -> None:
     pubmed_failed = diagnostics.get("pubmed_called") and diagnostics.get("pubmed_error")
 
     if pubmed_failed and has_openalex:
-        status_line = f"⚠ PubMed unavailable, OpenAlex active · PubMed: {distribution.get('PubMed', 0)} · OpenAlex: {distribution.get('OpenAlex', 0)}"
+        status_line = f"PubMed unavailable, OpenAlex active | PubMed: {distribution.get('PubMed', 0)} | OpenAlex: {distribution.get('OpenAlex', 0)}"
     elif has_pubmed and has_openalex:
-        status_line = f"✔ Hybrid Intelligence Active · PubMed: {distribution.get('PubMed', 0)} · OpenAlex: {distribution.get('OpenAlex', 0)}"
+        status_line = f"Hybrid Intelligence Active | PubMed: {distribution.get('PubMed', 0)} | OpenAlex: {distribution.get('OpenAlex', 0)}"
     elif has_pubmed:
-        status_line = f"✔ PubMed Connected · PubMed: {distribution.get('PubMed', 0)}"
+        status_line = f"PubMed Connected | PubMed: {distribution.get('PubMed', 0)}"
     elif has_openalex:
-        status_line = f"✔ OpenAlex Connected · OpenAlex: {distribution.get('OpenAlex', 0)}"
+        status_line = f"OpenAlex Connected | OpenAlex: {distribution.get('OpenAlex', 0)}"
     else:
-        status_line = "✔ PubMed Ready &nbsp;&nbsp; ✔ OpenAlex Ready &nbsp;&nbsp; ✔ Hybrid Intelligence Ready"
+        status_line = "PubMed Ready &nbsp;&nbsp; OpenAlex Ready &nbsp;&nbsp; Hybrid Intelligence Ready"
 
     st.markdown(
         f"""
@@ -650,6 +924,8 @@ def render_hero(results: dict | None = None) -> None:
             </div>
             <div class="rm-card-note" style="margin-top: 0.9rem;">{status_line}</div>
             <p>Araştırma konusunu gir, analiz dönemini seç ve tek tıkla trend, fırsat ve Research Gap Score sonuçlarını üret.</p>
+            <p><strong>Bu demo sürüm yalnızca Biyomedikal Mühendisliği alanı için optimize edilmiştir.</strong><br/>
+            Analizler; biyosensörler, tıbbi cihazlar, biyomedikal sinyaller, giyilebilir sağlık sistemleri ve tıbbi görüntüleme ekseninde değerlendirilir.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -690,6 +966,12 @@ def localize_text(value) -> str:
         "Semantic matching found limited related literature; refine query and validate coverage.": "Semantic matching sınırlı ilişkili literatür buldu; sorguyu iyileştirip kaynak kapsamını doğrulayın.",
         "Semantic matching found no reliable matches; broaden the query or verify source coverage.": "Semantic matching güvenilir eşleşme bulamadı; sorguyu genişletin veya kaynak kapsamını doğrulayın.",
     }
+    replacements.update({
+        "Biomedical engineering objects and metrics were preserved from the query.": "Sorgudaki biyomedikal mühendisliği odakları korunarak öneri oluşturuldu.",
+        "Uses biomedical engineering validation metrics.": "Biyomedikal mühendisliği doğrulama kriterleri kullanılarak oluşturuldu.",
+        "Domain-aware fallback generated from the detected query concepts.": "Sorgudaki biyomedikal odaklar dikkate alınarak öneri oluşturuldu.",
+        "Deterministic local fallback generated a complete research topic.": "Biyomedikal mühendisliği odağı korunarak tamamlanmış bir araştırma başlığı üretildi.",
+    })
     return replacements.get(text, text)
 
 
@@ -937,6 +1219,7 @@ def semantic_research_gap_score(df: pd.DataFrame, query: str, strict_gap: dict |
     }
 
 
+
 def classify_gap_score(score) -> tuple[str, str]:
     numeric = parse_numeric(score)
     if numeric < 30:
@@ -945,17 +1228,15 @@ def classify_gap_score(score) -> tuple[str, str]:
         return "Orta fırsat / konu daraltılmalı", "mid"
     return "Yüksek fırsat / güçlü araştırma potansiyeli", "high"
 
-
 def opportunity_status(score) -> tuple[str, str]:
     numeric = parse_numeric(score)
     if numeric < 30:
-        return "🔴 SATURATED / HIGH COMPETITION", "low"
+        return "Doygun / yüksek rekabet", "low"
     if numeric < 60:
-        return "🟡 COMPETITIVE BUT REFINEABLE", "mid"
+        return "Rekabetçi fakat daraltılabilir", "mid"
     if numeric < 80:
-        return "🟢 EMERGING OPPORTUNITY", "high"
-    return "🟢 STRONG STRATEGIC OPPORTUNITY", "high"
-
+        return "Yükselen araştırma fırsatı", "high"
+    return "Güçlü stratejik araştırma fırsatı", "high"
 
 def strategic_level(score) -> tuple[str, str]:
     numeric = parse_numeric(score)
@@ -967,16 +1248,14 @@ def strategic_level(score) -> tuple[str, str]:
         return "Yükselen araştırma fırsatı", "high"
     return "Güçlü stratejik araştırma fırsatı", "high"
 
-
 def opportunity_trend_status(score, growth) -> tuple[str, str]:
-    numeric_score = parse_numeric(score)
-    numeric_growth = parse_numeric(growth)
-    if numeric_score >= 70 or numeric_growth > 0.4:
-        return "🟢 Rising Opportunity", "high"
-    if numeric_score >= 30:
-        return "🟡 Competitive Area", "mid"
-    return "🔴 Saturated Topic", "low"
-
+    numeric = parse_numeric(score)
+    growth_value = parse_numeric(growth)
+    if numeric >= 65 and growth_value >= 0:
+        return "Yükselen fırsat", "high"
+    if numeric >= 40:
+        return "Rekabetçi alan", "mid"
+    return "Doygun başlık", "low"
 
 def term_relevance_score(term: str, query: str) -> float:
     term_key = normalize_topic_key(term)
@@ -1018,7 +1297,7 @@ def list_focus_terms(top_topics: pd.DataFrame, top_keywords: pd.DataFrame, query
 def normalize_topic_key(value: str) -> str:
     text = unicodedata.normalize("NFKD", str(value or "").lower())
     text = "".join(ch for ch in text if not unicodedata.combining(ch))
-    text = text.replace("’", "'").replace("`", "'").replace("´", "'")
+    text = text.replace("’", "'").replace("`", "'").replace("Â´", "'")
     text = re.sub(r"\balzheimer\?s\b", "alzheimer", text)
     text = re.sub(r"\balzheimer'?s\b", "alzheimer", text)
     text = re.sub(r"\balzheimer\s+s\b", "alzheimer", text)
@@ -1030,20 +1309,355 @@ def normalize_topic_key(value: str) -> str:
 def apply_phrase_replacements(text: str, replacements: dict[str, str]) -> str:
     clean = unicodedata.normalize("NFKC", str(text or ""))
     for source, target in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
-        clean = re.sub(re.escape(source), target, clean, flags=re.I)
+        pattern = rf"(?<![A-Za-z0-9]){re.escape(source)}(?![A-Za-z0-9])"
+        clean = re.sub(pattern, target, clean, flags=re.I)
+    return re.sub(r"\s+", " ", clean).strip()
+
+
+def turkishize_report_terms(text: str) -> str:
+    replacements = {
+        "biomedical signals": "biyomedikal sinyaller",
+        "biomedical signal": "biyomedikal sinyal",
+        "biosensors": "biyosensörler",
+        "biosensor": "biyosensör",
+        "wearable health systems": "giyilebilir sağlık sistemleri",
+        "wearable health system": "giyilebilir sağlık sistemi",
+        "medical devices": "tıbbi cihazlar",
+        "medical device": "tıbbi cihaz",
+        "medical imaging systems": "tıbbi görüntüleme sistemleri",
+        "medical imaging system": "tıbbi görüntüleme sistemi",
+        "signal quality": "sinyal kalitesi",
+        "device reliability": "cihaz güvenilirliği",
+        "diagnostic accuracy": "tanısal doğruluk",
+        "measurement precision": "ölçüm hassasiyeti",
+        "classification performance": "sınıflandırma performansı",
+        "external validation reliability": "dış doğrulama güvenilirliği",
+        "model interpretability": "model yorumlanabilirliği",
+    }
+    clean = str(text or "")
+    for source, target in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
+        clean = re.sub(rf"\b{re.escape(source)}\b", target, clean, flags=re.I)
+    clean = re.sub(r"Konuyu ([^;]+), ([^;]+) odağında", r"Konuyu \1 ve \2 odağında", clean)
     return re.sub(r"\s+", " ", clean).strip()
 
 
 def normalize_keywords_for_domain(text: str) -> dict[str, str]:
     original = re.sub(r"\s+", " ", str(text or "").replace("\n", " ")).strip()
-    expanded = apply_phrase_replacements(original, {**TURKISH_ENGINEERING_MAP, **TURKISH_HEALTHCARE_MAP})
-    return {
-        "original": original,
-        "expanded": expanded,
-        "normalized": normalize_topic_key(expanded),
-        "display": original or expanded,
-    }
+    expanded = apply_phrase_replacements(original, TURKISH_BIOMEDICAL_MAP)
+    return {"original": original, "expanded": expanded, "normalized": normalize_topic_key(expanded), "display": original or expanded}
 
+def normalize_field_keywords(text: str) -> str:
+    return normalize_keywords_for_domain(text)["normalized"]
+
+
+def curated_topic_query_text(seed: str) -> str:
+    expanded = apply_phrase_replacements(str(seed or ""), {
+        **TURKISH_BIOMEDICAL_MAP,
+        "biyomedikal kalibrasyon": "biomedical calibration",
+        "hastabaşı monitörü": "bedside patient monitor",
+        "hasta başı monitörü": "bedside patient monitor",
+        "hasta basi monitoru": "bedside patient monitor",
+        "hasta monitörü": "patient monitor",
+        "hasta monitoru": "patient monitor",
+        "sinyal işleme": "signal processing",
+        "sinyal isleme": "signal processing",
+        "ekg": "ecg",
+        "mrg": "mri",
+        "mr": "mri",
+        "yapay zeka": "artificial intelligence",
+        "yapay zekâ": "artificial intelligence",
+        "açıklanabilir yapay zeka": "explainable ai",
+        "aciklanabilir yapay zeka": "explainable ai",
+    })
+    return normalize_topic_key(expanded)
+
+
+def is_bad_suffix_title(title: str, query: str = "") -> bool:
+    key = normalize_topic_key(title)
+    if not key:
+        return True
+    bad_suffixes = [
+        "for explainable ai",
+        "for transformer model",
+        "for multimodal learning",
+        "for risk prediction",
+        "for small dataset learning",
+        "for federated learning",
+    ]
+    if any(key.endswith(suffix) for suffix in bad_suffixes):
+        return True
+    query_key = normalize_topic_key(query)
+    return bool(query_key and key.startswith(query_key + " for "))
+
+
+def is_near_duplicate_title(title: str, query: str) -> bool:
+    title_key = normalize_topic_key(title)
+    query_key = normalize_topic_key(query)
+    if not title_key or not query_key:
+        return False
+    if title_key == query_key:
+        return True
+    if title_key.startswith(query_key) or query_key.startswith(title_key):
+        return True
+
+    title_tokens = set(title_key.split())
+    query_tokens = set(query_key.split())
+    if not title_tokens or not query_tokens:
+        return False
+    overlap_ratio = len(title_tokens & query_tokens) / max(1, min(len(title_tokens), len(query_tokens)))
+    return overlap_ratio > 0.85
+
+
+TOPIC_RATIONALE_TEXT_FIXES = {
+    "Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.": "Biyomedikal sinyal işleme ve sinyal kalitesi odağı korunarak önerildi.",
+    "Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.": "Giyilebilir sistemler ve biyosensör bağlamı korunarak önerildi.",
+    "Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.": "Alzheimer, nörogörüntüleme veya nörolojik biyomedikal bağlam korunarak önerildi.",
+    "Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.": "Biyomedikal kalibrasyon, hasta monitörü ve sinyal doğrulama odağı korunarak önerildi.",
+    "Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.": "Akıllı tıbbi cihaz güvenilirliği ve doğrulama odağıyla önerildi.",
+    "Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.": "Tıbbi görüntüleme ve biyomedikal doğrulama odağıyla önerildi.",
+    "Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.": "Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi.",
+}
+
+
+def clean_topic_rationale(text: str) -> str:
+    value = str(text or "").strip()
+    return TOPIC_RATIONALE_TEXT_FIXES.get(value, value)
+
+
+def curated_topic_recommendations(seed: str, max_items: int = 5) -> list[dict]:
+    query = curated_topic_query_text(seed)
+    query_tokens = set(query.split())
+    scored = []
+
+    for index, item in enumerate(CURATED_BIOMEDICAL_TOPIC_BANK):
+        title = str(item.get("title", ""))
+        title_key = normalize_topic_key(title)
+        title_tokens = set(title_key.split())
+        tags = [normalize_topic_key(tag) for tag in item.get("tags", [])]
+        if not any(term in query for term in ["sports", "football", "athlete", "player", "performance"]) and any(
+            tag in {"sports", "football", "athlete"} for tag in tags
+        ):
+            continue
+        if "eeg" not in query and any(tag == "eeg" for tag in tags):
+            continue
+        if "ecg" not in query and any(tag == "ecg" for tag in tags):
+            continue
+        if not any(term in query for term in ["alzheimer", "dementia", "neurodegenerative", "mri", "neuroimaging"]) and any(
+            tag in {"alzheimer", "dementia", "neurodegenerative", "mild cognitive impairment", "neuroimaging"} for tag in tags
+        ):
+            continue
+        score = 0
+        for tag in item.get("tags", []):
+            tag_key = normalize_topic_key(tag)
+            if not tag_key:
+                continue
+            tag_tokens = set(tag_key.split())
+            if re.search(rf"(?<![a-z0-9]){re.escape(tag_key)}(?![a-z0-9])", query):
+                score += 3
+            elif query_tokens & tag_tokens:
+                score += 2
+        score += len(query_tokens & title_tokens)
+        if score > 0:
+            scored.append((score, index, item))
+
+    if scored:
+        scored = sorted(scored, key=lambda row: (-row[0], row[1]))[:20]
+        rotation = int(st.session_state.get("topic_suggester_rotation", 0)) if hasattr(st, "session_state") else 0
+        seed_hash = hashlib.sha256(f"{query}|{datetime.now().date()}|{rotation}".encode("utf-8")).hexdigest()
+        scored = sorted(scored, key=lambda row: (-row[0], hashlib.sha256(f"{seed_hash}|{row[1]}".encode("utf-8")).hexdigest()))
+        candidates = [item for _, _, item in scored]
+    else:
+        candidates = []
+
+    general = [
+        item for item in CURATED_BIOMEDICAL_TOPIC_BANK
+        if any(tag in item.get("tags", []) for tag in ["biomedical signal", "biosensor", "medical device", "wearable"])
+    ]
+    candidates.extend(general)
+    candidates.extend(CURATED_BIOMEDICAL_TOPIC_BANK)
+
+    results = []
+    seen = set()
+    for item in candidates:
+        title = str(item.get("title", "")).strip()
+        key = normalize_topic_key(title)
+        if not title or key in seen or is_bad_suffix_title(title, seed) or is_near_duplicate_title(title, seed):
+            continue
+        seen.add(key)
+        results.append({
+            "title": title,
+            "rationale": clean_topic_rationale(
+                item.get("rationale") or "Girilen anahtar kelimelerle uyumlu biyomedikal mühendisliği başlığı önerildi."
+            ),
+        })
+        if len(results) >= max_items:
+            break
+    return results
+
+
+def simplify_biomedical_retrieval_query(query: str) -> str:
+    normalized = normalize_keywords_for_domain(query)["normalized"]
+    if not normalized:
+        return ""
+
+    if len(normalized.split()) > 10 and "biosensor" in normalized and "wearable" in normalized:
+        return "wearable biosensor physiological signal monitoring"
+
+    priority_terms = [
+        "alzheimer",
+        "dementia",
+        "cognitive decline",
+        "mild cognitive impairment",
+        "neurodegenerative",
+        "eeg",
+        "ecg",
+        "emg",
+        "mri",
+        "mr",
+        "ct",
+        "pet",
+        "neuroimaging",
+        "medical imaging",
+        "biosensor",
+        "wearable biosensor",
+        "wearable",
+        "biomedical signal",
+        "physiological signal",
+        "signal quality",
+        "artifact reduction",
+        "noise reduction",
+        "sensor fusion",
+        "medical device",
+        "health monitoring",
+        "diagnosis",
+        "classification",
+        "machine learning",
+        "deep learning",
+        "explainable ai",
+        "artificial intelligence",
+    ]
+    selected = []
+    for term in priority_terms:
+        key = normalize_topic_key(term)
+        if key and re.search(rf"(?<![a-z0-9]){re.escape(key)}(?![a-z0-9])", normalized):
+            selected.append(term)
+
+    if len(normalized.split()) > 10 and selected:
+        return safe_join(dict.fromkeys(selected[:7]).keys(), " ")
+
+    return normalized
+
+
+def migrate_legacy_field(value: str) -> str:
+    return BIOMEDICAL_FIELD
+
+def get_domain_family(selected_field: str) -> str:
+    return "biomedical_engineering"
+
+def is_engineering_field(selected_field: str) -> bool:
+    return True
+
+def is_healthcare_field(selected_field: str) -> bool:
+    return False
+
+def compatibility_domain(selected_field: str) -> str:
+    return ENGINEERING_DOMAIN
+
+def current_selected_field() -> str:
+    value = st.session_state.get("selected_research_field", BIOMEDICAL_FIELD)
+    return BIOMEDICAL_FIELD if value != BIOMEDICAL_FIELD else value
+
+def compute_keyword_score(normalized_topic: str, keywords: list[str]) -> tuple[float, list[str]]:
+    score = 0.0
+    matches: list[str] = []
+    tokens = set(normalized_topic.split())
+    for keyword in keywords:
+        key = normalize_topic_key(keyword)
+        if not key:
+            continue
+        if re.search(rf"(?<![a-z0-9]){re.escape(key)}(?![a-z0-9])", normalized_topic):
+            score += 3
+            matches.append(keyword)
+        elif tokens & set(key.split()):
+            score += 1
+            matches.append(keyword)
+    return score, list(dict.fromkeys(matches))
+
+
+def supported_field_intent(user_topic: str, selected_field: str | None = None) -> dict:
+    selected_field = BIOMEDICAL_FIELD
+    ontology = BIOMEDICAL_ENGINEERING_ONTOLOGY
+    normalized = normalize_keywords_for_domain(user_topic)
+    score, matches = compute_keyword_score(normalized["normalized"], ontology["keywords"])
+    preferred_objects = list(ontology.get("preferred_objects", []))
+    preferred_metrics = list(ontology.get("preferred_metrics", []))
+    key = normalized["normalized"]
+    priority_objects = []
+    priority_metrics = []
+    neurodegenerative_terms = [
+        "alzheimer",
+        "dementia",
+        "cognitive decline",
+        "mild cognitive impairment",
+        "neurodegenerative",
+    ]
+    has_neurodegenerative_context = any(term in key for term in neurodegenerative_terms)
+    if has_neurodegenerative_context:
+        if "eeg" in key:
+            priority_objects.append("EEG signals")
+        if "mri" in key or "mr" in key or "neuroimaging" in key:
+            priority_objects.append("MRI neuroimaging data")
+        priority_objects.extend([
+            "Alzheimer diagnosis workflows",
+            "multimodal clinical and imaging datasets",
+            "cognitive assessment data",
+            "neurodegenerative disease screening systems",
+        ])
+        if "explainable" in key or "xai" in key:
+            priority_metrics.append("model interpretability")
+        priority_metrics.extend([
+            "diagnostic accuracy",
+            "early detection performance",
+            "clinical validation quality",
+            "classification performance",
+            "external validation reliability",
+        ])
+    if "biosensor" in key:
+        priority_objects.extend(["biosensors", "wearable health systems"])
+    if "wearable" in key:
+        priority_objects.append("wearable health systems")
+    if "medical device" in key:
+        priority_objects.append("medical devices")
+    if "biomedical signal" in key or "ecg" in key or "eeg" in key or "emg" in key:
+        priority_objects.append("biomedical signals")
+    if "medical imaging" in key or "mri" in key or "ct" in key:
+        priority_objects.append("medical imaging systems")
+    if "signal quality" in key:
+        priority_metrics.insert(0, "signal quality")
+    if "noise" in key:
+        priority_metrics.append("noise robustness")
+    if "artifact" in key:
+        priority_metrics.append("artifact reduction")
+    if "sensor fusion" in key:
+        priority_metrics.append("device reliability")
+    preferred_objects = list(dict.fromkeys([*priority_objects, *preferred_objects]))
+    preferred_metrics = list(dict.fromkeys([*priority_metrics, *preferred_metrics]))
+    return {
+        "selected_field": BIOMEDICAL_FIELD,
+        "selected_domain": ENGINEERING_DOMAIN,
+        "domain_family": "biomedical_engineering",
+        "subdomain_key": "biomedical_engineering",
+        "subdomain_label": BIOMEDICAL_FIELD,
+        "confidence": round(min(1.0, score / 9.0), 3),
+        "keyword_score": score,
+        "matched_keywords": matches,
+        "preferred_objects": preferred_objects,
+        "preferred_metrics": preferred_metrics,
+        "validation_language": ontology.get("validation_language", ""),
+        "original_keywords": normalized["original"],
+        "expanded_keywords": normalized["expanded"],
+        "normalized_keywords": normalized["normalized"],
+    }
 
 def _score_subdomain(normalized_text: str, ontology_item: dict) -> tuple[float, list[str]]:
     tokens = set(normalized_text.split())
@@ -1099,7 +1713,9 @@ def detect_healthcare_subdomain(normalized_keywords: str) -> dict:
 
 
 def domain_intent(query: str, selected_domain: str | None = None) -> dict:
-    selected_domain = selected_domain or current_selected_domain()
+    selected_domain = selected_domain or current_selected_field()
+    if selected_domain in SUPPORTED_FIELDS or selected_domain in LEGACY_DOMAIN_TO_FIELD:
+        return supported_field_intent(query, migrate_legacy_field(selected_domain))
     processed = normalize_keywords_for_domain(query)
     detected = (
         detect_engineering_subdomain(processed["normalized"])
@@ -1120,53 +1736,7 @@ def _cycle_pick(items: list[str], index: int, fallback: str) -> str:
 
 
 def generate_intent_titles(query: str, selected_domain: str | None = None, min_count: int = 5) -> list[dict[str, str]]:
-    intent = domain_intent(query, selected_domain)
-    label = intent["subdomain_label"]
-    objects = intent.get("preferred_objects") or [title_case_topic(intent.get("expanded_keywords") or query)]
-    metrics = intent.get("preferred_metrics") or ["performance"]
-    selected_domain = intent["selected_domain"]
-    subdomain_key = intent["subdomain_key"]
-
-    if selected_domain == ENGINEERING_DOMAIN:
-        templates = [
-            "Explainable AI for {metric} Prediction in {object}",
-            "Machine Learning-Based {metric} Assessment in {object}",
-            "Digital Twin-Based {object} Monitoring for {metric}",
-            "Optimization-Driven {object} Design for {metric}",
-            "Benchmark Dataset Evaluation for {metric} in {subdomain_label}",
-            "Decision Support Model for {metric} in {subdomain_label}",
-        ]
-    else:
-        templates = [
-            "Explainable AI for {metric} Prediction in {object}",
-            "Machine Learning-Based {metric} Assessment in {object}",
-            "Digital Health Framework for {object} Monitoring",
-            "Benchmark Dataset Evaluation for {metric} in {subdomain_label}",
-            "Decision Support Model for {metric} in {subdomain_label}",
-        ]
-        if subdomain_key == "medicine_clinical":
-            templates.insert(2, "Clinical Decision Support Model for {metric} in {subdomain_label}")
-
-    rows = []
-    seen = set()
-    for index, template in enumerate(templates * 2):
-        title = template.format(
-            metric=_cycle_pick(metrics, index, "performance"),
-            object=_cycle_pick(objects, index, label),
-            subdomain_label=label,
-        )
-        title = re.sub(r"\s+", " ", title).strip()
-        key = normalize_topic_key(title)
-        if key and key not in seen:
-            seen.add(key)
-            rows.append({
-                "title": title,
-                "rationale": f"{label} intent preserved using objects and metrics detected from the user's keywords.",
-            })
-        if len(rows) >= min_count:
-            break
-    return rows
-
+    return curated_topic_recommendations(query, max_items=min_count)
 
 def clean_topic_label(value: str) -> str:
     text = re.sub(r"\s+", " ", str(value or "").replace("’", "'")).strip(" ,;")
@@ -1176,7 +1746,7 @@ def clean_topic_label(value: str) -> str:
 
 
 def current_selected_domain() -> str:
-    return st.session_state.get("selected_research_domain", HEALTHCARE_DOMAIN)
+    return compatibility_domain(current_selected_field())
 
 
 def contains_domain_term(text: str, terms: set[str]) -> bool:
@@ -1193,6 +1763,35 @@ def matched_domain_terms(text: str, terms: set[str] | list[str]) -> list[str]:
         if normalized and re.search(rf"(?<![a-z0-9]){re.escape(normalized)}(?![a-z0-9])", key):
             matches.append(term)
     return sorted(matches)
+
+
+def classify_biomedical_topic_input(user_topic: str) -> dict:
+    expanded = apply_phrase_replacements(str(user_topic or ""), {**TURKISH_BIOMEDICAL_MAP, **TURKISH_UNRELATED_MAP})
+    normalized_topic = normalize_topic_key(expanded)
+    biomedical_terms = matched_domain_terms(normalized_topic, BIOMEDICAL_TERMS)
+    strong_biomedical_objects = matched_domain_terms(normalized_topic, STRONG_BIOMEDICAL_OBJECTS)
+    general_terms = matched_domain_terms(normalized_topic, GENERAL_RELATED_TERMS)
+    unrelated_terms = matched_domain_terms(normalized_topic, UNRELATED_BLOCK_TERMS)
+
+    if unrelated_terms and not biomedical_terms:
+        status = "hard_block"
+        message = BIOMEDICAL_HARD_BLOCK_MESSAGE
+    elif biomedical_terms or strong_biomedical_objects:
+        status = "allow"
+        message = BIOMEDICAL_MIXED_TERM_WARNING if unrelated_terms else ""
+    else:
+        status = "soft_guidance"
+        message = BIOMEDICAL_SOFT_GUIDANCE_MESSAGE
+
+    return {
+        "status": status,
+        "matched_biomedical_terms": sorted(set([*biomedical_terms, *strong_biomedical_objects])),
+        "strong_biomedical_objects": strong_biomedical_objects,
+        "general_terms": general_terms,
+        "unrelated_terms": unrelated_terms,
+        "message": message,
+        "normalized_topic": normalized_topic,
+    }
 
 
 def is_engineering_health_hybrid(text: str) -> bool:
@@ -1217,26 +1816,29 @@ def infer_research_domain(text: str) -> str:
 
 
 def validate_domain_query(query: str, selected_domain: str) -> tuple[bool, str, dict]:
-    inferred = infer_research_domain(query)
-    blocked_terms = matched_domain_terms(query, BLOCKED_KEYWORDS)
-    healthcare_terms = matched_domain_terms(query, HEALTHCARE_KEYWORDS)
-    engineering_terms = matched_domain_terms(query, ENGINEERING_KEYWORDS)
-    selected_terms = engineering_terms if selected_domain == ENGINEERING_DOMAIN else healthcare_terms
+    selected_field = BIOMEDICAL_FIELD
+    classification = classify_biomedical_topic_input(query)
+    normalized_topic = classification["normalized_topic"]
+    intent = supported_field_intent(query, selected_field)
     debug = {
-        "selected_domain": selected_domain,
-        "inferred_domain": inferred,
-        "domain_match": bool(selected_terms),
-        "leakage_terms": blocked_terms,
-        "engineering_terms": engineering_terms,
-        "healthcare_terms": healthcare_terms,
-        "classification_confidence": "high" if selected_terms else "low",
+        "selected_field": selected_field,
+        "selected_domain": ENGINEERING_DOMAIN,
+        "domain_family": "biomedical_engineering",
+        "normalized_topic": normalized_topic,
+        "validation_result": classification["status"],
+        "field_score": intent["keyword_score"],
+        "matched_keywords": classification["matched_biomedical_terms"],
+        "general_terms": classification["general_terms"],
+        "unrelated_terms": classification["unrelated_terms"],
+        "classification_confidence": "high" if intent["keyword_score"] >= 3 else "low",
     }
-    if blocked_terms:
-        debug["domain_match"] = False
-        return False, DOMAIN_SUPPORT_WARNING, debug
-    if selected_terms:
-        return True, "", debug
-    return True, "Topic classification confidence is low, but analysis can still continue.", debug
+    if classification["status"] == "hard_block":
+        debug["leakage_terms"] = classification["unrelated_terms"]
+        return False, classification["message"], debug
+    return True, classification["message"], debug
+
+def validate_supported_field_topic(selected_field: str, user_topic: str) -> tuple[bool, str, dict]:
+    return validate_domain_query(user_topic, selected_field)
 
 
 def forbidden_terms_for_domain(selected_domain: str, query: str) -> set[str]:
@@ -1249,19 +1851,20 @@ def forbidden_terms_for_domain(selected_domain: str, query: str) -> set[str]:
 
 def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]:
     intent = domain_intent(query, selected_domain)
+    compat = intent["selected_domain"]
     label = intent["subdomain_label"]
     objects = intent.get("preferred_objects", [])
     metrics = intent.get("preferred_metrics", [])
-    object_text = ", ".join(objects[:3]) or title_case_topic(intent.get("expanded_keywords") or query)
-    metric_text = ", ".join(metrics[:3]) or "performance"
-    if selected_domain == ENGINEERING_DOMAIN:
+    object_text = safe_join(objects[:3]) or title_case_topic(intent.get("expanded_keywords") or query)
+    metric_text = safe_join(metrics[:3]) or "performance"
+    if compat == ENGINEERING_DOMAIN:
         return {
             "direction": f"{label} research focused on {metric_text} in {object_text}",
             "methodology": engineering_methodology_for_intent(intent),
             "evidence": evidence_focus_for_intent(intent),
             "differentiation": f"Differentiate the work through subdomain-specific {metric_text}, benchmark validation, transparent error analysis, and a clearly defined engineering object: {object_text}.",
         }
-    if selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
+    if compat == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
         return {
             "direction": f"{label} research focused on {metric_text} in {object_text}",
             "methodology": healthcare_methodology_for_intent(intent),
@@ -1269,7 +1872,7 @@ def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]
             "differentiation": f"Differentiate the work through {label.lower()}-specific outcomes, validated measurement instruments, transparent error analysis, and a clearly defined evidence base.",
         }
     key = normalize_topic_key(query)
-    if selected_domain == ENGINEERING_DOMAIN:
+    if compat == ENGINEERING_DOMAIN:
         if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building", "infrastructure"]):
             return {
                 "direction": "Explainable AI for seismic vulnerability and infrastructure resilience assessment",
@@ -1309,10 +1912,11 @@ def domain_specific_strategy(query: str, selected_domain: str) -> dict[str, str]
 
 def domain_specific_insight(query: str, selected_domain: str) -> str:
     intent = domain_intent(query, selected_domain)
+    compat = intent["selected_domain"]
     label = intent["subdomain_label"]
-    objects = ", ".join(intent.get("preferred_objects", [])[:3]) or "the target research object"
-    metrics = ", ".join(intent.get("preferred_metrics", [])[:3]) or "domain-specific performance"
-    if selected_domain == ENGINEERING_DOMAIN:
+    objects = safe_join(intent.get("preferred_objects", [])[:3]) or "the target research object"
+    metrics = safe_join(intent.get("preferred_metrics", [])[:3]) or "domain-specific performance"
+    if compat == ENGINEERING_DOMAIN:
         return (
             f"This {label} topic should be framed around {objects}, measurable {metrics}, "
             "benchmark or simulation evidence, and engineering performance metrics. Strong differentiation "
@@ -1327,10 +1931,11 @@ def domain_specific_insight(query: str, selected_domain: str) -> str:
 
 def domain_specific_paperability_reason(query: str, selected_domain: str) -> str:
     intent = domain_intent(query, selected_domain)
+    compat = intent["selected_domain"]
     label = intent["subdomain_label"]
-    objects = ", ".join(intent.get("preferred_objects", [])[:2]) or "domain-specific evidence"
-    metrics = ", ".join(intent.get("preferred_metrics", [])[:2]) or "validated outcomes"
-    if selected_domain == ENGINEERING_DOMAIN:
+    objects = safe_join(intent.get("preferred_objects", [])[:2]) or "domain-specific evidence"
+    metrics = safe_join(intent.get("preferred_metrics", [])[:2]) or "validated outcomes"
+    if compat == ENGINEERING_DOMAIN:
         return f"{label} evidence such as {objects}, benchmark datasets, and {metrics} improves publication feasibility."
     return f"{label} evidence such as {objects} and {metrics} improves publication feasibility."
 
@@ -1343,37 +1948,35 @@ def sanitize_engineering_language(text: str) -> str:
     return clean
 
 
+def sanitize_biomedical_text(text: str) -> str:
+    clean = str(text or "")
+    replacements = {
+        "clinical cohorts": "benchmark biomedical datasets",
+        "patient groups": "biomedical signal datasets",
+        "treatment response": "device performance response",
+        "prognostic performance": "classification performance",
+        "prognosis": "performance prediction",
+        "mortality risk": "device risk indicator",
+        "readmission risk": "system reliability risk",
+        "clinical outcome prediction": "biomedical system performance prediction",
+        "clinically meaningful endpoints": "biomedical engineering performance metrics",
+        "external clinical evidence": "external biomedical engineering validation evidence",
+    }
+    clean = apply_phrase_replacements(clean, replacements)
+    for term in BIOMEDICAL_CLINICAL_DRIFT_TERMS:
+        clean = re.sub(rf"(?<![A-Za-z0-9]){re.escape(term)}(?![A-Za-z0-9])", "", clean, flags=re.I)
+    return re.sub(r"\s+", " ", clean).strip(" ;,.")
+
+
 def forbidden_terms_for_intent(intent: dict) -> set[str]:
-    selected_domain = intent.get("selected_domain", current_selected_domain())
-    subdomain = intent.get("subdomain_key", "")
-    explicit = set(intent.get("normalized_keywords", "").split())
     explicit_text = intent.get("normalized_keywords", "")
-
-    if selected_domain == ENGINEERING_DOMAIN:
-        forbidden = {
-            "clinical", "patient", "disease", "diagnosis", "treatment", "hospital", "healthcare",
-            "medical", "eeg", "ecg", "mri", "ct", "covid 19", "covid", "oncology", "alzheimer",
-            "nursing", "midwifery", "clinical decision support", "clinically meaningful endpoints",
-        }
-        if subdomain == "biomedical_engineering" or any(term in explicit_text for term in ["biomedical", "medical device", "medical imaging", "biosensor"]):
-            forbidden -= {"medical", "eeg", "ecg", "mri", "ct", "diagnosis"}
-        cross = {
-            "materials_engineering": {"bridge", "seismic", "earthquake", "concrete", "structural", "uav", "drone", "flight", "turbine"},
-            "civil_structural_engineering": {"coating", "corrosion", "polymer", "composite materials", "uav", "drone", "eeg"},
-            "mechanical_engineering": {"bridge", "seismic", "concrete", "coating", "corrosion", "uav", "drone", "eeg"},
-            "aerospace_uav_engineering": {"concrete", "coating", "corrosion", "patient", "clinical"},
-            "energy_environmental_engineering": {"patient", "clinical", "eeg", "oncology"},
-        }
-        forbidden |= cross.get(subdomain, set())
-    else:
-        forbidden = {
-            "seismic", "bridge", "concrete", "corrosion", "coating", "uav", "drone", "turbine",
-            "cfd", "additive manufacturing", "power grid", "geotechnical", "structural health monitoring",
-        }
-
-    allowed = {term for term in forbidden if term and (term in explicit_text or any(token in explicit for token in normalize_topic_key(term).split()))}
-    return forbidden - allowed
-
+    forbidden = {
+        "bridge", "concrete", "seismic", "earthquake", "coating", "corrosion", "uav", "drone",
+        "tax", "fiscal", "economics", "public expenditure", "nursing", "midwifery",
+        "clinical cohorts", "patient groups", "treatment response", "prognostic performance",
+        "mortality risk", "readmission risk",
+    }
+    return {term for term in forbidden if normalize_topic_key(term) not in explicit_text}
 
 def find_forbidden_terms(text: str, forbidden: set[str]) -> list[str]:
     key = normalize_topic_key(text)
@@ -1381,20 +1984,11 @@ def find_forbidden_terms(text: str, forbidden: set[str]) -> list[str]:
 
 
 def sanitize_text_for_intent(text: str, intent: dict) -> str:
-    clean = str(text or "")
-    if intent.get("selected_domain") == ENGINEERING_DOMAIN:
-        replacements = {
-            **ENGINEERING_LANGUAGE_REPLACEMENTS,
-            "EEG": "sensor", "ECG": "sensor", "MRI": "sensor", "CT": "sensor",
-            "COVID-19": "benchmark", "COVID": "benchmark", "oncology": "engineering application",
-            "Alzheimer": "target system", "nursing": "operations", "midwifery": "operations",
-        }
-        clean = apply_phrase_replacements(clean, replacements)
+    clean = sanitize_biomedical_text(text)
     forbidden = forbidden_terms_for_intent(intent)
     for term in find_forbidden_terms(clean, forbidden):
         clean = re.sub(rf"(?<![A-Za-z0-9]){re.escape(term)}(?![A-Za-z0-9])", "", clean, flags=re.I)
     return re.sub(r"\s+", " ", clean).strip(" ;,.")
-
 
 def sanitize_suggestions_for_intent(suggestions: pd.DataFrame, query: str, selected_domain: str | None = None) -> pd.DataFrame:
     suggestions = _as_dataframe(suggestions)
@@ -1507,32 +2101,45 @@ def validation_strategy_for_intent(intent: dict) -> str:
     return evidence_focus_for_intent(intent) + "; transparent error analysis."
 
 
-def domain_narrowing_for_selected(query: str, selected_domain: str) -> str:
-    intent = domain_intent(query, selected_domain)
-    object_text = ", ".join(intent.get("preferred_objects", [])[:2]) or title_case_topic(intent.get("expanded_keywords") or query)
-    metric_text = ", ".join(intent.get("preferred_metrics", [])[:2]) or "performance"
-    if selected_domain == ENGINEERING_DOMAIN:
-        return f"Narrow the topic around {object_text}, measurable {metric_text}, benchmark or simulation-based validation, and a clearly defined engineering performance contribution."
-    if selected_domain == HEALTHCARE_DOMAIN:
-        return f"Narrow the topic around {object_text}, measurable {metric_text}, subdomain-specific validation evidence, and transparent error analysis."
-    if selected_domain == ENGINEERING_DOMAIN:
-        key = normalize_topic_key(query)
-        if any(term in key for term in ["seismic", "earthquake", "structural", "bridge", "building"]):
-            return "Narrow the topic around structural health monitoring, seismic vulnerability indicators, finite element or sensor-fusion validation, and engineering performance metrics for a defined infrastructure class."
-        if any(term in key for term in ["cfd", "thermal", "heat transfer"]):
-            return "Narrow the topic around CFD/FEM simulation, thermal optimization objectives, benchmark validation and measurable engineering performance metrics."
-        if "uav" in key or "drone" in key:
-            return "Narrow the topic around UAV swarm computer vision, edge AI deployment, real-time threat detection metrics and benchmarked robustness validation."
-        if "wind turbine" in key:
-            return "Narrow the topic around digital twin modeling, multi-sensor fusion, fault detection and season-level reliability validation for wind turbines."
-        return "Narrow the topic around a specific engineering system, measurable performance metric, benchmark dataset and deployment-oriented validation protocol."
-    return domain_narrowing_direction(query)
+def _alzheimer_narrowing_text(query: str) -> str:
+    key = normalize_topic_key(query)
+    evidence = "EEG/MRI veya multimodal nörogörüntüleme verileri"
+    if "eeg" in key and not any(term in key for term in ["mri", "mr", "neuroimaging"]):
+        evidence = "EEG sinyalleri"
+    elif any(term in key for term in ["mri", "mr", "neuroimaging"]) and "eeg" not in key:
+        evidence = "MRI/nörogörüntüleme verileri"
+    xai = "açıklanabilir yapay zekâ ve yorumlanabilir model çıktıları" if ("explainable" in key or "xai" in key) else "açıklanabilir yapay zekâ"
+    return (
+        f"Konuyu Alzheimer tanısı, {evidence}, {xai}, "
+        "erken tanı performansı ve dış doğrulama protokolü etrafında daraltın."
+    )
 
+
+def is_alzheimer_context(query: str) -> bool:
+    key = normalize_topic_key(query)
+    return any(term in key for term in [
+        "alzheimer", "dementia", "cognitive decline",
+        "mild cognitive impairment", "neurodegenerative"
+    ])
+
+
+def domain_narrowing_for_selected(query: str, selected_domain: str) -> str:
+    if is_alzheimer_context(query):
+        return _alzheimer_narrowing_text(query)
+
+    intent = domain_intent(query, selected_domain)
+    object_text = safe_join(intent.get("preferred_objects", [])[:2]) or title_case_topic(intent.get("expanded_keywords") or query)
+    metric_text = safe_join(intent.get("preferred_metrics", [])[:2]) or "ölçülebilir performans"
+    return turkishize_report_terms(
+        f"Konuyu {object_text} odağında; {metric_text}, açık doğrulama protokolü "
+        "ve karşılaştırılabilir performans ölçütleriyle daraltın."
+    )
 
 def apply_domain_guard_to_results(results: dict) -> dict:
-    selected_domain = results.get("selected_domain") or current_selected_domain()
+    selected_field = migrate_legacy_field(results.get("selected_field", current_selected_field()))
+    selected_domain = compatibility_domain(selected_field)
     query = results.get("query", "")
-    intent = domain_intent(query, selected_domain)
+    intent = domain_intent(query, selected_field)
     forbidden = forbidden_terms_for_intent(intent) | forbidden_terms_for_domain(selected_domain, query)
     corrected = 0
     leakage_terms: set[str] = set()
@@ -1545,7 +2152,7 @@ def apply_domain_guard_to_results(results: dict) -> dict:
 
     suggestions = _as_dataframe(results.get("ai_topic_suggestions"))
     if selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN}:
-        results["research_strategy"] = domain_specific_strategy(query, selected_domain)
+        results["research_strategy"] = domain_specific_strategy(query, selected_field)
         corrected += 1
 
     if not suggestions.empty and forbidden:
@@ -1555,18 +2162,18 @@ def apply_domain_guard_to_results(results: dict) -> dict:
             filtered = suggestions.loc[mask].copy()
             corrected += len(suggestions) - len(filtered)
             if len(filtered) < 3:
-                fallback = intent_topics_to_dataframe(query, selected_domain)
+                fallback = intent_topics_to_dataframe(query, selected_field)
                 filtered = pd.concat([filtered, fallback], ignore_index=True).drop_duplicates(subset=[title_col], keep="first")
-            results["ai_topic_suggestions"] = sanitize_suggestions_for_intent(filtered.head(8), query, selected_domain)
+            results["ai_topic_suggestions"] = sanitize_suggestions_for_intent(filtered.head(8), query, selected_field)
 
-    results["ai_research_insight"] = sanitize_text_for_intent(domain_specific_insight(query, selected_domain), intent)
+    results["ai_research_insight"] = sanitize_text_for_intent(domain_specific_insight(query, selected_field), intent)
     if forbidden and has_forbidden(results.get("ai_research_insight", "")):
-        results["ai_research_insight"] = domain_specific_insight(query, selected_domain)
+        results["ai_research_insight"] = domain_specific_insight(query, selected_field)
         corrected += 1
 
     strategy = dict(results.get("research_strategy") or {})
     if forbidden and any(has_forbidden(value) for value in strategy.values()):
-        results["research_strategy"] = domain_specific_strategy(query, selected_domain)
+        results["research_strategy"] = domain_specific_strategy(query, selected_field)
         corrected += 1
 
     paperability = dict(results.get("paperability_score") or {})
@@ -1574,17 +2181,22 @@ def apply_domain_guard_to_results(results: dict) -> dict:
         reasons = [reason for reason in paperability.get("reasons", []) if not has_forbidden(reason)]
         if len(reasons) != len(paperability.get("reasons", [])):
             corrected += len(paperability.get("reasons", [])) - len(reasons)
-        domain_reason = domain_specific_paperability_reason(query, selected_domain)
+        domain_reason = domain_specific_paperability_reason(query, selected_field)
         if domain_reason not in reasons:
             reasons.insert(0, domain_reason)
         if not reasons:
             reasons = [domain_reason]
         paperability["reasons"] = reasons[:5]
         if selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN} or has_forbidden(paperability.get("recommended_next_action", "")):
-            paperability["recommended_next_action"] = domain_narrowing_for_selected(query, selected_domain)
+            paperability["recommended_next_action"] = domain_narrowing_for_selected(query, selected_field)
             corrected += 1
-        paperability["reasons"] = [sanitize_text_for_intent(reason, intent) for reason in paperability["reasons"]]
-        paperability["recommended_next_action"] = sanitize_text_for_intent(paperability.get("recommended_next_action", ""), intent)
+        paperability["reasons"] = [
+            turkishize_report_terms(sanitize_text_for_intent(reason, intent))
+            for reason in paperability["reasons"]
+        ]
+        paperability["recommended_next_action"] = turkishize_report_terms(
+            sanitize_text_for_intent(paperability.get("recommended_next_action", ""), intent)
+        )
         metrics = []
         for metric in paperability.get("metrics", []):
             item = dict(metric)
@@ -1603,6 +2215,7 @@ def apply_domain_guard_to_results(results: dict) -> dict:
     leakage_score = round(min(1.0, len(leakage_terms) / 5), 2)
     guard = {
         "selected_domain": selected_domain,
+        "selected_field": selected_field,
         "inferred_domain": inferred,
         "domain_match": inferred in {selected_domain, "Healthcare-Engineering Hybrid", "Not detected"},
         "leakage_terms": sorted(leakage_terms),
@@ -1612,6 +2225,7 @@ def apply_domain_guard_to_results(results: dict) -> dict:
     results["domain_guard"] = guard
     domain_reasoning = dict(results.get("domain_reasoning") or {})
     domain_reasoning["selected_domain"] = selected_domain
+    domain_reasoning["selected_field"] = selected_field
     domain_reasoning["domain_guard_leakage_score"] = leakage_score
     domain_reasoning["domain_guard_corrected_items"] = corrected
     results["domain_reasoning"] = domain_reasoning
@@ -1768,8 +2382,9 @@ def domain_label(values: list[str], fallback: str = "Not detected") -> str:
 
 
 def build_domain_reasoning(query: str, suggestions: pd.DataFrame | None = None) -> dict:
-    selected_domain = current_selected_domain()
-    intent = domain_intent(query, selected_domain)
+    selected_field = current_selected_field()
+    selected_domain = compatibility_domain(selected_field)
+    intent = domain_intent(query, selected_field)
     concepts = extract_query_concepts(query)
     suggestions = _as_dataframe(suggestions)
     scores = pd.to_numeric(suggestions.get("domain_consistency_score", pd.Series(dtype=float)), errors="coerce").dropna()
@@ -1802,13 +2417,14 @@ def build_domain_reasoning(query: str, suggestions: pd.DataFrame | None = None) 
         "primary_method": dominant_method,
         "clinical_domain": intent["subdomain_label"],
         "primary_domain": intent["subdomain_label"],
+        "selected_field": selected_field,
         "selected_domain": selected_domain,
         "subdomain_key": intent["subdomain_key"],
         "subdomain_label": intent["subdomain_label"],
         "subdomain_confidence": intent["confidence"],
-        "matched_keywords": ", ".join(intent.get("matched_keywords", [])[:8]),
-        "preferred_objects": ", ".join(intent.get("preferred_objects", [])[:6]),
-        "preferred_metrics": ", ".join(intent.get("preferred_metrics", [])[:6]),
+        "matched_keywords": safe_join(intent.get("matched_keywords", [])[:8]),
+        "preferred_objects": safe_join(intent.get("preferred_objects", [])[:6]),
+        "preferred_metrics": safe_join(intent.get("preferred_metrics", [])[:6]),
         "domain_consistency_score": round(consistency, 3),
         "domain_consistency": consistency_label,
         "semantic_leakage_risk": risk,
@@ -1959,9 +2575,10 @@ def generate_ai_insight(
 
 
 def build_research_strategy(query: str, suggestions: pd.DataFrame | None = None, selected_domain: str | None = None) -> dict[str, str]:
-    selected_domain = selected_domain or current_selected_domain()
+    selected_domain = selected_domain or current_selected_field()
     intent = domain_intent(query, selected_domain)
-    if selected_domain == ENGINEERING_DOMAIN or (selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}):
+    compat = intent["selected_domain"]
+    if compat == ENGINEERING_DOMAIN or (compat == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}):
         return domain_specific_strategy(query, selected_domain)
     text = f"{query} "
     suggestions = _as_dataframe(suggestions)
@@ -2084,6 +2701,9 @@ def paperability_level(score) -> tuple[str, str, str]:
 
 
 def domain_narrowing_direction(query: str, domain_reasoning: dict | None = None) -> str:
+    if is_alzheimer_context(query):
+        return _alzheimer_narrowing_text(query)
+
     concepts = extract_query_concepts(query)
     disease = concepts.get("disease", [])
     modality = concepts.get("modality", [])
@@ -2170,8 +2790,9 @@ def build_paperability_score(
     openalex_volume = parse_numeric((openalex_gap or {}).get("total_records"))
     distribution = distribution or {}
     domain_reasoning = domain_reasoning or build_domain_reasoning(query, suggestions)
-    selected_domain = domain_reasoning.get("selected_domain", current_selected_domain())
-    intent = domain_intent(query, selected_domain)
+    selected_field = domain_reasoning.get("selected_field", current_selected_field())
+    selected_domain = compatibility_domain(selected_field)
+    intent = domain_intent(query, selected_field)
     openalex_volume = max(openalex_volume, parse_numeric(distribution.get("OpenAlex", 0)))
 
     generic_terms = {"artificial intelligence", "machine learning", "deep learning", "healthcare", "diagnosis"}
@@ -2264,7 +2885,7 @@ def build_paperability_score(
         reasons.append("İlgili literatür mevcut ancak konu hâlâ farklılaştırılabilir görünüyor.")
 
     if method_hits:
-        reasons.append("Güçlü yöntem unsurları mevcut: " + ", ".join(dict.fromkeys(method_hits[:4])) + ".")
+        reasons.append("Güçlü yöntem unsurları mevcut: " + safe_join(dict.fromkeys(method_hits[:4]).keys()) + ".")
     if clinical_hits:
         reasons.append("Klinik/pratik bağlam SCI yayın potansiyelini destekliyor.")
     if evidence_hits:
@@ -2274,11 +2895,23 @@ def build_paperability_score(
     else:
         reasons.append("Domain consistency güçlü; öneriler hastalık, modalite ve yöntem bağlamında uyumlu kalıyor.")
 
-    reasons = reasons[:5]
+    if is_alzheimer_context(query):
+        alzheimer_reasons = [
+            "Alzheimer tanısı ve erken tespit bağlamı yayın potansiyelini güçlendirir.",
+            "EEG/MRI/nörogörüntüleme odağı, ölçülebilir biyomedikal kanıt üretimini destekler.",
+            "Açıklanabilir yapay zekâ ve yorumlanabilir model çıktıları klinik doğrulama değerini artırır.",
+            "Dış doğrulama ve karşılaştırılabilir veri seti planı SCI düzeyinde ayrışmayı güçlendirir.",
+        ]
+        reasons = alzheimer_reasons + [
+            reason for reason in reasons
+            if not any(term in normalize_topic_key(reason) for term in ["wearable", "biosensor", "device reliability"])
+        ]
+
+    reasons = [turkishize_report_terms(reason) for reason in reasons[:5]]
     if not reasons:
         reasons = ["Bu değerlendirme, konu kapsamı ve mevcut literatür sinyallerine göre tahmini olarak üretildi."]
 
-    next_action = domain_narrowing_direction(query, domain_reasoning)
+    next_action = turkishize_report_terms(domain_narrowing_direction(query, domain_reasoning))
 
     metrics = [
         {"metric": "Novelty Potential", "score": round(novelty, 2), "comment": "Strategic Opportunity Score ve konu genelliğine göre tahmini novelty."},
@@ -2474,7 +3107,7 @@ def naturalize_topic_title(base_query: str, topic: str = "") -> str:
 def intent_topics_to_dataframe(query: str, selected_domain: str | None = None, score: int = 68) -> pd.DataFrame:
     rows = [
         (item["title"], score, "positive", item["rationale"])
-        for item in generate_intent_titles(query, selected_domain, min_count=5)
+        for item in curated_topic_recommendations(query, max_items=5)
     ]
     out = pd.DataFrame(rows, columns=["suggested_research_topic", "gap_score", "growth_rate", "recommendation"])
     out["domain_consistency_score"] = 0.9
@@ -2482,13 +3115,43 @@ def intent_topics_to_dataframe(query: str, selected_domain: str | None = None, s
     return out
 
 
+def clean_suggestions_with_curated_bank(suggestions: pd.DataFrame, query: str, min_items: int = 5) -> pd.DataFrame:
+    suggestions = _as_dataframe(suggestions)
+    topic_col = "suggested_research_topic" if "suggested_research_topic" in suggestions.columns else "suggested_topic" if "suggested_topic" in suggestions.columns else None
+
+    if topic_col:
+        clean = suggestions.copy()
+        clean = clean[
+            ~clean[topic_col].fillna("").astype(str).map(
+                lambda title: is_bad_suffix_title(title, query) or is_near_duplicate_title(title, query)
+            )
+        ].copy()
+    else:
+        clean = pd.DataFrame()
+
+    curated = intent_topics_to_dataframe(query)
+    if clean.empty:
+        return curated.head(min_items)
+
+    clean = pd.concat([clean, curated], ignore_index=True, sort=False)
+    topic_col = "suggested_research_topic" if "suggested_research_topic" in clean.columns else "suggested_topic" if "suggested_topic" in clean.columns else None
+    if topic_col:
+        clean = clean.drop_duplicates(subset=[topic_col], keep="first")
+        bad_mask = clean[topic_col].fillna("").astype(str).map(
+            lambda title: is_bad_suffix_title(title, query) or is_near_duplicate_title(title, query)
+        )
+        clean = clean.loc[~bad_mask].copy()
+    return clean.head(max(min_items, len(clean))).reset_index(drop=True)
+
+
 def domain_adapted_suggestions(query: str) -> pd.DataFrame:
-    selected_domain = current_selected_domain()
-    intent = domain_intent(query, selected_domain)
+    selected_field = current_selected_field()
+    selected_domain = compatibility_domain(selected_field)
+    intent = domain_intent(query, selected_field)
     if selected_domain == ENGINEERING_DOMAIN:
-        return intent_topics_to_dataframe(query, selected_domain)
+        return intent_topics_to_dataframe(query, selected_field)
     if selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
-        return intent_topics_to_dataframe(query, selected_domain)
+        return intent_topics_to_dataframe(query, selected_field)
 
     concepts = extract_query_concepts(query)
     disease = concepts.get("disease", [])
@@ -2535,7 +3198,7 @@ def domain_adapted_suggestions(query: str) -> pd.DataFrame:
     else:
         title = naturalize_topic_title(query, "clinical validation" if "diagnosis" in task else "robust validation")
         rows = [
-            (title, 62, "neutral", "Domain-aware fallback generated from the detected query concepts."),
+            (title, 54, "positive", "Sorgudaki biyomedikal odaklar dikkate alınarak öneri oluşturuldu."),
         ]
 
     out = pd.DataFrame(rows, columns=["suggested_research_topic", "gap_score", "growth_rate", "recommendation"])
@@ -2548,7 +3211,7 @@ def domain_adapted_suggestions(query: str) -> pd.DataFrame:
 def apply_domain_reasoning_filter(suggestions: pd.DataFrame, query: str) -> pd.DataFrame:
     suggestions = _as_dataframe(suggestions)
     fallback = domain_adapted_suggestions(query)
-    selected_domain = current_selected_domain()
+    selected_domain = current_selected_field()
 
     if suggestions.empty:
         fallback.attrs["domain_filtered_count"] = 0
@@ -2591,10 +3254,10 @@ def apply_domain_reasoning_filter(suggestions: pd.DataFrame, query: str) -> pd.D
 
 def naturalize_suggestions(suggestions: pd.DataFrame, base_query: str) -> pd.DataFrame:
     if suggestions.empty:
-        return suggestions
+        return intent_topics_to_dataframe(base_query)
 
     out = suggestions.copy()
-    selected_domain = current_selected_domain()
+    selected_domain = current_selected_field()
     title_col = None
 
     if "suggested_research_topic" in out.columns:
@@ -2604,7 +3267,7 @@ def naturalize_suggestions(suggestions: pd.DataFrame, base_query: str) -> pd.Dat
 
     if title_col:
         if selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN}:
-            return sanitize_suggestions_for_intent(out, base_query, selected_domain)
+            return clean_suggestions_with_curated_bank(sanitize_suggestions_for_intent(out, base_query, selected_domain), base_query)
 
         def _format(row):
             raw_title = str(row.get(title_col, ""))
@@ -2616,7 +3279,7 @@ def naturalize_suggestions(suggestions: pd.DataFrame, base_query: str) -> pd.Dat
         out[title_col] = out.apply(_format, axis=1)
         out = out.drop_duplicates(subset=[title_col], keep="first").reset_index(drop=True)
 
-    return out
+    return clean_suggestions_with_curated_bank(out, base_query)
 
 
 QUERY_HELP = """
@@ -2808,7 +3471,7 @@ def demo_cache_key(config: dict) -> str:
             "query": query,
             "source": config.get("data_source", ""),
             "years_back": int(config.get("years_back", 5)),
-            "selected_domain": config.get("selected_domain", current_selected_domain()),
+            "selected_field": config.get("selected_field", current_selected_field()),
         },
         sort_keys=True,
         ensure_ascii=False,
@@ -2856,6 +3519,7 @@ def load_demo_cache(config: dict) -> dict | None:
         "data_source": config.get("data_source", "-"),
         "data_source_label": config.get("data_source_label", config.get("data_source", "-")),
         "selected_domain": config.get("selected_domain", current_selected_domain()),
+        "selected_field": config.get("selected_field", current_selected_field()),
         "query": preprocess_research_query(config.get("query", "")),
         "raw_query": config.get("query", ""),
         "analysis_time": metadata.get("analysis_time", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
@@ -2900,6 +3564,7 @@ def save_demo_cache(config: dict, results: dict) -> None:
                 "source": config.get("data_source", ""),
                 "years_back": int(config.get("years_back", 5)),
                 "selected_domain": config.get("selected_domain", current_selected_domain()),
+                "selected_field": config.get("selected_field", current_selected_field()),
                 "analysis_time": results.get("analysis_time", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                 "export_path": str(Path(export_path).resolve()),
             },
@@ -3034,7 +3699,7 @@ def normalize_topic_seed(text: str) -> str:
 
 
 def topic_refinement_prompt(seed: str, selected_domain: str = "") -> str:
-    domain_text = selected_domain or current_selected_domain()
+    domain_text = migrate_legacy_field(selected_domain or current_selected_field())
     intent = domain_intent(seed, domain_text)
     objects = ", ".join(intent.get("preferred_objects", [])[:4])
     metrics = ", ".join(intent.get("preferred_metrics", [])[:4])
@@ -3044,7 +3709,7 @@ def topic_refinement_prompt(seed: str, selected_domain: str = "") -> str:
         "Preserve the user's actual research object/subdomain; AI terms are only methodological modifiers. "
         "Do not append unrelated suffixes such as EEG, COVID-19, Healthcare Security, VANETs, or patient risk prediction unless they are explicit in the user input and aligned with the selected domain. "
         "Each title must include a clear domain object, method, metric/task, and novelty angle when possible. "
-        f"Selected research domain: {domain_text}. Stay strictly within this domain. "
+        f"Selected supported research field: {domain_text}. Stay strictly within this field. "
         f"Detected subdomain: {intent['subdomain_label']}. Preferred objects: {objects}. Preferred metrics: {metrics}. "
         "Write titles that sound like real high-quality journal article titles. "
         "Return only valid JSON in this exact shape: "
@@ -3086,73 +3751,7 @@ def healthcare_topic_refinement(seed: str) -> list[dict[str, str]]:
 
 
 def rule_based_topic_refinement(seed: str, selected_domain: str | None = None) -> list[dict[str, str]]:
-    selected_domain = selected_domain or current_selected_domain()
-    normalized = normalize_topic_seed(seed)
-    normalized_key = normalize_topic_key(normalized)
-
-    if selected_domain == ENGINEERING_DOMAIN:
-        return engineering_topic_refinement(seed)
-
-    intent_topics = healthcare_topic_refinement(seed)
-    if intent_topics and domain_intent(seed, HEALTHCARE_DOMAIN)["subdomain_key"] != "general_healthcare":
-        return intent_topics
-
-    if any(term in normalized_key for term in ["tax compliance", "public expenditure", "fiscal sustainability", "public finance", "budget"]):
-        return [
-            {
-                "title": "AI-Assisted Tax Compliance and Public Expenditure Sustainability Analysis",
-                "rationale": "Connects tax compliance, public spending, and fiscal sustainability in a publishable analytics topic.",
-            },
-            {
-                "title": "Machine Learning-Based Fiscal Risk Assessment for Public Finance Sustainability",
-                "rationale": "Frames the topic around fiscal risk, predictive modeling, and public finance decision support.",
-            },
-            {
-                "title": "Data-Driven Analysis of Tax Compliance and Government Spending Efficiency",
-                "rationale": "Focuses on measurable public finance efficiency and compliance behavior.",
-            },
-            {
-                "title": "Predictive Analytics for Fiscal Sustainability and Public Budget Management",
-                "rationale": "Turns the keywords into a clear forecasting and budget management research direction.",
-            },
-            {
-                "title": "Explainable AI for Tax Compliance Risk Detection in Public Finance",
-                "rationale": "Adds explainability and risk detection for a stronger SCI-style contribution angle.",
-            },
-        ]
-
-    suggestions = domain_adapted_suggestions(normalized)
-    suggestions = naturalize_suggestions(suggestions, normalized)
-    titles = synthesize_paper_titles({"query": normalized, "ai_topic_suggestions": suggestions}, min_count=5)
-    topics = [
-        {
-            "title": title,
-            "rationale": "Domain, method, modality, task and novelty angle were inferred from the provided keywords.",
-        }
-        for title in titles[:5]
-    ]
-    if len(topics) >= 3:
-        return topics
-
-    fallback_base = title_case_topic(normalized or "Applied AI Research")
-    fallback_titles = [
-        f"Explainable AI Framework for {fallback_base}",
-        f"Data-Driven Decision Support for {fallback_base}",
-        f"Predictive Analytics and Validation Strategy for {fallback_base}",
-    ]
-    seen = {normalize_topic_key(item["title"]) for item in topics}
-    for title in fallback_titles:
-        key = normalize_topic_key(title)
-        if key not in seen:
-            seen.add(key)
-            topics.append({
-                "title": title,
-                "rationale": "Deterministic local fallback generated a complete research topic.",
-            })
-        if len(topics) >= 5:
-            break
-    return topics
-
+    return curated_topic_recommendations(seed, max_items=5)
 
 def mask_secret(value: str) -> str:
     text = str(value or "").strip()
@@ -3283,86 +3882,16 @@ def auto_topic_provider_from_config() -> tuple[str, str]:
     return "Rule-based", ""
 
 
-def refine_research_topics_legacy(seed: str, provider: str, api_key: str) -> tuple[list[dict[str, str]], str]:
+def refine_research_topics_legacy(seed: str, provider: str = "", api_key: str = "") -> tuple[list[dict[str, str]], str]:
     if not str(seed or "").strip():
         return [], "No input"
-
-    try:
-        llm_topics = call_llm_topic_refiner(provider, seed, api_key)
-        if llm_topics:
-            return llm_topics[:5], f"{provider} LLM refinement"
-    except Exception as exc:
-        st.session_state["topic_suggester_warning"] = f"LLM önerisi başarısız oldu; rule-based öneriler gösteriliyor. ({exc})"
-
-    if provider != "Rule-based" and api_key:
-        st.session_state["topic_suggester_warning"] = (
-            "Konu önerme servisi şu anda yanıt vermedi. Yerel öneri motoru ile devam ediliyor."
-        )
-
-    fallback_topics = rule_based_topic_refinement(seed)
-    return fallback_topics[:5], "Rule-based fallback"
+    return curated_topic_recommendations(seed, max_items=5), "Curated biomedical recommendations"
 
 
-def refine_research_topics(seed: str, provider: str, api_key: str, selected_domain: str | None = None) -> tuple[list[dict[str, str]], str]:
-    selected_domain = selected_domain or current_selected_domain()
-    debug = {
-        "active_provider": provider,
-        "selected_domain": selected_domain,
-        "inferred_domain": infer_research_domain(seed),
-        "secret_detected": bool(str(api_key or "").strip()),
-        "secret_masked": mask_secret(api_key),
-        "llm_status": "not_started",
-        "fallback_reason": "",
-        "traceback": "",
-    }
-    st.session_state["topic_llm_debug"] = debug
-
+def refine_research_topics(seed: str, provider: str = "", api_key: str = "", selected_domain: str | None = None) -> tuple[list[dict[str, str]], str]:
     if not str(seed or "").strip():
-        debug["llm_status"] = "skipped"
-        debug["fallback_reason"] = "No topic seed was entered."
         return [], "No input"
-
-    try:
-        llm_topics = call_llm_topic_refiner(provider, seed, api_key, selected_domain, debug)
-        if llm_topics:
-            llm_topics = sanitize_topic_items_for_intent(llm_topics, seed, selected_domain)
-            fallback_topics = rule_based_topic_refinement(seed, selected_domain)[:5]
-            debug["fallback_comparison_count"] = len(fallback_topics)
-            debug["fallback_comparison_titles"] = [item.get("title", "") for item in fallback_topics]
-            debug["llm_quality_note"] = (
-                "LLM output is preferred for more creative Q1/SCI-style synthesis; "
-                "fallback remains deterministic and domain-safe."
-            )
-            return llm_topics[:5], f"{provider} LLM"
-    except Exception as exc:
-        debug["llm_status"] = "exception"
-        debug["fallback_reason"] = debug.get("fallback_reason") or str(exc)
-        debug["traceback"] = traceback.format_exc()
-        st.session_state["topic_suggester_warning"] = (
-            "Konu önerme servisi şu anda yanıt vermedi. Yerel öneri motoru ile devam ediliyor."
-        )
-
-    if provider != "Rule-based" and api_key:
-        st.session_state["topic_suggester_warning"] = (
-            "Konu önerme servisi şu anda yanıt vermedi. Yerel öneri motoru ile devam ediliyor."
-        )
-        if not debug.get("fallback_reason"):
-            debug["fallback_reason"] = "LLM returned no valid topic suggestions."
-
-    fallback_topics = rule_based_topic_refinement(seed, selected_domain)
-    debug["fallback_topic_count"] = len(fallback_topics)
-    debug["fallback_titles"] = [item.get("title", "") for item in fallback_topics[:5]]
-    if provider == "Rule-based":
-        debug["fallback_reason"] = debug.get("fallback_reason") or "No provider secret was detected, so local fallback was used."
-    return fallback_topics[:5], "Rule-based fallback"
-
-
-QUERY_WIDGET_KEYS = {
-    "Local CSV": "local_analysis_query",
-    "OpenAlex Live": "openalex_query",
-    "PubMed Live": "pubmed_query",
-    "Hybrid: OpenAlex + PubMed": "hybrid_query",
-}
+    return curated_topic_recommendations(seed, max_items=5), "Curated biomedical recommendations"
 
 
 def apply_suggested_research_topic(title: str) -> None:
@@ -3372,20 +3901,11 @@ def apply_suggested_research_topic(title: str) -> None:
 
     st.session_state["pending_research_topic"] = clean_title
     st.session_state["selected_research_topic"] = clean_title
-    st.session_state["topic_transfer_notice"] = "Önerilen konu araştırma konusu alanına aktarıldı."
-
-
-def sync_pending_research_topic(data_source: str) -> None:
-    pending = st.session_state.pop("pending_research_topic", "")
-    if not pending:
-        return
 
     for key in QUERY_WIDGET_KEYS.values():
-        st.session_state[key] = pending
+        st.session_state[key] = clean_title
 
-    active_key = QUERY_WIDGET_KEYS.get(data_source)
-    if active_key:
-        st.session_state[active_key] = pending
+    st.session_state["topic_transfer_notice"] = "Önerilen konu araştırma konusu alanına aktarıldı."
 
 
 def render_topic_suggester() -> None:
@@ -3394,106 +3914,43 @@ def render_topic_suggester() -> None:
             st.session_state["topic_suggester_seed"] = ""
         seed = st.text_area(
             "Türkçe veya İngilizce anahtar kelimelerinizi yazın",
-            placeholder="otizm eeg göz takibi\nalzheimer mri yapay zeka\nblokzincir sağlık verisi",
+            placeholder="biyosensör sinyal kalitesi\nalzheimer mri yapay zeka\nwearable biosensor ECG",
             key="topic_suggester_seed",
             height=90,
         )
-        selected_domain = current_selected_domain()
-        if is_admin():
-            with st.expander("Konu önerme config durumu", expanded=False):
-                for name, env_key in TOPIC_PROVIDER_ENV_KEYS.items():
-                    secret_value = read_env_value(env_key)
-                    st.caption(f"{name}: {mask_secret(secret_value)}")
-        if demo_mode_enabled() and not is_admin():
-            provider, api_key = auto_topic_provider_from_config()
-        else:
-            provider_options = ["Rule-based", "OpenAI", "Groq", "Gemini"]
-            default_provider, _ = auto_topic_provider_from_config()
-            provider = st.selectbox(
-                "LLM sağlayıcı",
-                provider_options,
-                index=provider_options.index(default_provider) if default_provider in provider_options else 0,
-                help="API key yoksa ücretsiz/rule-based mod kullanılır.",
-                key="topic_suggester_provider",
-            )
-        if not (demo_mode_enabled() and not is_admin()):
-            api_key = ""
-        if provider != "Rule-based" and ((not demo_mode_enabled()) or is_admin()):
-            env_key = TOPIC_PROVIDER_ENV_KEYS[provider]
-            api_key = st.text_input(
-                f"{provider} API key",
-                value="",
-                type="password",
-                help=f"Opsiyonel. Boş bırakılırsa .env içindeki {env_key} kullanılır; yoksa rule-based öneriler çalışır.",
-                key=f"topic_suggester_{provider.lower()}_api_key",
-            ).strip() or read_env_value(env_key)
+
+        selected_field = current_selected_field()
 
         if st.button("Konu Öner", use_container_width=True, key="suggest_research_topics_button"):
-            domain_ok, domain_message, domain_debug = validate_domain_query(seed, selected_domain)
+            st.session_state.pop("topic_suggester_notice", None)
+            st.session_state.pop("topic_suggester_notice_type", None)
+            st.session_state["topic_suggester_rotation"] = int(st.session_state.get("topic_suggester_rotation", 0)) + 1
+            domain_ok, domain_message, domain_debug = validate_domain_query(seed, selected_field)
             st.session_state["domain_guard_debug"] = domain_debug
+
             if not domain_ok:
-                st.warning(domain_message)
                 st.session_state["topic_suggestions"] = []
                 st.session_state["topic_suggester_results"] = []
-                st.session_state["topic_suggester_mode"] = "Domain blocked"
+                st.session_state["topic_suggester_notice"] = f"{domain_message}\n\n{BIOMEDICAL_KEYWORD_SUGGESTION}"
+                st.session_state["topic_suggester_notice_type"] = "error"
             else:
-                if domain_message:
-                    st.warning(domain_message)
-                with st.spinner("Konu önerileri üretiliyor..."):
-                    topics, mode = refine_research_topics(seed, provider, api_key, selected_domain)
+                topics = curated_topic_recommendations(seed, max_items=5)
                 st.session_state["topic_suggestions"] = topics
                 st.session_state["topic_suggester_results"] = topics
-                st.session_state["topic_suggester_mode"] = mode
+                if domain_message:
+                    st.session_state["topic_suggester_notice"] = domain_message
+                    st.session_state["topic_suggester_notice_type"] = "warning"
 
-        warning = st.session_state.pop("topic_suggester_warning", "")
-        if warning:
-            st.warning(warning)
-
-        llm_debug = st.session_state.get("topic_llm_debug", {})
-        if llm_debug and is_admin():
-            with st.expander("LLM konu önerme debug", expanded=False):
-                st.write({
-                    "active_provider": llm_debug.get("active_provider"),
-                    "secret_detected": llm_debug.get("secret_detected"),
-                    "secret_masked": llm_debug.get("secret_masked"),
-                    "client_status": llm_debug.get("client_status"),
-                    "model": llm_debug.get("model"),
-                    "llm_status": llm_debug.get("llm_status"),
-                    "http_status": llm_debug.get("http_status"),
-                    "response_chars": llm_debug.get("response_chars"),
-                    "parsed_topic_count": llm_debug.get("parsed_topic_count"),
-                    "elapsed_ms": llm_debug.get("elapsed_ms"),
-                    "fallback_reason": llm_debug.get("fallback_reason"),
-                })
-                if llm_debug.get("fallback_comparison_titles"):
-                    st.caption("Fallback comparison titles")
-                    st.write(llm_debug.get("fallback_comparison_titles"))
-                if llm_debug.get("fallback_titles"):
-                    st.caption("Fallback titles used")
-                    st.write(llm_debug.get("fallback_titles"))
-                if llm_debug.get("raw_response_preview"):
-                    st.caption("LLM raw response preview")
-                    st.code(llm_debug.get("raw_response_preview"))
-                if llm_debug.get("traceback"):
-                    st.caption("Traceback")
-                    st.code(llm_debug.get("traceback"))
-
-        domain_debug = st.session_state.get("domain_guard_debug", {})
-        if domain_debug and is_admin():
-            with st.expander("DomainGuard debug", expanded=False):
-                st.write({
-                    "selected_domain": domain_debug.get("selected_domain"),
-                    "inferred_domain": domain_debug.get("inferred_domain"),
-                    "domain_match": domain_debug.get("domain_match"),
-                    "leakage_terms": domain_debug.get("leakage_terms"),
-                    "corrected_items_count": domain_debug.get("corrected_items_count", 0),
-                    "topic_suggestion_provider": st.session_state.get("topic_suggester_mode", "-"),
-                    "fallback_reason": (st.session_state.get("topic_llm_debug", {}) or {}).get("fallback_reason", "-"),
-                })
+        notice = st.session_state.get("topic_suggester_notice", "")
+        notice_type = st.session_state.get("topic_suggester_notice_type", "warning")
+        if notice:
+            if notice_type == "error":
+                st.error(notice)
+            else:
+                st.warning(notice)
 
         topics = st.session_state.get("topic_suggestions", st.session_state.get("topic_suggester_results", []))
         if topics:
-            st.caption(f"Öneri modu: {st.session_state.get('topic_suggester_mode', 'Rule-based fallback')}")
             for index, item in enumerate(topics, start=1):
                 title = item.get("title", "")
                 st.markdown(f"**{index}. {title}**")
@@ -3506,7 +3963,6 @@ def render_topic_suggester() -> None:
                     on_click=apply_suggested_research_topic,
                     args=(title,),
                 )
-
 
 def render_config_warnings() -> None:
     missing = []
@@ -3718,12 +4174,15 @@ def compute_top_keywords(df: pd.DataFrame, n: int = 20) -> pd.DataFrame:
 
 def run_full_analysis(config: dict) -> dict:
     source = config["data_source"]
-    raw_query = config["query"]
-    selected_domain = config.get("selected_domain", current_selected_domain())
-    query = preprocess_research_query(raw_query)
+    raw_query = config.get("raw_query", config["query"])
+    selected_field = migrate_legacy_field(config.get("selected_field", current_selected_field()))
+    selected_domain = compatibility_domain(selected_field)
+    retrieval_query = config.get("query", raw_query)
+    query = simplify_biomedical_retrieval_query(preprocess_research_query(normalize_keywords_for_domain(retrieval_query)["expanded"]))
     config = config.copy()
     config["query"] = query
     config["selected_domain"] = selected_domain
+    config["selected_field"] = selected_field
     warnings: list[str] = []
     errors: list[str] = []
     diagnostics: dict = {
@@ -3765,6 +4224,16 @@ def run_full_analysis(config: dict) -> dict:
     strict_gap_score = _safe_dict_call("strict research gap score", research_gap_score, df, query, errors)
     query_trend = semantic_query_trend(df, query)
     gap_score = semantic_research_gap_score(df, query, strict_gap_score)
+    insufficient_data = df.empty
+    if insufficient_data:
+        gap_score = {
+            "total_records": 0,
+            "growth_rate": 0,
+            "gap_score": "Yetersiz veri",
+            "interpretation": "Hesaplanamadı / güvenilir değil",
+            "matching_method": "semantic topic-aware matching",
+        }
+        warnings.append("Yetersiz veri: Bu sorgu PubMed ve OpenAlex üzerinde yeterli kayıt döndürmedi.")
     semantic_results = _safe_dataframe_call(
         "semantic search", semantic_search_tfidf, df, query, 8, errors
     )
@@ -3787,6 +4256,8 @@ def run_full_analysis(config: dict) -> dict:
         top_topics,
         top_keywords,
     )
+    if insufficient_data:
+        strategic_score = "Yetersiz veri"
     ai_insight = generate_ai_insight(
         gap_score,
         top_topics,
@@ -3796,7 +4267,7 @@ def run_full_analysis(config: dict) -> dict:
         source_distribution_after,
         query,
     )
-    research_strategy = build_research_strategy(query, ai_suggestions, selected_domain)
+    research_strategy = build_research_strategy(query, ai_suggestions, selected_field)
     paperability_score = build_paperability_score(
         query,
         gap_score,
@@ -3812,6 +4283,7 @@ def run_full_analysis(config: dict) -> dict:
         "data_source": source,
         "data_source_label": config.get("data_source_label", DATA_SOURCE_LABELS.get(source, source)),
         "selected_domain": selected_domain,
+        "selected_field": selected_field,
         "query": query,
         "raw_query": raw_query,
         "analysis_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -3987,6 +4459,11 @@ def _load_pubmed_dataframe(
     return _empty_researchmind_frame()
 
 
+def _is_openalex_rate_limit_error(message: str) -> bool:
+    key = str(message or "").lower()
+    return "429" in key or "too many requests" in key or "rate limit" in key
+
+
 def _run_openalex_gap(config: dict, warnings: list[str], errors: list[str]) -> dict | None:
     if "_openalex_gap" in config:
         return config["_openalex_gap"]
@@ -3996,16 +4473,29 @@ def _run_openalex_gap(config: dict, warnings: list[str], errors: list[str]) -> d
     if not openalex_contact:
         warnings.append("OpenAlex e-posta veya API bilgisi eklenmemiş. Yoğun kullanımda erişim sınırlanabilir.")
 
-    try:
-        return openalex_gap_analysis(
-            query=config["query"],
-            api_key=openalex_contact,
-            per_page=int(config.get("openalex_max_results", DEFAULT_LIVE_RESULT_LIMIT)),
-            years_back=int(config.get("years_back", 5)),
-        )
-    except Exception as exc:
-        errors.append(f"OpenAlex live gap analysis failed: {exc}")
-        return None
+    last_error = ""
+    for attempt, delay in enumerate([0, 1.5, 3, 6]):
+        if delay:
+            time.sleep(delay)
+
+        try:
+            return openalex_gap_analysis(
+                query=config["query"],
+                api_key=openalex_contact,
+                per_page=int(config.get("openalex_max_results", DEFAULT_LIVE_RESULT_LIMIT)),
+                years_back=int(config.get("years_back", 5)),
+            )
+        except Exception as exc:
+            last_error = str(exc)
+            if _is_openalex_rate_limit_error(last_error) and attempt < 3:
+                continue
+            break
+
+    if _is_openalex_rate_limit_error(last_error):
+        warnings.append("OpenAlex geçici yoğunluk nedeniyle yanıt vermedi. Lütfen birkaç saniye sonra tekrar deneyin.")
+    else:
+        errors.append("OpenAlex canlı gap analizi şu anda tamamlanamadı. Lütfen birkaç saniye sonra tekrar deneyin.")
+    return None
 
 
 def _openalex_gap_to_dataframe(openalex_gap: dict | None) -> pd.DataFrame:
@@ -4032,24 +4522,7 @@ def _generate_ai_suggestions(
     config: dict,
     errors: list[str],
 ) -> pd.DataFrame:
-    try:
-        if source in {"OpenAlex Live", "Hybrid: OpenAlex + PubMed"}:
-            openalex_contact = str(config.get("openalex_api_key", "")).strip() or get_config_value("OPENALEX_EMAIL")
-            suggestions = generate_ai_research_topic_suggestions(
-                query=query,
-                api_key=openalex_contact,
-                years_back=int(config.get("years_back", 5)),
-            )
-            suggestions = apply_domain_reasoning_filter(suggestions, query)
-            return naturalize_suggestions(suggestions, query)
-
-        suggestions = suggest_research_opportunities(df, query, top_n=8)
-        suggestions = apply_domain_reasoning_filter(suggestions, query)
-        return naturalize_suggestions(suggestions, query)
-    except Exception as exc:
-        errors.append(f"AI topic suggestions failed: {exc}")
-        return pd.DataFrame()
-
+    return intent_topics_to_dataframe(query, config.get("selected_field", current_selected_field()))
 
 def _safe_dataframe_call(label: str, func, *args) -> pd.DataFrame:
     errors = args[-1]
@@ -4076,6 +4549,51 @@ def _safe_dict_call(label: str, func, *args) -> dict:
 
 def _as_dataframe(value) -> pd.DataFrame:
     return value if isinstance(value, pd.DataFrame) else pd.DataFrame()
+
+
+def make_unique_columns(df: pd.DataFrame) -> pd.DataFrame:
+    if not isinstance(df, pd.DataFrame):
+        return pd.DataFrame()
+    return df.loc[:, ~df.columns.duplicated()].copy()
+
+
+def safe_text(value, default: str = "-") -> str:
+    try:
+        if value is None or pd.isna(value):
+            return default
+    except Exception:
+        if value is None:
+            return default
+
+    if isinstance(value, (list, tuple, set)):
+        cleaned = []
+        for item in value:
+            try:
+                if item is None or pd.isna(item):
+                    continue
+            except Exception:
+                if item is None:
+                    continue
+            cleaned.append(str(item))
+        return ", ".join(cleaned) if cleaned else default
+
+    return str(value)
+
+
+def safe_join(values, sep: str = ", ") -> str:
+    if values is None:
+        return ""
+
+    cleaned = []
+    for value in values:
+        try:
+            if value is None or pd.isna(value):
+                continue
+        except Exception:
+            if value is None:
+                continue
+        cleaned.append(str(value))
+    return sep.join(cleaned)
 
 
 def _register_pdf_font() -> str:
@@ -4209,7 +4727,8 @@ def build_executive_summary(results: dict) -> str:
     gap = results.get("gap_score") or {}
     domain = results.get("domain_reasoning") or {}
     paperability = results.get("paperability_score") or {}
-    selected_domain = results.get("selected_domain", current_selected_domain())
+    selected_field = migrate_legacy_field(results.get("selected_field", current_selected_field()))
+    selected_domain = compatibility_domain(selected_field)
     strategic = parse_numeric(results.get("strategic_opportunity_score"))
     paper_score = parse_numeric(paperability.get("total_score"))
     matched = parse_numeric(gap.get("total_records"))
@@ -4239,21 +4758,30 @@ def build_executive_summary(results: dict) -> str:
         pubmed_note = " PubMed temporarily unavailable; OpenAlex results were used for analysis."
 
     if selected_domain == ENGINEERING_DOMAIN:
-        intent = domain_intent(results.get("query", ""), selected_domain)
+        intent = domain_intent(results.get("query", ""), selected_field)
         objects = ", ".join(intent.get("preferred_objects", [])[:2]) or "the target engineering system"
         metrics = ", ".join(intent.get("preferred_metrics", [])[:2]) or "engineering performance"
+        field_openings = {
+            "Electrical & Electronics Engineering": "This topic represents a focused AI-compatible electrical and electronics engineering research area.",
+            "Biomedical Engineering": "This topic represents a focused biomedical engineering research area.",
+        }
         return sanitize_text_for_intent(
-            f"This topic represents {competition} and {opportunity_phrase} engineering research area. "
-            f"The current evidence landscape in {intent['subdomain_label']} should be evaluated through {objects}, "
+            f"{field_openings.get(selected_field, f'This topic represents {competition} and {opportunity_phrase} engineering research area.')} "
+            f"The current evidence landscape should be evaluated through {objects}, "
             f"{metrics}, benchmark datasets, and validation evidence, {growth_phrase}. "
             f"Based on the combined opportunity, domain consistency, and paperability signals, the topic shows "
             f"{publication_phrase}, provided the study preserves the real research object and frames AI as a methodological modifier.",
             intent,
         )
 
-    intent = domain_intent(results.get("query", ""), selected_domain)
+    intent = domain_intent(results.get("query", ""), selected_field)
+    field_openings = {
+        "AI-Compatible Medicine": "This topic represents a focused AI-compatible medical research area.",
+        "Nursing": "This topic represents a focused nursing research area.",
+        "Midwifery": "This topic represents a focused midwifery research area.",
+    }
     summary = (
-        f"This topic represents {competition} and {opportunity_phrase} research area within {clinical_domain}. "
+        f"{field_openings.get(selected_field, f'This topic represents {competition} and {opportunity_phrase} research area within {clinical_domain}.')} "
         f"The current evidence landscape is primarily shaped by {intent.get('preferred_objects', ['the available evidence base'])[0]}, {growth_phrase}. "
         f"Based on the combined opportunity, domain consistency, and paperability signals, the topic shows "
         f"{publication_phrase}, provided the study is framed around a specific method, validation strategy, "
@@ -4300,115 +4828,8 @@ def is_generic_paper_title(title: str, query: str) -> bool:
 
 
 def synthesize_paper_titles(results: dict, min_count: int = 5) -> list[str]:
-    query = results.get("query", "")
-    selected_domain = results.get("selected_domain", current_selected_domain())
-    concepts = extract_query_concepts(query)
-    disease = concepts.get("disease", [])
-    modality = concepts.get("modality", [])
-    method = concepts.get("method", [])
-    suggestions = _as_dataframe(results.get("ai_topic_suggestions"))
-    titles = []
-    suggestion_titles = []
-    intent = domain_intent(query, selected_domain)
-
-    topic_col = "suggested_research_topic" if "suggested_research_topic" in suggestions.columns else "suggested_topic"
-    if topic_col in suggestions.columns:
-        suggestion_titles.extend(suggestions[topic_col].dropna().astype(str).head(3).tolist())
-
-    if selected_domain == ENGINEERING_DOMAIN and not is_engineering_health_hybrid(query):
-        titles.extend([item["title"] for item in generate_intent_titles(query, selected_domain, min_count=5)])
-    elif selected_domain == HEALTHCARE_DOMAIN and intent["subdomain_key"] not in {"general_healthcare", "medicine_clinical"}:
-        titles.extend([item["title"] for item in generate_intent_titles(query, selected_domain, min_count=5)])
-    elif "autism" in disease:
-        titles.extend([
-            "Federated Explainable EEG-Eye Tracking Fusion for Early Autism Detection",
-            "Privacy-Aware Multimodal Neurodevelopmental AI for ASD Screening",
-            "Explainable Temporal Transformers for EEG-Based Autism Screening",
-            "Gaze-Assisted Multimodal AI for Early Autism Detection",
-            "Domain-Consistent Federated Learning for Neurodevelopmental Screening",
-        ])
-    elif "alzheimer" in disease:
-        titles.extend([
-            "Explainable Multimodal MRI-PET Fusion for Early Alzheimer Diagnosis",
-            "Federated Neuroimaging AI for Privacy-Preserving Alzheimer Detection",
-            "Transformer-Based Explainable AI for Alzheimer MRI Analysis",
-            "Clinically Validated Vision Transformers for Dementia Neuroimaging",
-            "Privacy-Aware Multimodal Learning for Alzheimer Progression Modeling",
-        ])
-    elif "breast cancer" in disease:
-        titles.extend([
-            "Explainable CNN-Based Histopathology Analysis for Breast Cancer Classification",
-            "Federated Mammography AI for Privacy-Preserving Breast Cancer Screening",
-            "Attention-Enhanced CNN Models for Breast Cancer Image Classification",
-            "External Validation of Explainable Deep Learning for Breast Cancer Detection",
-            "Lightweight CNN Decision Support for Breast Cancer Mammography Screening",
-        ])
-    elif "depression" in disease and "eeg" in modality:
-        titles.extend([
-            "Spectral Attention Networks for EEG-Based Depression Detection",
-            "Wavelet-CNN Fusion for Robust Depression Classification from EEG",
-            "Explainable Temporal Transformers for Depression Biosignal Screening",
-            "Subject-Level Validation of EEG Deep Learning Models for Depression",
-            "Privacy-Aware EEG Analytics for Clinical Depression Detection",
-        ])
-    elif "blockchain" in method:
-        titles.extend([
-            "Blockchain-Based Privacy and Interoperability Framework for Healthcare Data Security",
-            "Smart Contract-Enabled Clinical Data Sharing with Privacy-Aware Validation",
-            "Decentralized Healthcare Data Integrity Framework Using Blockchain",
-            "Auditability-Centered Blockchain Architecture for Secure Medical Records",
-            "Interoperable Healthcare Data Governance Using Blockchain Smart Contracts",
-        ])
-    elif "sports medicine" in concepts.get("clinical_domain", []) or "sports injury" in disease:
-        titles.extend([
-            "Explainable Deep Learning for Football Player Injury Risk Prediction",
-            "Wearable Sensor-Based Injury Risk Assessment in Professional Football",
-            "Temporal Transformer Models for Training Load and Injury Prediction in Soccer",
-            "Interpretable Player Workload Modeling for Football Injury Prevention",
-            "Multi-Season Validation of AI-Based Injury Risk Scoring in Football Players",
-        ])
-    else:
-        base = title_case_topic(query)
-        titles.extend([
-            f"Explainable AI Framework for {base}",
-            f"Clinical Validation Strategy for {base}",
-            f"Robust and Interpretable Learning for {base}",
-            f"Dataset-Centered Evaluation of {base}",
-            f"Decision-Support Modeling for {base}",
-        ])
-
-    titles.extend(suggestion_titles)
-
-    clean_titles = []
-    seen = set()
-    for title in titles:
-        clean = re.sub(r"\s+", " ", str(title or "")).strip(" .")
-        clean = sanitize_text_for_intent(clean, intent)
-        key = normalize_topic_key(clean)
-        if clean and key not in seen and not find_forbidden_terms(clean, forbidden_terms_for_intent(intent)) and (selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN} or not is_generic_paper_title(clean, query)):
-            seen.add(key)
-            clean_titles.append(clean)
-        if len(clean_titles) >= min_count:
-            break
-    if len(clean_titles) < min_count:
-        if selected_domain == ENGINEERING_DOMAIN:
-            fallback_titles = pd.DataFrame(
-                [(item["title"],) for item in engineering_topic_refinement(query)],
-                columns=["suggested_research_topic"],
-            )
-        else:
-            fallback_titles = domain_adapted_suggestions(query)
-        if "suggested_research_topic" in fallback_titles.columns:
-            for title in fallback_titles["suggested_research_topic"].dropna().astype(str).tolist():
-                title = sanitize_text_for_intent(title, intent)
-                key = normalize_topic_key(title)
-                if title and key not in seen and not find_forbidden_terms(title, forbidden_terms_for_intent(intent)) and (selected_domain in {ENGINEERING_DOMAIN, HEALTHCARE_DOMAIN} or not is_generic_paper_title(title, query)):
-                    seen.add(key)
-                    clean_titles.append(title)
-                if len(clean_titles) >= min_count:
-                    break
-    return clean_titles
-
+    query = results.get("raw_query") or results.get("query", "")
+    return [item["title"] for item in curated_topic_recommendations(query, max_items=min_count)]
 
 def build_opportunity_analysis(results: dict) -> dict[str, str]:
     gap = results.get("gap_score") or {}
@@ -4417,8 +4838,9 @@ def build_opportunity_analysis(results: dict) -> dict[str, str]:
     strategic = parse_numeric(results.get("strategic_opportunity_score"))
     paper_score = parse_numeric(paperability.get("total_score"))
     domain = results.get("domain_reasoning") or {}
-    selected_domain = results.get("selected_domain", current_selected_domain())
-    intent = domain_intent(results.get("query", ""), selected_domain)
+    selected_field = migrate_legacy_field(results.get("selected_field", current_selected_field()))
+    selected_domain = compatibility_domain(selected_field)
+    intent = domain_intent(results.get("query", ""), selected_field)
 
     competition = (
         "The field appears crowded and requires a narrow claim." if matched > 250
@@ -4475,8 +4897,9 @@ def build_opportunity_analysis(results: dict) -> dict[str, str]:
 def final_strategic_recommendation(results: dict) -> str:
     paperability = results.get("paperability_score") or {}
     domain = results.get("domain_reasoning") or {}
-    selected_domain = results.get("selected_domain", current_selected_domain())
-    intent = domain_intent(results.get("query", ""), selected_domain)
+    selected_field = migrate_legacy_field(results.get("selected_field", current_selected_field()))
+    selected_domain = compatibility_domain(selected_field)
+    intent = domain_intent(results.get("query", ""), selected_field)
     score = parse_numeric(paperability.get("total_score"))
     consistency = domain.get("domain_consistency", "Medium")
 
@@ -4524,219 +4947,240 @@ def final_strategic_recommendation(results: dict) -> str:
     )
 
 
+
 def generate_executive_pdf_report(results: dict, output_path: str | Path, summary_text: str = "") -> bool:
     try:
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.styles import ParagraphStyle
         from reportlab.lib.units import cm
-        from reportlab.platypus import HRFlowable, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+        from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
     except Exception:
-        return generate_pdf_report(summary_text, output_path)
+        return False
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     font_name = _register_pdf_font()
 
+    def num(value, default=0):
+        try:
+            return int(float(value))
+        except Exception:
+            return default
+
+    def pct(value):
+        parsed = parse_numeric(value)
+        return f"{parsed:.1f}%" if parsed else str(value or "-")
+
+    def clean_text(value: str) -> str:
+        return re.sub(r"\s+", " ", str(value or "-")).strip()
+
+    def turkish_gap_comment(gap: dict, strategic_score) -> str:
+        matched = parse_numeric(gap.get("total_records"))
+        growth = parse_numeric(gap.get("growth_rate"))
+        strategic = parse_numeric(strategic_score)
+        if safe_text(gap.get("gap_score", "")).lower() == "yetersiz veri" or matched == 0:
+            return "Yetersiz veri: Bu sorgu PubMed ve OpenAlex üzerinde güvenilir yorum için yeterli kayıt döndürmedi."
+        if strategic >= 70 and growth >= 0:
+            return "Bu konu güçlü bir araştırma fırsatı sinyali taşır; ancak yayın potansiyelini artırmak için yöntem, veri türü ve doğrulama planı net biçimde daraltılmalıdır."
+        if matched > 50:
+            return "Bu konu görünür ve rekabetçi bir literatüre sahiptir. En iyi strateji, geniş başlık yerine daha özgün alt problem ve ölçülebilir katkı tanımlamaktır."
+        if matched > 0:
+            return "Bu konu için anlamlı fakat yönetilebilir düzeyde literatür bulunmaktadır. Daraltılmış bir araştırma sorusu ile takip edilmeye uygundur."
+        return "Bu konu için eşleşme sınırlıdır. Sonuçlar yorumlanırken sorgu kapsamı ve veri kaynağı kapsaması ayrıca kontrol edilmelidir."
+
+    def turkish_final_recommendation(results: dict) -> tuple[str, str, str]:
+        gap = results.get("gap_score") or {}
+        paperability = results.get("paperability_score") or {}
+        df = _as_dataframe(results.get("normalized_dataset"))
+        if df.empty or safe_text(gap.get("gap_score", "")).lower() == "yetersiz veri":
+            return (
+                "Hayır, bu haliyle takip edilmeye uygun değildir.",
+                "Sorgu daha sade ve biyomedikal mühendisliği odaklı yeniden yazılmalıdır.",
+                "Yetersiz veri nedeniyle yayın potansiyeli güvenilir biçimde değerlendirilemedi.",
+            )
+
+        strategic = parse_numeric(results.get("strategic_opportunity_score", gap.get("gap_score")))
+        paper_score = parse_numeric(paperability.get("total_score"))
+        selected_field = migrate_legacy_field(results.get("selected_field", current_selected_field()))
+        display_query = results.get("raw_query") or results.get("query", "")
+        if is_alzheimer_context(display_query):
+            narrowing = _alzheimer_narrowing_text(display_query)
+        else:
+            intent = domain_intent(results.get("query", ""), selected_field)
+            objects = safe_join(intent.get("preferred_objects", [])[:2]) or "seçilen araştırma nesnesi"
+            metrics = safe_join(intent.get("preferred_metrics", [])[:2]) or "ölçülebilir performans çıktıları"
+            narrowing = f"Konuyu {objects} odağında; {metrics}, açık doğrulama protokolü ve karşılaştırılabilir performans ölçütleriyle daraltın."
+        narrowing = turkishize_report_terms(narrowing)
+        pursue = "Evet, takip edilmeli." if strategic >= 45 or paper_score >= 45 else "Önce yeniden daraltılmalı."
+        potential = (
+            "Yayın potansiyeli güçlü görünüyor; ana risk rekabet düzeyi ve doğrulama kalitesidir."
+            if paper_score >= 65 else
+            "Yayın potansiyeli orta düzeydedir; katkı iddiası ve veri/kanıt planı güçlendirilmelidir."
+            if paper_score >= 40 else
+            "Yayın potansiyeli şu haliyle sınırlıdır; konu daha net ve uygulanabilir bir alt probleme indirgenmelidir."
+        )
+        return pursue, narrowing, potential
+
     try:
         doc = SimpleDocTemplate(
             str(output_path),
             pagesize=A4,
-            rightMargin=1.35 * cm,
-            leftMargin=1.35 * cm,
-            topMargin=1.25 * cm,
-            bottomMargin=1.25 * cm,
-            title="ResearchMind AI Executive Report",
+            rightMargin=1.25 * cm,
+            leftMargin=1.25 * cm,
+            topMargin=1.15 * cm,
+            bottomMargin=1.15 * cm,
+            title="ResearchMind AI Biyomedikal Mühendisliği Araştırma Raporu",
         )
         width = A4[0] - doc.leftMargin - doc.rightMargin
-
-        title = ParagraphStyle("ExecTitle", fontName=font_name, fontSize=28, leading=33, textColor=colors.white, spaceAfter=12)
-        subtitle = ParagraphStyle("ExecSubtitle", fontName=font_name, fontSize=14, leading=18, textColor=colors.HexColor("#c7d2fe"))
-        h1 = ParagraphStyle("ExecH1", fontName=font_name, fontSize=17, leading=21, textColor=colors.HexColor("#12324a"), spaceBefore=8, spaceAfter=8)
-        h2 = ParagraphStyle("ExecH2", fontName=font_name, fontSize=11, leading=14, textColor=colors.HexColor("#2563eb"), spaceAfter=4)
-        body = ParagraphStyle("ExecBody", fontName=font_name, fontSize=9.3, leading=13.2, textColor=colors.HexColor("#243447"))
-        small = ParagraphStyle("ExecSmall", fontName=font_name, fontSize=8.2, leading=11, textColor=colors.HexColor("#475569"))
-        white_small = ParagraphStyle("ExecWhiteSmall", fontName=font_name, fontSize=9, leading=12, textColor=colors.HexColor("#e5edf6"))
+        title_style = ParagraphStyle("RmTitle", fontName=font_name, fontSize=22, leading=27, textColor=colors.HexColor("#0f172a"), spaceAfter=4)
+        subtitle_style = ParagraphStyle("RmSubtitle", fontName=font_name, fontSize=11, leading=15, textColor=colors.HexColor("#2563eb"), spaceAfter=10)
+        h1 = ParagraphStyle("RmH1", fontName=font_name, fontSize=14, leading=18, textColor=colors.HexColor("#12324a"), spaceBefore=8, spaceAfter=6)
+        h2 = ParagraphStyle("RmH2", fontName=font_name, fontSize=9, leading=12, textColor=colors.HexColor("#2563eb"))
+        body = ParagraphStyle("RmBody", fontName=font_name, fontSize=8.7, leading=12.2, textColor=colors.HexColor("#243447"))
+        small = ParagraphStyle("RmSmall", fontName=font_name, fontSize=8, leading=11, textColor=colors.HexColor("#475569"))
 
         def p(text, style=body):
-            clean = html.escape(str(text or "-")).replace("\n", "<br/>")
-            clean = clean.replace("&lt;br/&gt;", "<br/>").replace("&lt;br /&gt;", "<br/>")
+            clean = html.escape(clean_text(safe_text(text))).replace("&lt;br/&gt;", "<br/>")
             return Paragraph(clean, style)
 
-        def card(title_text, value_text, note_text="", accent="#2563eb"):
-            return Table(
-                [[p(title_text, h2)], [p(value_text, ParagraphStyle("CardValue", fontName=font_name, fontSize=18, leading=22, textColor=colors.HexColor(accent)))], [p(note_text, small)]],
-                colWidths=[width / 3 - 8],
-                style=TableStyle([
-                    ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f8fafc")),
-                    ("BOX", (0, 0), (-1, -1), 0.7, colors.HexColor("#dbeafe")),
-                    ("LEFTPADDING", (0, 0), (-1, -1), 10),
-                    ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-                    ("TOPPADDING", (0, 0), (-1, -1), 8),
-                    ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
-                ]),
-            )
+        def section(title_text):
+            return [Spacer(1, 0.12 * cm), p(title_text, h1), HRFlowable(width="100%", color=colors.HexColor("#dbeafe")), Spacer(1, 0.08 * cm)]
+
+        def simple_table(rows, col_widths=None, header=False, bg="#f8fafc"):
+            safe_rows = [[safe_text(cell) for cell in row] for row in (rows or [])]
+            if not safe_rows:
+                safe_rows = [["-"]]
+            data = [[p(cell, h2 if header and r == 0 else body) for cell in row] for r, row in enumerate(safe_rows)]
+            style = [
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor(bg)),
+                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#dbeafe")),
+                ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ]
+            if header:
+                style.append(("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e0f2fe")))
+            col_count = max(1, len(safe_rows[0]))
+            return Table(data, colWidths=col_widths or [width / col_count] * col_count, style=TableStyle(style))
 
         df = _as_dataframe(results.get("normalized_dataset"))
-        distribution = results.get("source_distribution", {})
         gap = results.get("gap_score") or {}
-        strategy = results.get("research_strategy") or {}
-        domain = results.get("domain_reasoning") or {}
-        paperability = results.get("paperability_score") or {}
-        intent = domain_intent(results.get("query", ""), results.get("selected_domain", current_selected_domain()))
-        strategic = results.get("strategic_opportunity_score", gap.get("gap_score", "-"))
-        paper_score = paperability.get("total_score", "-")
-        strategic_label, strategic_color = _score_band(strategic)
-        paper_label, paper_color = _score_band(paper_score)
-        color_map = {"high": "#16a34a", "mid": "#d97706", "low": "#dc2626"}
-
-        source_text = f"PubMed: {distribution.get('PubMed', 0)} | OpenAlex: {distribution.get('OpenAlex', 0)} | Local: {distribution.get('Yerel', 0)}"
-        cover_table = Table(
-            [[
-                p("ResearchMind AI", title),
-                p(
-                    "Research Intelligence Report<br/><br/>"
-                    f"Research Topic: {results.get('query', '-')}<br/>"
-                    f"Selected Research Domain: {results.get('selected_domain', '-')}<br/>"
-                    f"Analysis Date: {results.get('analysis_time', '-')}<br/>"
-                    f"Data Sources: {source_text}<br/>"
-                    f"Strategic Opportunity Score: {strategic}<br/>"
-                    f"Paperability Score: {paper_score}",
-                    subtitle,
-                ),
-            ]],
-            colWidths=[width * 0.45, width * 0.55],
-            style=TableStyle([
-                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#0f172a")),
-                ("BOX", (0, 0), (-1, -1), 1.2, colors.HexColor("#38bdf8")),
-                ("LEFTPADDING", (0, 0), (-1, -1), 20),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 20),
-                ("TOPPADDING", (0, 0), (-1, -1), 28),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 28),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ]),
+        openalex_gap = results.get("openalex_gap") or {}
+        suggestions = clean_suggestions_with_curated_bank(
+            _as_dataframe(results.get("ai_topic_suggestions")),
+            results.get("query", ""),
         )
+        semantic = _as_dataframe(results.get("semantic_search_results"))
+        distribution = results.get("source_distribution", {}) or {}
+        selected_field = migrate_legacy_field(results.get("selected_field", current_selected_field()))
+        strategic_score = results.get("strategic_opportunity_score", gap.get("gap_score", "-"))
+        pubmed_count = distribution.get("PubMed", 0)
+        openalex_count = distribution.get("OpenAlex", 0)
+        local_count = distribution.get("Yerel", 0)
+        openalex_estimated_volume = openalex_gap.get("total_records", openalex_count)
 
-        story = [cover_table, Spacer(1, 0.6 * cm), HRFlowable(width="100%", color=colors.HexColor("#38bdf8")), Spacer(1, 0.35 * cm)]
-        story.append(p("Executive Summary", h1))
-        story.append(p(build_executive_summary(results), body))
-        story.append(PageBreak())
-
-        story.append(p("Research Intelligence KPIs", h1))
-        kpi_rows = [
-            [
-                card("Total Records", f"{len(df):,}", "Normalized corpus size"),
-                card("Semantic Match Count", gap.get("total_records", 0), "Topic-aware match volume"),
-                card("Strategic Opportunity", strategic, strategic_label, color_map[strategic_color]),
-            ],
-            [
-                card("Paperability Score", paper_score, paperability.get("level_tr", paper_label), color_map[paper_color]),
-                card("Domain Consistency", domain.get("domain_consistency", "-"), f"Score: {domain.get('domain_consistency_score', '-')}", "#2563eb"),
-                card("Growth Rate", gap.get("growth_rate", "-"), "Recent momentum signal"),
-            ],
+        story = [
+            p("ResearchMind AI Biyomedikal Mühendisliği Araştırma Raporu", title_style),
+            p("OpenAlex Destekli Research Gap ve Yayın Potansiyeli Analizi", subtitle_style),
+            HRFlowable(width="100%", color=colors.HexColor("#38bdf8")),
         ]
-        story.append(Table(kpi_rows, colWidths=[width / 3] * 3, style=TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("BOTTOMPADDING", (0, 0), (-1, -1), 10)])))
 
-        story.append(p("AI Research Insight", h1))
-        story.append(Table([[p(results.get("ai_research_insight", "Insight could not be generated."), body)]], colWidths=[width], style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#ecfeff")),
-            ("BOX", (0, 0), (-1, -1), 0.8, colors.HexColor("#67e8f9")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 12),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 12),
-            ("TOPPADDING", (0, 0), (-1, -1), 10),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-        ])))
-
-        story.append(p("Research Strategy Recommendations", h1))
-        validation_strategy = validation_strategy_for_intent(intent)
-        strategy_rows = [
-            [p("Recommended Methodology", h2), p(strategy.get("methodology", "-"), body)],
-            [p("Suggested Validation Strategy", h2), p(validation_strategy, body)],
-            [p("Dataset / Evidence Focus", h2), p(strategy.get("evidence", "-"), body)],
-            [p("Differentiation Strategy", h2), p(strategy.get("differentiation", "-"), body)],
-        ]
-        story.append(Table(strategy_rows, colWidths=[width * 0.32, width * 0.68], style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f8fafc")),
-            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#e2e8f0")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 9),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 9),
-            ("TOPPADDING", (0, 0), (-1, -1), 7),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-        ])))
-
-        story.append(p("Domain Reasoning", h1))
-        domain_rows = [
-            [p("Selected Research Domain", h2), p(results.get("selected_domain", "-"), body)],
-            [p("Primary Domain", h2), p(domain.get("clinical_domain", "-"), body)],
-            [p("Primary Modality", h2), p(domain.get("primary_modality", "-"), body)],
-            [p("Dominant Methodology", h2), p(domain.get("primary_method", "-"), body)],
-            [p("Domain Consistency", h2), p(f"{domain.get('domain_consistency', '-')} ({domain.get('domain_consistency_score', '-')})", body)],
-        ]
-        story.append(Table(domain_rows, colWidths=[width * 0.32, width * 0.68], style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f0f9ff")),
-            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#bae6fd")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 9),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 9),
-            ("TOPPADDING", (0, 0), (-1, -1), 7),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-        ])))
-
-        story.append(PageBreak())
-        story.append(p("Suggested Paper Titles", h1))
-        for index, title_text in enumerate(synthesize_paper_titles(results, min_count=5), start=1):
-            story.append(Table([[p(f"{index:02d}", ParagraphStyle("TitleIndex", fontName=font_name, fontSize=15, leading=18, textColor=colors.HexColor("#2563eb"))), p(title_text, body)]], colWidths=[1.2 * cm, width - 1.2 * cm], style=TableStyle([
-                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f8fafc")),
-                ("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#dbeafe")),
-                ("LEFTPADDING", (0, 0), (-1, -1), 8),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-                ("TOPPADDING", (0, 0), (-1, -1), 7),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ])))
+        story += section("1. Genel Bilgiler")
+        story.append(simple_table([
+            ["Araştırma Alanı", "Biyomedikal Mühendisliği"],
+            ["Araştırma Konusu", results.get("query", "-")],
+            ["Veri Kaynağı", results.get("data_source_label", results.get("data_source", "-"))],
+            ["Analiz Tarihi", results.get("analysis_time", "-")],
+            ["Filtreleme Sonrası Analiz Edilen Yayın Sayısı", f"{len(df):,}"],
+            ["PubMed Kayıt Sayısı", str(pubmed_count)],
+            ["Analize Dahil Edilen OpenAlex Kayıt Sayısı", str(openalex_count)],
+            ["OpenAlex Tahmini Toplam Yayın Hacmi", str(openalex_estimated_volume)],
+        ], col_widths=[width * 0.35, width * 0.65]))
+        story.append(Spacer(1, 0.08 * cm))
+        story.append(p("OpenAlex tahmini toplam yayın hacmi, sorgunun genel akademik görünürlüğünü temsil eder. Analize dahil edilen kayıtlar ise filtreleme ve işleme sonrası kullanılan örnek yayın kümesini ifade eder.", small))
+        if pubmed_count == 0 and openalex_count > 0:
             story.append(Spacer(1, 0.08 * cm))
+            story.append(p("PubMed bağlantısı başarılı ancak bu spesifik sorgu için sonuç bulunamadı. Analiz OpenAlex verileriyle tamamlandı.", small))
 
-        story.append(p("Paperability Score", h1))
-        strengths = paperability.get("reasons", [])[:3] or ["Domain-aligned research positioning."]
-        risks = []
-        matched = parse_numeric(gap.get("total_records"))
-        if matched > 50:
-            risks.append("Competition is meaningful; the contribution must be narrowed.")
-        if domain.get("semantic_leakage_risk") in {"Medium", "High"}:
-            risks.append("Domain leakage risk should be monitored during literature framing.")
-        risks.append("Dataset access and external validation may determine publication readiness.")
-        potential_rows = [
-            [p("Total Score", h2), p(str(paper_score), body)],
-            [p("Publication Potential Level", h2), p(paperability.get("level_tr", paper_label), body)],
-            [p("Strongest Strengths", h2), p("<br/>".join(f"- {html.escape(item)}" for item in strengths), body)],
-            [p("Main Risks", h2), p("<br/>".join(f"- {html.escape(item)}" for item in risks[:3]), body)],
-            [p("Recommended Narrowing Direction", h2), p(paperability.get("recommended_next_action", "-"), body)],
-        ]
-        story.append(Table(potential_rows, colWidths=[width * 0.32, width * 0.68], style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#fff7ed")),
-            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#fed7aa")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 9),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 9),
-            ("TOPPADDING", (0, 0), (-1, -1), 7),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-        ])))
+        story += section("2. Konu Trendi ve Research Gap Skoru")
+        story.append(simple_table([
+            ["Eşleşen kayıt sayısı", str(gap.get("total_records", "-"))],
+            ["Büyüme oranı", str(gap.get("growth_rate", "-"))],
+            ["Research Gap Skoru", str(gap.get("gap_score", "-"))],
+            ["Stratejik Fırsat Skoru", str(strategic_score)],
+            ["Türkçe Değerlendirme", turkish_gap_comment(gap, strategic_score)],
+        ], col_widths=[width * 0.35, width * 0.65], bg="#f0f9ff"))
 
-        story.append(p("Final Strategic Recommendation", h1))
-        story.append(Table([[p("Should this topic be pursued?", h2)], [p(final_strategic_recommendation(results), body)]], colWidths=[width], style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#eef2ff")),
-            ("BOX", (0, 0), (-1, -1), 0.9, colors.HexColor("#818cf8")),
-            ("LEFTPADDING", (0, 0), (-1, -1), 12),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 12),
-            ("TOPPADDING", (0, 0), (-1, -1), 10),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 10),
-        ])))
-        story.append(Spacer(1, 0.25 * cm))
-        story.append(p("Estimated decision-support report. This output is not a publication guarantee.", small))
+        story += section("3. Benzer Akademik Çalışmalar")
+        sim_rows = [["Başlık", "Dergi", "Yıl", "Yayın türü", "Benzerlik"]]
+        for _, row in semantic.head(10).iterrows():
+            sim = row.get("similarity_score", "")
+            sim_text = f"{parse_numeric(sim) * 100:.1f}%" if sim != "" else "-"
+            sim_rows.append([
+                row.get("title", "-"),
+                row.get("journal", "-"),
+                row.get("pub_year", row.get("year", row.get("publication_year", "-"))),
+                row.get("research_type", "-"),
+                sim_text,
+            ])
+        if len(sim_rows) == 1:
+            sim_rows.append(["Benzer çalışma bulunamadı", "-", "-", "-", "-"])
+        story.append(simple_table(sim_rows, col_widths=[width * 0.42, width * 0.18, width * 0.10, width * 0.18, width * 0.12], header=True))
+
+        story += section("4. OpenAlex Canlı Gap Analizi")
+        story.append(p("OpenAlex sonuçları, konunun genel akademik görünürlüğünü ve son yıllardaki yayın hacmini değerlendirmek için kullanılmıştır.", body))
+        story.append(simple_table([
+            ["OpenAlex Tahmini Toplam Yayın Hacmi", str(openalex_estimated_volume)],
+            ["OpenAlex Büyüme Oranı", str(openalex_gap.get("growth_rate", "-"))],
+            ["OpenAlex Research Gap Skoru", str(openalex_gap.get("gap_score", "-"))],
+        ], col_widths=[width * 0.40, width * 0.60], bg="#ecfeff"))
+        trend = _as_dataframe(openalex_gap.get("trend"))
+        if not trend.empty:
+            trend_rows = [["Yıl", "Yayın sayısı"]]
+            year_col = "publication_year" if "publication_year" in trend.columns else "period" if "period" in trend.columns else None
+            count_col = "publication_count" if "publication_count" in trend.columns else "count" if "count" in trend.columns else None
+            if year_col and count_col:
+                for _, row in trend.tail(8).iterrows():
+                    trend_rows.append([row.get(year_col, "-"), row.get(count_col, "-")])
+                story.append(Spacer(1, 0.08 * cm))
+                story.append(simple_table(trend_rows, col_widths=[width * 0.35, width * 0.65], header=True))
+
+        story += section("5. Araştırma Konusu Önerileri")
+        if suggestions.empty:
+            suggestions = intent_topics_to_dataframe(results.get("query", ""), selected_field)
+        if df.empty:
+            story.append(p("Sorguyu iyileştirmek için önerilen biyomedikal başlıklar aşağıda listelenmiştir.", small))
+        topic_col = "suggested_research_topic" if "suggested_research_topic" in suggestions.columns else "suggested_topic" if "suggested_topic" in suggestions.columns else None
+        suggestion_rows = [["Başlık", "Fırsat Düzeyi", "Gap Skoru", "Kısa Gerekçe"]]
+        if topic_col:
+            for _, row in suggestions.head(5).iterrows():
+                trend_status, _ = opportunity_trend_status(row.get("gap_score", "-"), row.get("growth_rate", "-"))
+                suggestion_rows.append([
+                    row.get(topic_col, "-"),
+                    trend_status,
+                    row.get("gap_score", "-"),
+                    localize_text(row.get("recommendation", "")) or "Seçilen araştırma alanı ile uyumlu öneri.",
+                ])
+        if len(suggestion_rows) == 1:
+            suggestion_rows.append(["Bu analiz için otomatik öneri üretilemedi. Konunun daha net anahtar kelimelerle yeniden çalıştırılması önerilir.", "-", "-", "-"])
+        story.append(simple_table(suggestion_rows, col_widths=[width * 0.42, width * 0.18, width * 0.12, width * 0.28], header=True, bg="#fff7ed"))
+
+        story += section("6. Sonuç ve Stratejik Öneri")
+        pursue, narrowing, potential = turkish_final_recommendation(results)
+        story.append(simple_table([
+            ["Konu takip edilmeli mi?", pursue],
+            ["Daraltma önerisi", narrowing],
+            ["Yayın potansiyeli yorumu", potential],
+            ["Not", "Bu rapor karar destek amaçlıdır; yayın garantisi anlamına gelmez."],
+        ], col_widths=[width * 0.35, width * 0.65], bg="#eef2ff"))
 
         doc.build(story)
         return output_path.exists()
     except Exception:
-        return generate_pdf_report(summary_text, output_path)
-
+        return False
 
 def export_analysis_results(results: dict) -> str:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -4773,7 +5217,6 @@ def export_analysis_results(results: dict) -> str:
     summary = build_summary_report(results, export_dir)
     summary_path = export_dir / "summary_report.txt"
     summary_path.write_text(summary, encoding="utf-8-sig")
-    generate_pdf_report(summary, export_dir / "ResearchMind_AI_Report.pdf")
     generate_executive_pdf_report(
         results,
         export_dir / f"ResearchMind_AI_Executive_Report_{timestamp}.pdf",
@@ -4812,6 +5255,7 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
     paperability = results.get("paperability_score") or {}
     domain_reasoning = results.get("domain_reasoning") or {}
     domain_guard = results.get("domain_guard") or {}
+    selected_field = migrate_legacy_field(results.get("selected_field", current_selected_field()))
     paperability_reasons = [
         f"- {item}"
         for item in paperability.get("reasons", [])
@@ -4825,7 +5269,7 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         "ResearchMind AI Özet Raporu",
         "",
         f"Veri kaynağı: {results.get('data_source_label', results.get('data_source', '-'))}",
-        f"Selected research domain: {results.get('selected_domain', '-')}",
+        f"Araştırma alanı: Biyomedikal Mühendisliği",
         f"Ham araştırma konusu: {results.get('raw_query', results.get('query', '-'))}",
         f"Araştırma konusu: {results.get('query', '-')}",
         f"Kayıt sayısı: {len(df):,}",
@@ -4848,7 +5292,7 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         f"- PubMed service unavailable: {'Evet' if diagnostics.get('pubmed_final_status') == 'service_unavailable' else 'Hayır'}",
         f"- Final status: {diagnostics.get('pubmed_final_status') or '-'}",
         f"- Original PubMed query: {diagnostics.get('pubmed_original_query') or '-'}",
-        f"- Tried fallback queries: {', '.join(diagnostics.get('pubmed_fallback_queries') or []) or '-'}",
+        f"- Tried fallback queries: {safe_join(diagnostics.get('pubmed_fallback_queries') or []) or '-'}",
         f"- Successful PubMed query: {diagnostics.get('pubmed_successful_query') or '-'}",
         f"- Çekilen PMID: {diagnostics.get('pubmed_pmids_fetched', 0)}",
         f"- EFetch kayıt sayısı: {diagnostics.get('pubmed_raw_records', 0)}",
@@ -4865,7 +5309,7 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         f"- Yorum: {gap_score.get('interpretation', '-')}",
         "",
         "AI Research Insight:",
-        results.get("ai_research_insight", "Insight üretilemedi."),
+        safe_text(results.get("ai_research_insight", "Insight üretilemedi.")),
         "",
         "Research Strategy Engine:",
         f"- Suggested Research Direction: {results.get('research_strategy', {}).get('direction', '-')}",
@@ -4873,17 +5317,17 @@ def build_summary_report(results: dict, export_dir: Path) -> str:
         f"- Suggested Dataset / Evidence Focus: {results.get('research_strategy', {}).get('evidence', '-')}",
         f"- Differentiation Strategy: {results.get('research_strategy', {}).get('differentiation', '-')}",
         "",
-        "Domain Reasoning:",
-        f"- Selected research domain: {results.get('selected_domain', '-')}",
-        f"- Detected subdomain: {domain_reasoning.get('subdomain_label', domain_reasoning.get('primary_domain', '-'))}",
-        f"- Subdomain confidence: {domain_reasoning.get('subdomain_confidence', '-')}",
+        "Field Reasoning:",
+        f"- Selected research field: {selected_field}",
+        f"- Detected field: {domain_reasoning.get('subdomain_label', domain_reasoning.get('primary_domain', '-'))}",
+        f"- Field confidence: {domain_reasoning.get('subdomain_confidence', '-')}",
         f"- Preferred objects: {domain_reasoning.get('preferred_objects', '-')}",
         f"- Preferred metrics: {domain_reasoning.get('preferred_metrics', '-')}",
         f"- Primary disease: {domain_reasoning.get('primary_disease', '-')}",
         f"- Modality: {domain_reasoning.get('primary_modality', '-')}",
         f"- Clinical domain: {domain_reasoning.get('clinical_domain', '-')}",
         f"- Dominant methodology: {domain_reasoning.get('primary_method', '-')}",
-        f"- Domain consistency: {domain_reasoning.get('domain_consistency', '-')} ({domain_reasoning.get('domain_consistency_score', '-')})",
+        f"- Field consistency: {domain_reasoning.get('domain_consistency', '-')} ({domain_reasoning.get('domain_consistency_score', '-')})",
         f"- Leakage risk: {domain_reasoning.get('semantic_leakage_risk', '-')}",
         f"- Filtered leakage suggestions: {domain_reasoning.get('leakage_filtered_count', 0)}",
         f"- DomainGuard inferred domain: {domain_guard.get('inferred_domain', '-')}",
@@ -4914,26 +5358,24 @@ def build_sidebar_config() -> dict:
     query_max_chars = 160 if is_demo else None
     with st.sidebar:
         st.header("Veri Kaynağı ve Analiz Ayarları")
-        selected_domain = st.selectbox(
-            "Araştırma Alanı",
-            ACTIVE_RESEARCH_DOMAINS,
-            index=0,
-            key="selected_research_domain",
-        )
+        st.markdown("**Desteklenen Araştırma Alanı**")
+        st.markdown("Biomedical Engineering")
+        selected_field = BIOMEDICAL_FIELD
+        selected_domain = compatibility_domain(selected_field)
+        st.session_state["selected_research_domain"] = selected_domain
         st.caption(
-            "ResearchMind AI şu anda sağlık/biyomedikal ve mühendislik/uygulamalı teknolojiler "
-            "alanlarında optimize edilmiştir. Diğer alanlar yakında aktif olacaktır."
+            "ResearchMind AI demo sürümü şu anda yalnızca Biyomedikal Mühendisliği alanı için optimize edilmiştir. "
+            "Desteklenmeyen alanlar analiz kapsamı dışında bırakılır."
         )
         source_label = st.selectbox(
             "Veri kaynağı",
             list(DATA_SOURCE_LABELS.values()),
-            index=0,
+            index=list(DATA_SOURCE_LABELS.values()).index("Hibrit Analiz"),
             key="sidebar_data_source",
         )
         data_source = next(
             key for key, value in DATA_SOURCE_LABELS.items() if value == source_label
         )
-        sync_pending_research_topic(data_source)
         transfer_notice = st.session_state.pop("topic_transfer_notice", "")
         if transfer_notice:
             st.success(transfer_notice)
@@ -4951,6 +5393,7 @@ def build_sidebar_config() -> dict:
             "pubmed_api_key": "",
             "years_back": 5,
             "selected_domain": selected_domain,
+            "selected_field": selected_field,
         }
 
         if data_source == "Local CSV":
@@ -5087,6 +5530,12 @@ def build_sidebar_config() -> dict:
         if is_demo and len(str(config.get("query", ""))) > 160:
             config["query"] = str(config["query"])[:160]
 
+        raw_query = str(config.get("query", "") or "")
+        config["raw_query"] = raw_query
+        normalized_query = normalize_field_keywords(preprocess_research_query(raw_query))
+        if normalized_query:
+            config["query"] = simplify_biomedical_retrieval_query(normalized_query)
+
         render_topic_suggester()
 
         st.divider()
@@ -5117,7 +5566,6 @@ def _render_download_buttons(export_path: str) -> None:
     summary_path = export_dir / "summary_report.txt"
     executive_matches = sorted(export_dir.glob("ResearchMind_AI_Executive_Report_*.pdf"))
     executive_pdf_path = executive_matches[-1] if executive_matches else export_dir / "ResearchMind_AI_Executive_Report.pdf"
-    text_pdf_path = export_dir / "ResearchMind_AI_Report.pdf"
 
     show_admin_exports = (not demo_mode_enabled()) or is_admin()
 
@@ -5150,16 +5598,7 @@ def _render_download_buttons(export_path: str) -> None:
             use_container_width=True,
             key="download_executive_pdf_report_sidebar",
         )
-    elif text_pdf_path.exists():
-        st.download_button(
-            label="Executive PDF İndir",
-            data=text_pdf_path.read_bytes(),
-            file_name="ResearchMind_AI_Executive_Report.pdf",
-            mime="application/pdf",
-            use_container_width=True,
-            key="download_executive_pdf_report_sidebar_fallback",
-        )
-    elif not text_pdf_path.exists():
+    else:
         st.info("PDF raporu henüz oluşturulmadı.")
 
 
@@ -5167,8 +5606,11 @@ def render_results(results: dict) -> None:
     df = _as_dataframe(results.get("normalized_dataset"))
     diagnostics = results.get("diagnostics", {})
     pubmed_user_message = diagnostics.get("pubmed_user_message", "")
+    distribution = results.get("source_distribution", {})
 
     for warning in results.get("warnings", []):
+        if "PubMed" in str(warning) and distribution.get("OpenAlex", 0) > 0:
+            continue
         st.warning(warning)
 
     for error in results.get("errors", []):
@@ -5178,18 +5620,23 @@ def render_results(results: dict) -> None:
 
     _render_product_success(results)
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Kayıt", f"{len(df):,}")
-    c2.metric("Dergi", df["journal"].nunique() if "journal" in df.columns else "-")
-    c3.metric("Araştırma Türü", df["research_type"].nunique() if "research_type" in df.columns else "-")
+    if distribution.get("PubMed", 0) == 0 and distribution.get("OpenAlex", 0) > 0:
+        if diagnostics.get("pubmed_error"):
+            st.warning("PubMed bağlantı hatası oluştu. Analiz OpenAlex verileriyle tamamlandı.")
+        else:
+            st.info("PubMed bağlantısı başarılı ancak bu spesifik sorgu için sonuç bulunamadı. Analiz OpenAlex verileriyle tamamlandı.")
 
-    _render_source_distribution(results)
-    _render_pubmed_diagnostics(results)
+    with st.expander("Teknik detayları göster", expanded=False):
+        t1, t2, t3, t4 = st.columns(4)
+        t1.metric("Analize dahil edilen toplam kayıt", f"{len(df):,}")
+        t2.metric("Analize dahil edilen OpenAlex kayıtları", f"{distribution.get('OpenAlex', 0):,}")
+        t3.metric("PubMed", f"{distribution.get('PubMed', 0):,}")
+        t4.metric("Yerel", f"{distribution.get('Yerel', 0):,}")
+        _render_pubmed_diagnostics(results)
+        if (not demo_mode_enabled()) or is_admin():
+            st.caption(f"Dedup öncesi: {results.get('dedup_before_count', len(df))} | Dedup sonrası: {results.get('dedup_after_count', len(df))}")
 
     st.divider()
-    _render_publication_trend(results)
-    _render_topics(results)
-    _render_distribution_tables(results)
     _render_query_gap(results)
     _render_semantic_results(results)
     _render_openalex_gap(results)
@@ -5219,37 +5666,19 @@ def _render_pubmed_diagnostics(results: dict) -> None:
         st.info(
             diagnostics.get(
                 "pubmed_user_message",
-                "PubMed araması bu spesifik konuda sonuç döndürmedi; OpenAlex ile analiz tamamlandı.",
+                "PubMed ba\u011flant\u0131s\u0131 ba\u015far\u0131l\u0131 ancak bu spesifik sorgu i\u00e7in sonu\u00e7 bulunamad\u0131.",
             )
         )
         return
 
     if diagnostics.get("pubmed_error"):
-        st.warning(
-            diagnostics.get(
-                "pubmed_user_message",
-                "PubMed geçici olarak yanıt vermedi. OpenAlex sonuçlarıyla analiz tamamlandı.",
-            )
-        )
-        if demo_mode_enabled() and not is_admin():
-            return
-        with st.expander("PubMed teknik detayını göster"):
-            st.write(diagnostics["pubmed_error"])
-            st.write(f"Final status: {diagnostics.get('pubmed_final_status') or '-'}")
-            st.write(f"Original query: {diagnostics.get('pubmed_original_query') or '-'}")
-            fallback_queries = diagnostics.get("pubmed_fallback_queries") or []
-            st.write(f"Tried fallback queries: {', '.join(fallback_queries) if fallback_queries else '-'}")
+        st.warning("PubMed bağlantı hatası oluştu. Analiz OpenAlex verileriyle tamamlandı.")
         return
 
     st.info(
-        "PubMed bağlantısı başarılı: "
-        f"{diagnostics.get('pubmed_pmids_fetched', 0)} PMID çekildi, "
-        f"{diagnostics.get('pubmed_normalized_records', 0)} kayıt normalize edildi."
-        + (
-            f" Kullanılan sorgu: {diagnostics.get('pubmed_successful_query')}."
-            if diagnostics.get("pubmed_successful_query")
-            else ""
-        )
+        "PubMed ba\u011flant\u0131s\u0131 ba\u015far\u0131l\u0131: "
+        f"{diagnostics.get('pubmed_pmids_fetched', 0)} PMID \u00e7ekildi, "
+        f"{diagnostics.get('pubmed_normalized_records', 0)} kay\u0131t normalize edildi."
     )
 
 
@@ -5266,7 +5695,7 @@ def _render_publication_trend(results: dict) -> None:
         x="period",
         y="publication_count",
         markers=True,
-        title="Yayın Trendi",
+        title="Yıllara Göre Yayın Trendi",
     )
     fig = style_plotly_chart(fig)
     st.plotly_chart(fig, use_container_width=True)
@@ -5330,13 +5759,19 @@ def _render_distribution_tables(results: dict) -> None:
                 st.dataframe(out, use_container_width=True, hide_index=True)
 
 
+
 def _render_query_gap(results: dict) -> None:
-    st.subheader("4) Konu Trendi ve Research Gap Score")
+    st.subheader("1) Konu Trendi ve Research Gap Skoru")
     gap = results.get("gap_score") or {}
     qtrend = _as_dataframe(results.get("query_trend"))
     strategic_score = results.get("strategic_opportunity_score", gap.get("gap_score", "-"))
-    opportunity_label, opportunity_level = strategic_level(strategic_score)
-    big_badge, big_badge_level = opportunity_status(strategic_score)
+    insufficient = safe_text(strategic_score).lower() == "yetersiz veri" or safe_text(gap.get("gap_score", "")).lower() == "yetersiz veri"
+    if insufficient:
+        opportunity_label, opportunity_level = "Yetersiz veri", "low"
+        big_badge, big_badge_level = "Hesaplanamadı / güvenilir değil", "low"
+    else:
+        opportunity_label, opportunity_level = strategic_level(strategic_score)
+        big_badge, big_badge_level = opportunity_status(strategic_score)
 
     g1, g2, g3, g4 = st.columns(4)
     with g1:
@@ -5344,39 +5779,15 @@ def _render_query_gap(results: dict) -> None:
     with g2:
         render_metric_card("Büyüme oranı", gap.get("growth_rate", "-"), "Son dönem eğilim sinyali")
     with g3:
-        render_metric_card("Strategic Opportunity Score", strategic_score, f"Ham Gap Score: {gap.get('gap_score', '-')}", big_badge, big_badge_level)
+        render_metric_card("Stratejik Fırsat Skoru", strategic_score, f"Research Gap Skoru: {gap.get('gap_score', '-')}", big_badge, big_badge_level)
     with g4:
-        render_metric_card("Research Opportunity Level", opportunity_label, "Skora göre stratejik seviye", big_badge, opportunity_level)
-
-    insight = results.get("ai_research_insight") or generate_ai_insight(
-        gap,
-        _as_dataframe(results.get("top_topics")),
-        _as_dataframe(results.get("top_keywords")),
-        qtrend,
-    )
-    st.markdown("### AI Research Insight")
-    st.markdown(
-        f"""
-        <div class="rm-insight">
-            <div class="rm-insight-title">✦ Strategic Research Commentary</div>
-            {insight}
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    _render_research_strategy_engine(results)
-    _render_domain_reasoning_summary(results)
-    _render_paperability_score(results)
+        render_metric_card("Fırsat seviyesi", opportunity_label, "Skora göre stratejik seviye", big_badge, opportunity_level)
 
     interpretation = localize_text(gap.get("interpretation", ""))
     if interpretation:
         st.caption(interpretation)
-    if "strict_matched_records" in gap:
-        st.caption(
-            f"Semantic matching aktif: eski strict eşleşme {gap.get('strict_matched_records', 0)}, "
-            f"semantic eşleşme {gap.get('total_records', 0)} kayıt."
-        )
+    if insufficient:
+        st.warning("Yetersiz veri: Bu sorgu PubMed ve OpenAlex üzerinde yeterli kayıt döndürmedi.")
 
     if qtrend.empty:
         st.info("Bu araştırma konusu için zamansal trend bulunamadı.")
@@ -5387,10 +5798,11 @@ def _render_query_gap(results: dict) -> None:
         x="period",
         y="publication_count",
         markers=True,
-        title=f"Konu Trendi: {results.get('query', '')}",
+        title="Yıllara Göre Yayın Trendi",
+        labels={"period": "Yıl", "publication_count": "Yayın Sayısı"},
     )
     fig = style_plotly_chart(fig)
-    fig.update_layout(height=360, margin={"l": 18, "r": 18, "t": 48, "b": 28})
+    fig.update_layout(height=340, margin={"l": 18, "r": 18, "t": 48, "b": 28}, xaxis_title="Yıl", yaxis_title="Yayın Sayısı")
     st.plotly_chart(fig, use_container_width=True)
     trend_badge, trend_level = opportunity_status(strategic_score)
     st.markdown(
@@ -5400,38 +5812,32 @@ def _render_query_gap(results: dict) -> None:
 
 
 def _render_semantic_results(results: dict) -> None:
-    st.subheader("5) Benzer Akademik Çalışmalar")
+    st.subheader("2) Benzer Akademik Çalışmalar")
     st.caption("Girilen araştırma konusuna semantik olarak en yakın çalışmalar listelenir.")
     semantic = _as_dataframe(results.get("semantic_search_results"))
 
     if semantic.empty:
-        st.info("Semantik arama sonucu üretilemedi.")
+        st.info("Benzer akademik çalışma sonucu üretilemedi.")
         return
 
-    display = semantic.drop(columns=["abstract"], errors="ignore").copy()
+    display = semantic.copy().head(10)
     if "similarity_score" in display.columns:
         display["Benzerlik"] = (
             pd.to_numeric(display["similarity_score"], errors="coerce")
             .fillna(0)
             .map(lambda value: f"{value * 100:.1f}%")
         )
-        display = display.drop(columns=["similarity_score"], errors="ignore")
-
-    st.dataframe(
-        display,
-        use_container_width=True,
-        hide_index=True,
-    )
-
-    with st.expander("Özetleri göster"):
-        for _, row in semantic.iterrows():
-            st.markdown(f"**{row.get('title', 'Untitled')}**")
-            st.caption(
-                f"{row.get('journal', '')} | {row.get('pub_year', '')} | {row.get('country', '')}"
-            )
-            st.write(row.get("abstract", ""))
-            st.divider()
-
+    year_col = "pub_year" if "pub_year" in display.columns else "year" if "year" in display.columns else "publication_year" if "publication_year" in display.columns else None
+    columns = {
+        "title": "Başlık",
+        "journal": "Dergi",
+        "research_type": "Yayın türü",
+    }
+    if year_col:
+        columns[year_col] = "Yıl"
+    keep = [col for col in ["title", "journal", year_col, "research_type", "Benzerlik"] if col and col in display.columns]
+    display = make_unique_columns(display[keep].rename(columns=columns))
+    st.dataframe(display, use_container_width=True, hide_index=True)
 
 def _render_research_strategy_engine(results: dict) -> None:
     strategy = results.get("research_strategy") or {}
@@ -5472,21 +5878,21 @@ def _render_domain_reasoning_summary(results: dict) -> None:
     level = "high" if consistency == "High" else "mid" if consistency == "Medium" else "low"
     risk_level = "low" if risk == "High" else "mid" if risk == "Medium" else "high"
 
-    st.markdown("### Domain Reasoning Summary")
+    st.markdown("### Field Reasoning Summary")
     cols = st.columns(5)
     values = [
-        ("Primary domain", reasoning.get("clinical_domain", "-"), "Clinical family"),
+        ("Primary research field", reasoning.get("subdomain_label", reasoning.get("clinical_domain", "-")), "Selected field"),
         ("Primary modality", reasoning.get("primary_modality", "-"), "Evidence type"),
         ("Dominant methodology", reasoning.get("primary_method", "-"), "Method family"),
-        ("Domain consistency", consistency, f"Score: {reasoning.get('domain_consistency_score', '-')}"),
+        ("Field consistency", consistency, f"Score: {reasoning.get('domain_consistency_score', '-')}"),
         ("Semantic leakage risk", risk, f"Filtered: {reasoning.get('leakage_filtered_count', 0)}"),
     ]
 
     for index, (label, value, note) in enumerate(values):
         with cols[index]:
-            badge = value if label in {"Domain consistency", "Semantic leakage risk"} else ""
-            badge_level = level if label == "Domain consistency" else risk_level
-            render_metric_card(label, value, note, badge if label in {"Domain consistency", "Semantic leakage risk"} else "", badge_level)
+            badge = value if label in {"Field consistency", "Semantic leakage risk"} else ""
+            badge_level = level if label == "Field consistency" else risk_level
+            render_metric_card(label, value, note, badge if label in {"Field consistency", "Semantic leakage risk"} else "", badge_level)
 
     if reasoning.get("leakage_filtered_count", 0):
         st.warning("Cross-domain semantic leakage detected and filtered.")
@@ -5535,23 +5941,39 @@ def _render_paperability_score(results: dict) -> None:
     st.caption("Bu skor karar destek amaçlı tahmini bir değerlendirmedir; yayın garantisi anlamına gelmez.")
 
 
+
 def _render_openalex_gap(results: dict) -> None:
     openalex_gap = results.get("openalex_gap")
+    distribution = results.get("source_distribution", {})
 
-    if not openalex_gap:
+    if not openalex_gap and distribution.get("OpenAlex", 0) <= 0:
         return
 
-    st.subheader("6) OpenAlex Canlı Gap Analizi")
+    st.subheader("3) OpenAlex Canlı Gap Analizi")
+    st.caption("OpenAlex sonuçları, konunun genel akademik görünürlüğünü ve son yıllardaki yayın hacmini değerlendirmek için kullanılmıştır.")
+
     l1, l2, l3 = st.columns(3)
-    l1.metric("OpenAlex’te bulunan yayın", openalex_gap.get("total_records", 0))
-    l2.metric("OpenAlex Büyüme Oranı", openalex_gap.get("growth_rate", "-"))
-    l3.metric("OpenAlex Research Gap Score", openalex_gap.get("gap_score", "-"))
-    st.write(localize_text(openalex_gap.get("interpretation", "")))
+    l1.metric("OpenAlex tahmini toplam yayın hacmi", (openalex_gap or {}).get("total_records", distribution.get("OpenAlex", 0)))
+    l1.caption("Bu değer OpenAlex üzerinde sorguyla ilişkili genel akademik görünürlüğü temsil eder.")
+    l2.metric("OpenAlex büyüme oranı", (openalex_gap or {}).get("growth_rate", "-"))
+    l3.metric("OpenAlex Research Gap Skoru", (openalex_gap or {}).get("gap_score", "-"))
 
-    trend = _as_dataframe(openalex_gap.get("trend"))
+    interpretation = localize_text((openalex_gap or {}).get("interpretation", ""))
+    if interpretation:
+        st.write(interpretation)
+
+    trend = _as_dataframe((openalex_gap or {}).get("trend"))
     if not trend.empty:
-        st.dataframe(trend, use_container_width=True, hide_index=True)
-
+        year_col = "publication_year" if "publication_year" in trend.columns else "period" if "period" in trend.columns else None
+        count_col = "publication_count" if "publication_count" in trend.columns else "count" if "count" in trend.columns else None
+        if not year_col or not count_col:
+            return
+        trend_display = pd.DataFrame({
+            "Yıl": trend[year_col],
+            "Yayın sayısı": trend[count_col],
+        })
+        trend_display = make_unique_columns(trend_display)
+        st.dataframe(trend_display, use_container_width=True, hide_index=True)
 
 def _render_product_success(results: dict) -> None:
     st.success("✅ Analiz başarıyla tamamlandı. Sonuçlar otomatik olarak kaydedildi.")
@@ -5563,7 +5985,6 @@ def _render_product_success(results: dict) -> None:
     export_dir = Path(export_path) if export_path else Path()
     executive_matches = sorted(export_dir.glob("ResearchMind_AI_Executive_Report_*.pdf")) if export_path else []
     executive_pdf_path = executive_matches[-1] if executive_matches else export_dir / "ResearchMind_AI_Executive_Report.pdf"
-    text_pdf_path = Path(export_path) / "ResearchMind_AI_Report.pdf" if export_path else Path()
     if export_path and executive_pdf_path.exists():
         st.download_button(
             label="Executive PDF İndir",
@@ -5573,59 +5994,61 @@ def _render_product_success(results: dict) -> None:
             use_container_width=True,
             key="download_executive_pdf_report_main",
         )
-    elif export_path and text_pdf_path.exists():
-        st.download_button(
-            label="Executive PDF İndir",
-            data=text_pdf_path.read_bytes(),
-            file_name="ResearchMind_AI_Executive_Report.pdf",
-            mime="application/pdf",
-            use_container_width=True,
-            key="download_executive_pdf_report_main_fallback",
-        )
     else:
         st.info("PDF raporu henüz oluşturulmadı.")
 
 
+
 def _render_ai_suggestions(results: dict) -> None:
-    st.subheader("7) Araştırma Konusu Önerileri")
-    suggestions = _as_dataframe(results.get("ai_topic_suggestions"))
+    st.subheader("4) Araştırma Konusu Önerileri")
+    suggestions = clean_suggestions_with_curated_bank(
+        _as_dataframe(results.get("ai_topic_suggestions")),
+        results.get("query", ""),
+    )
 
     if suggestions.empty:
-        st.info("Araştırma konusu önerisi üretilemedi.")
+        suggestions = intent_topics_to_dataframe(
+            results.get("query", ""),
+            results.get("selected_field", current_selected_field()),
+        )
+
+    if suggestions.empty:
+        st.info("Alan uyumlu Öneri üretilemedi.")
         return
 
-    st.markdown("### Öne Çıkan 3 Araştırma Fırsatı")
-    top_three = suggestions.head(3)
-    columns = st.columns(3)
-
-    for idx, (_, row) in enumerate(top_three.iterrows()):
-        with columns[idx]:
-            title = row.get("suggested_research_topic", row.get("suggested_topic", "Araştırma önerisi"))
-            score = row.get("gap_score", "-")
-            growth = row.get("growth_rate", "-")
-            recommendation = localize_text(row.get("recommendation", ""))
-            trend_status, level = opportunity_trend_status(score, growth)
-            st.markdown(
-                f"""
-                <div class="rm-opportunity">
-                    <h4>{title}</h4>
-                    <span class="rm-status rm-status-{level}">{trend_status}</span>
-                    <div class="rm-muted" style="margin-top: 0.85rem;">Gap Score</div>
-                    <div class="rm-card-value">{score}</div>
-                    <div class="rm-card-note">Trend durumu: {growth}</div>
-                    <p class="rm-card-note">{recommendation or "Bu fırsat detaylı tabloda incelenebilir."}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+    st.markdown("### Öne Çıkan Araştırma Başlıkları")
+    top_items = suggestions.head(5)
+    for index, (_, row) in enumerate(top_items.iterrows(), start=1):
+        title = row.get("suggested_research_topic", row.get("suggested_topic", "Araştırma önerisi"))
+        score = row.get("gap_score", "-")
+        growth = row.get("growth_rate", "-")
+        recommendation = localize_text(row.get("recommendation", "")) or "Bu başlık, seçilen araştırma alanı ile uyumlu olacak şekilde önerilmiştir."
+        trend_status, level = opportunity_trend_status(score, growth)
+        st.markdown(
+            f"""
+            <div class="rm-opportunity">
+                <h4>{index}. {title}</h4>
+                <span class="rm-status rm-status-{level}">{trend_status}</span>
+                <div class="rm-muted" style="margin-top: 0.85rem;">Gap Score</div>
+                <div class="rm-card-value">{score}</div>
+                <p class="rm-card-note">{recommendation}</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     display = suggestions.copy()
     if "recommendation" in display.columns:
-        display["recommendation"] = display["recommendation"].map(localize_text)
-
-    st.markdown("### Detaylı Öneri Tablosu")
-    st.dataframe(display, use_container_width=True, hide_index=True)
-
+        display["Kısa gerekçe"] = display["recommendation"].map(localize_text)
+    topic_col = "suggested_research_topic" if "suggested_research_topic" in display.columns else "suggested_topic" if "suggested_topic" in display.columns else None
+    if topic_col:
+        display["Başlık"] = display[topic_col]
+    if "gap_score" in display.columns:
+        display["Gap Skoru"] = display["gap_score"]
+    keep = [col for col in ["Başlık", "Gap Skoru", "Kısa gerekçe"] if col in display.columns]
+    if keep:
+        with st.expander("Detaylı öneri tablosunu göster", expanded=False):
+            st.dataframe(make_unique_columns(display[keep].head(8)), use_container_width=True, hide_index=True)
 
 inject_product_styles()
 
@@ -5638,13 +6061,13 @@ if sidebar_config["run_clicked"]:
     is_demo = demo_mode_enabled()
     demo_email = st.session_state.get("demo_user_email", "")
     domain_ok, domain_message, domain_debug = validate_domain_query(
-        sidebar_config.get("query", ""),
-        sidebar_config.get("selected_domain", current_selected_domain()),
+        sidebar_config.get("raw_query", sidebar_config.get("query", "")),
+        sidebar_config.get("selected_field", current_selected_field()),
     )
     st.session_state["domain_guard_debug"] = domain_debug
 
     if not domain_ok:
-        st.warning(domain_message)
+        st.error(f"{domain_message}\n\n{BIOMEDICAL_KEYWORD_SUGGESTION}")
     elif is_demo and not st.session_state.get("demo_user_registered"):
         if domain_message:
             st.warning(domain_message)
@@ -5698,4 +6121,4 @@ render_hero(results)
 if results:
     render_results(results)
 else:
-    st.info("Araştırma konusunu gir, analiz dönemini seç ve tek tıkla trend, fırsat ve Research Gap Score sonuçlarını üret.")
+    st.info("Araştırma konusunu gir, analiz dönemini seç ve tek tıkla trend, fırsat ve Research Gap Score sonuçlarını üret. Bu demo sürüm yalnızca Biyomedikal Mühendisliği alanı için optimize edilmiştir.")
